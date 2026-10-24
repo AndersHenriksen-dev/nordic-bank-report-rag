@@ -1,0 +1,37 @@
+# Private notes, never public
+handoff_*.md
+private/
+
+# Data: the reports belong to the banks and are downloaded by scripts/download.py
+data/raw/
+data/processed/
+data/index/
+data/traces/
+*.pdf
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Claude Code local settings
+.claude/settings.local.json
