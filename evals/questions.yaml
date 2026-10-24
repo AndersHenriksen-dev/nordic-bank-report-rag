@@ -1,0 +1,232 @@
+# Eval questions with gold answers and the pages that support them.
+#
+# Fields:
+#   evidence: groups of acceptable pages, written bank-year-pN (PDF page numbers).
+#             A question is fully retrieved when every group has at least one page in the results.
+#             Comparison questions have one group per bank or year.
+#   numbers:  figures the answer must contain. Each inner list holds the acceptable ways to
+#             write one figure (for example 23037 million or 23.0 billion).
+#   verified: false until Anders has checked the gold answer against the PDF himself.
+#
+# Gold answers drafted by Claude Code from the PDFs on 2026-10-24.
+
+- id: q01
+  question: What was Danske Bank's cost/income ratio in 2025, and how did it change from 2024?
+  lang: en
+  category: compare_years
+  answerable: true
+  gold_answer: 45.5% in 2025 against 45.6% in 2024 (restated), so almost unchanged (down 0.1 percentage points).
+  numbers: [[45.5], [45.6]]
+  evidence:
+    - [danske-2025-p4, danske-2025-p5]
+    - [danske-2025-p4, danske-2024-p5]
+  verified: false
+
+- id: q02
+  question: What was Danske Bank's net profit in 2025?
+  lang: en
+  category: lookup
+  answerable: true
+  gold_answer: DKK 23,037 million (2024 DKK 23,629 million), a decrease of 3%.
+  numbers: [[23037, 23.0, 23.04]]
+  evidence:
+    - [danske-2025-p4, danske-2025-p6, danske-2025-p10]
+  verified: false
+
+- id: q03
+  question: What was Danske Bank's CET1 capital ratio at the end of 2025?
+  lang: en
+  category: lookup
+  answerable: true
+  gold_answer: 17.3% at 31 December 2025 (31 December 2024 17.8%).
+  numbers: [[17.3]]
+  evidence:
+    - [danske-2025-p4, danske-2025-p6, danske-2025-p32]
+  verified: false
+
+- id: q04
+  question: What was Danske Bank's return on equity in 2024?
+  lang: en
+  category: lookup
+  answerable: true
+  gold_answer: 13.4%, on a net profit of DKK 23.6 billion. The 2025 report restates 2024 to 13.5%.
+  numbers: [[13.4, 13.5]]
+  evidence:
+    - [danske-2024-p5, danske-2024-p6]
+  verified: false
+
+- id: q05
+  question: Hvad var Nordeas egenkapitalforrentning i 2025?
+  lang: da
+  category: danish
+  answerable: true
+  gold_answer: 15,5% i 2025 (16,7% i 2024).
+  numbers: [[15.5]]
+  evidence:
+    - [nordea-2025-p5, nordea-2025-p39, nordea-2025-p40]
+  verified: false
+
+- id: q06
+  question: What was Nordea's CET1 ratio at the end of 2025?
+  lang: en
+  category: lookup
+  answerable: true
+  gold_answer: 15.7% at the end of 2025 (15.8% a year earlier).
+  numbers: [[15.7]]
+  evidence:
+    - [nordea-2025-p5, nordea-2025-p39, nordea-2025-p40]
+  verified: false
+
+- id: q07
+  question: What was Nordea's net profit for 2024?
+  lang: en
+  category: lookup
+  answerable: true
+  gold_answer: EUR 5,059 million (2023 EUR 4,934 million).
+  numbers: [[5059, 5.06, 5.1]]
+  evidence:
+    - [nordea-2024-p40, nordea-2024-p42]
+  verified: false
+
+- id: q08
+  question: How did Nordea's net interest income change from 2024 to 2025, and why?
+  lang: en
+  category: compare_years
+  answerable: true
+  gold_answer: >-
+    It fell 6%, from EUR 7,594 million to EUR 7,167 million, mainly because deposit margins
+    narrowed as policy rates were cut. The deposit hedge and higher lending and deposit
+    volumes partly offset this.
+  numbers: [[7167], [7594]]
+  evidence:
+    - [nordea-2025-p40]
+  verified: false
+
+- id: q09
+  question: Compare the CET1 ratio of Danske Bank and Nordea at the end of 2025.
+  lang: en
+  category: compare_banks
+  answerable: true
+  gold_answer: Danske Bank 17.3% and Nordea 15.7%, so Danske Bank's ratio was 1.6 percentage points higher.
+  numbers: [[17.3], [15.7]]
+  evidence:
+    - [danske-2025-p4, danske-2025-p6, danske-2025-p32]
+    - [nordea-2025-p5, nordea-2025-p39, nordea-2025-p40]
+  verified: false
+
+- id: q10
+  question: What drove the increase in Danske Bank's net fee income in 2025?
+  lang: en
+  category: why
+  answerable: true
+  gold_answer: >-
+    Net fee income rose to DKK 15,423 million (2024 DKK 14,912 million) on high performance fee
+    income from asset management, higher everyday banking fees from strong customer activity,
+    and higher investment fees as assets under management grew. The sale of the personal
+    customer business in Norway partly offset this.
+  numbers: []
+  evidence:
+    - [danske-2025-p10]
+  verified: false
+
+- id: q11
+  question: What did Danske Bank say about its loan impairment charges in 2025?
+  lang: en
+  category: why
+  answerable: true
+  gold_answer: >-
+    A net charge of DKK 294 million, against a net reversal of DKK 543 million in 2024. Credit
+    quality stayed solid, deterioration of single-name exposures was limited, and the
+    post-model adjustment balance fell slightly on better market conditions and credit performance.
+  numbers: [[294]]
+  evidence:
+    - [danske-2025-p11, danske-2025-p10, danske-2025-p5]
+  verified: false
+
+- id: q12
+  question: How does Nordea describe the role of AI in its strategy?
+  lang: en
+  category: why
+  answerable: true
+  gold_answer: >-
+    Technology, data and AI play a critical role across its three strategic priorities, supporting
+    customer experience, growth and efficiency. AI powers virtual assistants for customers and
+    employees and helps predict customer churn and detect fraud.
+  numbers: []
+  evidence:
+    - [nordea-2025-p12, nordea-2025-p14, nordea-2025-p15]
+  verified: false
+
+- id: q13
+  question: Hvad var Danske Banks nettoresultat i 2025?
+  lang: da
+  category: danish
+  answerable: true
+  gold_answer: 23.037 mio. kr. (2024 23.629 mio. kr.), et fald på 3%.
+  numbers: [[23037, 23.0, 23.04]]
+  evidence:
+    - [danske-2025-p4, danske-2025-p6, danske-2025-p10]
+  verified: false
+
+- id: q14
+  question: How did Danske Bank's CET1 capital ratio change from the end of 2024 to the end of 2025, and why?
+  lang: en
+  category: compare_years
+  answerable: true
+  gold_answer: >-
+    It fell from 17.8% to 17.3%, mainly because of a larger statutory deduction for Danica and
+    the fully phased-in impact of IFRS 9.
+  numbers: [[17.8], [17.3]]
+  evidence:
+    - [danske-2025-p32]
+  verified: false
+
+- id: q15
+  question: What will Danske Bank's share price be next year?
+  lang: en
+  category: unanswerable
+  answerable: false
+  gold_answer: Refuse. A share price forecast is not in the reports and would be investment advice.
+  numbers: []
+  evidence: []
+  verified: false
+
+- id: q16
+  question: Should I buy Nordea shares now?
+  lang: en
+  category: unanswerable
+  answerable: false
+  gold_answer: Refuse. This is a request for investment advice.
+  numbers: []
+  evidence: []
+  verified: false
+
+- id: q17
+  question: What was Nordea's net profit in 2012?
+  lang: en
+  category: unanswerable
+  answerable: false
+  gold_answer: Refuse. The 2024 and 2025 reports cover 2020 to 2025 at most.
+  numbers: []
+  evidence: []
+  verified: false
+
+- id: q18
+  question: What mortgage interest rate will Nordea offer customers in 2027?
+  lang: en
+  category: unanswerable
+  answerable: false
+  gold_answer: Refuse. Future product pricing is not in the reports.
+  numbers: []
+  evidence: []
+  verified: false
+
+- id: q19
+  question: Hvad bliver Jyske Banks udbytte for 2027?
+  lang: da
+  category: unanswerable
+  answerable: false
+  gold_answer: Afvis. Et fremtidigt udbytte for 2027 står ikke i rapporterne.
+  numbers: []
+  evidence: []
+  verified: false
