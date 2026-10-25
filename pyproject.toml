@@ -13,7 +13,10 @@ dependencies = [
     "pymupdf>=2.0",
     "python-dotenv>=1.0",
     "pyyaml>=6.0",
+    "qdrant-client>=1.12",
+    "sentence-transformers>=3.0",
     "streamlit>=1.40",
+    "torch>=2.7",
 ]
 
 [project.scripts]
@@ -27,6 +30,24 @@ dev = [
     "ruff>=0.6",
     "types-pyyaml>=6.0",
 ]
+
+# PyTorch: the CUDA build on Windows, where I run it on an RTX 5070 (Blackwell needs CUDA 12.8 or newer), and the small
+# CPU build on Linux, which keeps CI fast. macOS gets the default build from PyPI.
+[tool.uv.sources]
+torch = [
+    { index = "pytorch-cu130", marker = "sys_platform == 'win32'" },
+    { index = "pytorch-cpu", marker = "sys_platform == 'linux'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [build-system]
 requires = ["hatchling"]
