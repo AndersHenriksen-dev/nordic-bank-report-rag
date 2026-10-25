@@ -61,3 +61,4 @@ The `make` targets wrap the same commands.
 - `src/bankrag/figures.py`: number and figure parsing in English and Danish formats, used by the evals and the UI
 - `src/bankrag/evaluate.py`: metrics; `src/bankrag/judge.py`: the LLM judge; `evals/run_evals.py` runs them and writes `evals/RESULTS.md` and `evals/ANSWERS.md` (generated, do not edit by hand)
 - `docs/documents.md`: the six reports, their checksums and what to know about them
+- `docs/concepts.md`: study guide to every concept the system uses, from BM25 to CET1; update it when a new technique is added
