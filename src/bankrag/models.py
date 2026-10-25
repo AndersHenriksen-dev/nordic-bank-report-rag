@@ -90,6 +90,7 @@ class Answer(BaseModel):
 
     question: str
     text: str
+    thinking: str = Field(default="", description="Claude's summary of its reasoning before answering.")
     sources: list[Source]
     refused: bool
     model: str

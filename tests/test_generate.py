@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from anthropic.types import Message
 
-from bankrag.answer.generate import is_refusal, render_with_citations, search_result_block
+from bankrag.answer.generate import is_refusal, render_with_citations, search_result_block, thinking_summary
 from bankrag.models import Chunk
 from bankrag.retrieve import Hit
 
@@ -115,3 +115,13 @@ def test_space_is_added_where_a_cited_block_follows_a_full_stop() -> None:
     )
     text, _ = render_with_citations(response, [hit(40, "a")])
     assert text == "Egenkapitalforrentningen var 15,5 %. Return on equity was 15.5%. [1]"
+
+
+def test_thinking_summary_joins_thinking_blocks_only() -> None:
+    response = message(
+        [
+            {"type": "thinking", "thinking": "The 2025 table gives 15.5%.", "signature": "s"},
+            {"type": "text", "text": "Return on equity was 15.5%.", "citations": None},
+        ],
+    )
+    assert thinking_summary(response) == "The 2025 table gives 15.5%."

@@ -4,6 +4,7 @@ I am building a question answering system over the 2024 and 2025 annual reports 
 
 Work in progress. The full README, setup steps and a demo will follow here. What exists so far:
 
+- A web page (`make app`): ask a question in English or Danish and see Claude's reasoning, the answer with citations, and each cited report page with the passage highlighted. It runs on your own machine, because it needs the downloaded PDFs and an API key.
 - [docs/documents.md](docs/documents.md): the six reports, where they come from, and what to know when reading them.
 - [evals/RESULTS.md](evals/RESULTS.md): retrieval and answer metrics from the latest eval run.
 - [evals/ANSWERS.md](evals/ANSWERS.md): every eval question with its gold answer, the system's answer and the passages it cites.

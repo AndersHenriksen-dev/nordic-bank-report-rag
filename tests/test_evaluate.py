@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from bankrag.evaluate import figures_grounded, numbers_in, numbers_match, retrieval_scores
+from bankrag.evaluate import figures_grounded, numbers_match, retrieval_scores
+from bankrag.figures import numbers_in
 from bankrag.models import Question, Source
 
 
