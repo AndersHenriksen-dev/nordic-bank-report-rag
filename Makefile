@@ -1,4 +1,4 @@
-.PHONY: setup download ingest ask app eval-retrieval eval test lint check
+.PHONY: setup download ingest ask app mcp eval-retrieval eval test lint check
 
 setup:
 	uv sync
@@ -17,6 +17,10 @@ ask:
 # Web page on http://localhost:8501: question, reasoning, cited answer and highlighted report pages.
 app:
 	uv run streamlit run src/bankrag/ui/app.py
+
+# Read-only MCP server over stdio for Claude Desktop or Claude Code: report search and the KPI table.
+mcp:
+	uv run bankrag-mcp
 
 eval-retrieval:
 	uv run python evals/run_evals.py
