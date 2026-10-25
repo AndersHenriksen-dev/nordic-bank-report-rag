@@ -20,7 +20,7 @@ The evals compare this with fixed 500-token windows that ignore paragraphs and t
 
 ## 4. Route on bank names and years in the question
 
-If a question names banks or years, search only those reports. For questions about two or three banks, each bank gets its own share of the results, because plain top-k search tends to fill every slot with the bank whose wording matches best. The evals compare search with and without routing.
+If a question names banks or years, search only those reports. For questions about two or three banks, each bank is searched separately and the results are interleaved by rank (each bank's best hit, then each bank's second best), because plain top-k search tends to fill every slot with the bank whose wording matches best. My first version sorted the per-bank results by score, which let one bank take all the top slots again once the list was cut to k. The evals compare search with and without routing.
 
 ## 5. Claude Haiku 5.5 for answers, with search-result citations
 
@@ -33,3 +33,26 @@ Citations cannot be combined with structured output, so the model signals a refu
 ## 7. Jyske Bank's reports are downloaded by hand
 
 Jyske Bank's site answers scripted downloads with a bot check (HTTP 403). The download script does not try to get around it: it prints the URL, a person saves the file, and the script then verifies the checksum.
+
+## 8. Parse each report in a child process that can crash and restart
+
+PyMuPDF 2.0 detects tables with a layout model. Without it, the line-based detector finds none of Nordea's key figure tables, because they have no ruling lines (pages 40 and 42 of the 2025 report). But the model crashes the Python process with an access violation on some pages, for example page 3 of Nordea's 2025 report, on Python 3.12 and 3.14 alike.
+
+So each report is parsed in a child process that writes every page to disk as soon as it is done. When the child crashes, the pipeline restarts it at the crashing page with the layout model switched off for that page only. A page that crashes even then is kept as an empty page. The ingest output lists every page that needed the fallback.
+
+## 9. Pin Python 3.12
+
+uv picked Python 3.14 when nothing was pinned. `.python-version` now pins 3.12, the version installed on my machine, which also has the most mature wheels for PyMuPDF and onnxruntime.
+
+## 10. Sections from the PDF outline, the navigation bar or large headings
+
+Every chunk carries a section path such as "Management's report > Financial review", which keyword search can match and which shows up in citations. Nordea's PDFs have an outline (bookmarks), which gives the path directly. Danske Bank's and Jyske Bank's do not, so the parser combines two signals:
+
+- The navigation bar at the top of each page gives the part of the report. The current part is styled differently from the other tabs (white text at Danske Bank), and the tab that stands out most from the majority wins.
+- Large headings (18 pt and up) start a new section within that part.
+
+Large text is only treated as a heading if it reads like one: at least four letters, mostly letters, starting with a capital or a digit, at most 12 words, and not a figure callout such as "DKK 6,307 million". Without this filter, chart labels like "'24" and arrows became section names, and the notes to Danske Bank's financial statements were all filed under "Contents".
+
+## 11. A Danish glossary for keyword search
+
+The reports are in English, so keyword search cannot match a Danish question such as "Hvad var Nordeas egenkapitalforrentning i 2025?". When a question looks Danish (æ, ø, å or Danish question words), about 25 Danish finance terms are expanded with the English wording the reports use ("egenkapitalforrentning" adds "return on equity"). The original words stay in the query. It is a fixed list, cheap and easy to inspect. Multilingual embeddings in milestone 2 should make it matter less, and the evals show how much it adds.

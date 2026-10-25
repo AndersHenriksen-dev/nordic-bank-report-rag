@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import collections
 import re
+from collections.abc import Iterator
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from statistics import median
@@ -27,6 +28,10 @@ HEADER_ZONE = 0.12  # top share of the page where navigation bars live
 FOOTER_ZONE = 0.93  # lines below this share of the height count as footer
 BOILERPLATE_MIN_SHARE = 0.3  # a header/footer line on 30% of pages is boilerplate
 MIN_HEADING_SIZE = 12.0
+MIN_SECTION_SIZE = 18.0
+NAV_MIN_STYLE_DISTANCE = 100  # how different the active navigation tab must look
+FIGURE_RE = re.compile(r"^(DKK|EUR|SEK|NOK|USD)?\s*[-+]?[\d.,]+\s*(%|bn|m|million|billion)?\b", re.I)
+NOT_TITLES = re.compile(r"^(contents|table of contents|annual report( \d{4})?)$", re.I)
 
 
 @dataclass
@@ -43,6 +48,7 @@ class Page:
     section: str
     heading: str
     blocks: list[Block] = field(default_factory=list)
+    part: str = ""  # top-level part of the report, from the navigation bar
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -83,11 +89,71 @@ def _toc_sections(doc: pymupdf.Document) -> list[tuple[int, str]]:
     path: list[str] = []
     out = []
     for level, title, page in doc.get_toc():
-        title = " ".join(title.split())
-        path = path[: level - 1] + [title]
+        # Nordea's outline names whole parts "Table of Contents Nordea Group" and has
+        # bare "Table of Contents" entries. Strip that, and fall back to the parent.
+        title = re.sub(r"^table of contents\s*", "", " ".join(title.split()), flags=re.I)
+        path = path[: level - 1] + ([title] if title else [])
         # The top entry is usually the report title, which adds nothing.
         out.append((page, " > ".join(path[1:] if len(path) > 1 else path)))
     return out
+
+
+def is_title(text: str) -> bool:
+    """Whether large text reads like a heading, not a chart label or a figure callout."""
+    text = text.strip()
+    letters = sum(c.isalpha() for c in text)
+    visible = sum(not c.isspace() for c in text)
+    return (
+        letters >= 4
+        and letters >= 0.6 * visible
+        and (text[0].isupper() or text[0].isdigit())
+        and len(text.split()) <= 12
+        and not FIGURE_RE.match(text)
+        and not NOT_TITLES.match(text)
+    )
+
+
+def _nav_part(page: pymupdf.Page, data: dict, boilerplate: set[str]) -> str:
+    """The navigation tab that is styled differently from the others, if any.
+
+    Danske Bank marks the current part of the report with white text, Nordea with
+    bold. The tab whose colour or weight stands out most from the majority wins.
+    """
+    tabs = []
+    for block in data["blocks"]:
+        for line in block.get("lines", []):
+            text = _line_text(line)
+            in_header = line["bbox"][1] < HEADER_ZONE * page.rect.height
+            # Tabs are short titles; this skips page numbers, running headers and
+            # navigation bars set as one line of text (Jyske Bank).
+            if in_header and _norm(text) in boilerplate and is_title(text) and len(text.split()) <= 6:
+                span = max(line["spans"], key=lambda s: len(s["text"].strip()))
+                tabs.append((text, span["color"], bool(span["flags"] & 16)))
+    if len(tabs) < 3:
+        return ""
+    majority = collections.Counter((c, b) for _, c, b in tabs).most_common(1)[0][0]
+
+    def distance(color: int, bold: bool) -> float:
+        rgb = [(color >> s) & 255 for s in (16, 8, 0)]
+        base = [(majority[0] >> s) & 255 for s in (16, 8, 0)]
+        return sum((a - b) ** 2 for a, b in zip(rgb, base, strict=True)) ** 0.5 + 255 * (bold != majority[1])
+
+    text, color, bold = max(tabs, key=lambda t: distance(t[1], t[2]))
+    return text if distance(color, bold) >= NAV_MIN_STYLE_DISTANCE else ""
+
+
+def _heading(spans: list[tuple[float, float, str]]) -> tuple[float, str]:
+    """The top-most run of lines in the largest font: (size, text)."""
+    if not spans:
+        return 0.0, ""
+    top = max(s for s, _, _ in spans)
+    lines = sorted((y, t) for s, y, t in spans if s == top)
+    out = [lines[0]]
+    for y, t in lines[1:]:
+        if y - out[-1][0] > 2 * top:  # a gap: the next heading, not a second line of this one
+            break
+        out.append((y, t))
+    return top, " ".join(t for _, t in out)
 
 
 def _inside(bbox: tuple[float, ...], rect: tuple[float, ...]) -> bool:
@@ -135,14 +201,24 @@ def _join_lines(lines: list[str]) -> str:
     return text
 
 
-def parse_pdf(path: Path, bank: str, year: int) -> list[Page]:
+def iter_pages(
+    path: Path, bank: str, year: int, start_page: int = 1, no_layout: frozenset[int] = frozenset()
+) -> Iterator[Page]:
+    """Yield parsed pages from start_page on.
+
+    PyMuPDF 2.0 finds tables with a layout model, which is the only way it finds
+    tables without ruling lines (most of Nordea's). On a few pages that model
+    crashes the whole process. Pages listed in no_layout use line-based table
+    detection only; the pipeline fills that list when a page crashes.
+
+    Sections are set only on pages that start one. Run fill_sections over the
+    full list to carry them forward.
+    """
     doc = pymupdf.open(path)
     boilerplate = _find_boilerplate(doc)
     toc = _toc_sections(doc)
-    pages: list[Page] = []
-    section = ""
 
-    for page in doc:
+    for page in doc.pages(start_page - 1):
         pno = page.number + 1
         height = page.rect.height
         data = page.get_text("dict")
@@ -155,11 +231,12 @@ def parse_pdf(path: Path, bank: str, year: int) -> list[Page]:
                     size_chars[round(span["size"], 1)] += len(span["text"].strip())
         body_size = size_chars.most_common(1)[0][0] if size_chars else 10.0
 
-        tables = [t for t in page.find_tables().tables if t.row_count >= 2 and t.col_count >= 2]
+        found = page.find_tables(use_layout=pno not in no_layout)
+        tables = [t for t in found.tables if t.row_count >= 2 and t.col_count >= 2]
         table_rects = [tuple(t.bbox) for t in tables]
 
         items: list[tuple[float, Block]] = []
-        heading_spans: list[tuple[float, str]] = []
+        heading_spans: list[tuple[float, float, str]] = []  # (size, y, text)
         for block in data["blocks"]:
             lines = []
             for line in block.get("lines", []):
@@ -171,8 +248,8 @@ def parse_pdf(path: Path, bank: str, year: int) -> list[Page]:
                 if any(_inside(line["bbox"], r) for r in table_rects):
                     continue
                 size = max(round(s["size"], 1) for s in line["spans"])
-                if size >= MIN_HEADING_SIZE and size >= 1.3 * body_size:
-                    heading_spans.append((size, text))
+                if size >= MIN_HEADING_SIZE and size >= 1.3 * body_size and is_title(text):
+                    heading_spans.append((size, line["bbox"][1], text))
                 lines.append(text)
             if lines:
                 items.append((block["bbox"][1], Block("text", _join_lines(lines))))
@@ -197,14 +274,34 @@ def parse_pdf(path: Path, bank: str, year: int) -> list[Page]:
             ordered.append(blk)
         ordered.extend(blk for _, blk in tabs)
 
-        heading = ""
-        if heading_spans:
-            top = max(s for s, _ in heading_spans)
-            heading = " ".join(t for s, t in heading_spans if s == top)
+        size, heading = _heading(heading_spans)
+        section, part = "", ""
         if toc:
             section = next((name for start, name in reversed(toc) if start <= pno), "")
-        elif heading_spans and max(s for s, _ in heading_spans) >= 18:
-            section = heading
+        else:
+            part = _nav_part(page, data, boilerplate)
+            if size >= MIN_SECTION_SIZE:
+                section = heading
 
-        pages.append(Page(bank=bank, year=year, page=pno, section=section, heading=heading, blocks=ordered))
+        yield Page(
+            bank=bank, year=year, page=pno, section=section, heading=heading, blocks=ordered, part=part
+        )
+
+
+def fill_sections(pages: list[Page]) -> list[Page]:
+    """Carry each section forward to the pages that follow it, and prefix the part.
+
+    A section ends at the next section or when the report moves to another part.
+    Reports with a PDF outline already have a full section path on every page.
+    """
+    section, part = "", ""
+    for page in pages:
+        if page.part != part:
+            section, part = "", page.part
+        section = page.section or section
+        page.section = " > ".join(s for s in (part, section) if s)
     return pages
+
+
+def parse_pdf(path: Path, bank: str, year: int) -> list[Page]:
+    return fill_sections(list(iter_pages(path, bank, year)))

@@ -36,17 +36,18 @@ SEARCH_DEPTH = 30  # how far down the ranking MRR looks
 def retrieval_eval(questions, configs) -> list[dict]:
     rows = []
     answerable = [q for q in questions if q.answerable]
-    for name, retriever, route in configs:
+    for name, retriever, route, expand in configs:
         recalls = {k: [] for k in K_VALUES}
         rrs = []
         for q in answerable:
-            hits = routed_search(retriever, q.question, k=SEARCH_DEPTH, route=route)
-            pages = list(dict.fromkeys(page_key(h.chunk) for h in hits))
-            ranked_pages_by_chunk = [page_key(h.chunk) for h in hits]
             for k in K_VALUES:
-                # k counts chunks, the unit the answer model sees
-                recall, _ = retrieval_scores(q, ranked_pages_by_chunk, k)
+                # Search at each k, because routing splits k between banks: the top k of a
+                # deeper search is not what the answer model would get. k counts chunks.
+                hits = routed_search(retriever, q.question, k=k, route=route, expand=expand)
+                recall, _ = retrieval_scores(q, [page_key(h.chunk) for h in hits], k)
                 recalls[k].append(recall)
+            hits = routed_search(retriever, q.question, k=SEARCH_DEPTH, route=route, expand=expand)
+            pages = list(dict.fromkeys(page_key(h.chunk) for h in hits))
             rrs.append(retrieval_scores(q, pages, SEARCH_DEPTH)[1])
         row = {"config": name, "questions": len(answerable), "mrr": statistics.mean(rrs)}
         row.update({f"recall@{k}": statistics.mean(v) for k, v in recalls.items()})
@@ -114,8 +115,10 @@ def write_results_md(retrieval: list[dict], answers: dict | None, n_questions: i
         "",
         "## Retrieval",
         "",
-        "Recall@k: share of evidence pages found in the top k chunks. MRR: mean reciprocal rank of the",
-        "first relevant page. Answerable questions only.",
+        "Recall@k: share of a question's evidence groups (one per bank or year it needs) with a gold page",
+        "among the top k chunks, averaged over answerable questions. MRR: mean reciprocal rank of the first",
+        "gold page in the top 30. Routed: search only the banks and years the question names.",
+        "Danish glossary: add English report wording for Danish finance terms.",
         "",
         "| Config | " + " | ".join(f"Recall@{k}" for k in K_VALUES) + " | MRR |",
         "|---|" + "---|" * (len(K_VALUES) + 1),
@@ -153,17 +156,19 @@ def main() -> int:
     questions = load_questions(EVAL_DIR / "questions.yaml")
     structure = BM25Retriever(load_chunks("structure"))
     fixed = BM25Retriever(load_chunks("fixed"))
+    # (name, retriever, route by bank and year, expand Danish terms)
     configs = [
-        ("BM25, fixed chunks", fixed, False),
-        ("BM25, structure chunks", structure, False),
-        ("BM25, structure chunks, routed", structure, True),
+        ("BM25, fixed chunks", fixed, False, False),
+        ("BM25, structure chunks", structure, False, False),
+        ("BM25, structure chunks, routed", structure, True, False),
+        ("BM25, structure chunks, routed, Danish glossary", structure, True, True),
     ]
     retrieval = retrieval_eval(questions, configs)
     RESULTS_DIR.mkdir(exist_ok=True)
     (RESULTS_DIR / "retrieval.json").write_text(json.dumps(retrieval, indent=2), encoding="utf-8")
     for r in retrieval:
         recalls = "  ".join(f"R@{k} {r[f'recall@{k}']:.2f}" for k in K_VALUES)
-        print(f"{r['config']:34s} {recalls}  MRR {r['mrr']:.2f}")
+        print(f"{r['config']:50s} {recalls}  MRR {r['mrr']:.2f}")
 
     summary = None
     if args.answers:

@@ -1,23 +1,31 @@
 """Parse every report in data/raw/ and write pages and chunks to data/processed/.
 
 Parsing is the slow step (table detection takes about a second per page), so
-parsed pages are cached in pages.jsonl. Chunking reads that cache, which makes
-it cheap to try other chunking strategies.
+parsed pages are cached per report in data/processed/pages/. Chunking reads that
+cache, which makes it cheap to try other chunking strategies.
+
+Each report is parsed in its own child process (see worker.py), because
+PyMuPDF's layout model crashes the process on a few pages. When that happens
+the child is restarted at the crashing page, with the layout model switched off
+for that page only.
 """
 
 from __future__ import annotations
 
 import json
 import re
+import subprocess
+import sys
 import time
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from bankrag.config import PROCESSED_DIR, RAW_DIR
 from bankrag.ingest.chunk import Chunk, chunk_pages
-from bankrag.ingest.pdf import Page, parse_pdf
+from bankrag.ingest.pdf import Page, fill_sections
 
-PAGES_FILE = PROCESSED_DIR / "pages.jsonl"
+PAGES_DIR = PROCESSED_DIR / "pages"
+PARALLEL_REPORTS = 3
 
 
 def chunks_file(strategy: str) -> Path:
@@ -33,40 +41,76 @@ def _report_files() -> list[tuple[Path, str, int]]:
     return out
 
 
-def _parse_one(args: tuple[Path, str, int]) -> list[dict]:
-    path, bank, year = args
-    return [p.to_dict() for p in parse_pdf(path, bank, year)]
+def _read_pages(path: Path) -> list[dict]:
+    if not path.exists():
+        return []
+    pages = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        try:
+            pages.append(json.loads(line))
+        except json.JSONDecodeError:
+            break  # a line cut off by a crash; the page is parsed again
+    return pages
+
+
+def _parse_report(pdf: Path, bank: str, year: int) -> str:
+    """Parse one report into PAGES_DIR/<name>.jsonl, restarting after crashes."""
+    partial = PAGES_DIR / f"{pdf.stem}.partial.jsonl"
+    no_layout: set[int] = set()  # crashed once: parse again without the layout model
+    broken: set[int] = set()  # crashed without the layout model too: keep as an empty page
+    while True:
+        done = _read_pages(partial)
+        start = done[-1]["page"] + 1 if done else 1
+        if start in broken:
+            done.append(Page(bank=bank, year=year, page=start, section="", heading="").to_dict())
+            start += 1
+        # Rewrite without any cut-off last line before appending to it.
+        partial.write_text("".join(json.dumps(d, ensure_ascii=False) + "\n" for d in done), encoding="utf-8")
+        cmd = [sys.executable, "-m", "bankrag.ingest.worker", str(pdf), bank, str(year), str(partial)]
+        cmd += ["--start", str(start), "--no-layout", ",".join(map(str, sorted(no_layout)))]
+        result = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        if result.returncode == 0:
+            break
+        if "Traceback (most recent call last)" in result.stderr:
+            # A Python error, not a native crash: restarting would not help.
+            raise RuntimeError(f"parsing {pdf.name} failed:\n{result.stderr}")
+        done = _read_pages(partial)
+        crashed = done[-1]["page"] + 1 if done else 1
+        (broken if crashed in no_layout else no_layout).add(crashed)
+
+    final = PAGES_DIR / f"{pdf.stem}.jsonl"
+    partial.replace(final)
+    notes = ""
+    if no_layout:
+        notes += f", layout model skipped on page(s) {sorted(no_layout)}"
+    if broken:
+        notes += f", page(s) {sorted(broken)} left empty"
+    return f"{bank} {year}: {len(_read_pages(final))} pages{notes}"
 
 
 def parse_all(force: bool = False) -> list[Page]:
     reports = _report_files()
     if not reports:
         raise SystemExit(f"No reports in {RAW_DIR}. Run `python scripts/download.py` first.")
+    PAGES_DIR.mkdir(parents=True, exist_ok=True)
+    if force:
+        for f in PAGES_DIR.glob("*.jsonl"):
+            f.unlink()
 
-    cached: dict[tuple[str, int], list[dict]] = {}
-    if PAGES_FILE.exists() and not force:
-        for line in PAGES_FILE.read_text(encoding="utf-8").splitlines():
-            d = json.loads(line)
-            cached.setdefault((d["bank"], d["year"]), []).append(d)
-
-    todo = [r for r in reports if (r[1], r[2]) not in cached]
+    todo = [r for r in reports if not (PAGES_DIR / f"{r[0].stem}.jsonl").exists()]
     if todo:
-        names = ", ".join(p.name for p, _, _ in todo)
-        print(f"parsing {len(todo)} report(s): {names}")
+        print(f"parsing {len(todo)} report(s): {', '.join(p.name for p, _, _ in todo)}")
         start = time.time()
-        with ProcessPoolExecutor(max_workers=len(todo)) as pool:
-            for (_, bank, year), pages in zip(todo, pool.map(_parse_one, todo), strict=True):
-                cached[(bank, year)] = pages
-                print(f"  {bank} {year}: {len(pages)} pages")
+        with ThreadPoolExecutor(max_workers=PARALLEL_REPORTS) as pool:
+            for line in pool.map(lambda r: _parse_report(*r), todo):
+                print(f"  {line}")
         print(f"parsed in {time.time() - start:.0f}s")
 
-    PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
-    keys = sorted((b, y) for _, b, y in reports)
-    with PAGES_FILE.open("w", encoding="utf-8") as f:
-        for key in keys:
-            for d in cached[key]:
-                f.write(json.dumps(d, ensure_ascii=False) + "\n")
-    return [Page.from_dict(d) for key in keys for d in cached[key]]
+    pages: list[Page] = []
+    for pdf, _, _ in reports:
+        report_pages = [Page.from_dict(d) for d in _read_pages(PAGES_DIR / f"{pdf.stem}.jsonl")]
+        pages.extend(fill_sections(report_pages))
+    return pages
 
 
 def load_chunks(strategy: str = "structure") -> list[Chunk]:

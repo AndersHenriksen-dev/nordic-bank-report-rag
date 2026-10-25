@@ -7,7 +7,7 @@ Question answering over the 2024 and 2025 annual reports of Danske Bank, Nordea 
 ```bash
 uv sync                                  # install
 uv run python scripts/download.py        # fetch PDFs into data/raw/ (Jyske Bank: download by hand, see script output)
-uv run bankrag ingest                    # parse PDFs, write data/processed/
+uv run bankrag ingest                    # parse PDFs (about 30 min the first time), write data/processed/
 uv run bankrag search "question"         # show retrieved chunks, no API key needed
 uv run bankrag ask "question"            # answer with citations, needs ANTHROPIC_API_KEY in .env
 uv run python evals/run_evals.py         # retrieval evals, no API key needed
@@ -37,7 +37,7 @@ The `make` targets wrap the same commands.
 
 ## Layout
 
-- `src/bankrag/ingest/`: PDF parsing (`pdf.py`), chunking (`chunk.py`), pipeline with page cache (`pipeline.py`)
-- `src/bankrag/retrieve/`: BM25 (`bm25.py`), bank and year routing (`route.py`)
+- `src/bankrag/ingest/`: PDF parsing (`pdf.py`), chunking (`chunk.py`), pipeline with a per-report page cache (`pipeline.py`) that runs each report in a crash-safe child process (`worker.py`)
+- `src/bankrag/retrieve/`: BM25 (`bm25.py`), bank and year routing (`route.py`), Danish query glossary (`rewrite.py`)
 - `src/bankrag/answer/generate.py`: Claude call with `search_result` blocks, citations, prompt caching, refusals, cost, trace log
 - `src/bankrag/evaluate.py`: metrics; `evals/run_evals.py` runs them and writes `evals/RESULTS.md`
