@@ -18,11 +18,11 @@ from typing import NamedTuple
 from pydantic import BaseModel, TypeAdapter, ValidationError
 
 from bankrag.answer import answer, log_trace
-from bankrag.config import ANSWER_MODEL, bank_name, parse_bank
+from bankrag.config import ANSWER_MODEL, EMBED_MODEL, RERANK_MODEL, bank_name, parse_bank
 from bankrag.evaluate import figures_grounded, load_questions, numbers_match, page_key, percentile, retrieval_scores
 from bankrag.ingest import load_chunks
 from bankrag.models import Question, Source
-from bankrag.retrieve import BM25Retriever, Retriever, routed_search
+from bankrag.retrieve import DEFAULT_RETRIEVER, BM25Retriever, Retriever, build_retriever, routed_search
 
 EVAL_DIR = Path(__file__).resolve().parent
 RESULTS_DIR = EVAL_DIR / "results"
@@ -90,6 +90,7 @@ class AnswerReport(BaseModel):
 
     run_date: date
     model: str
+    retriever: str = "bm25"  # answer runs before the hybrid retriever all used BM25
     summary: AnswerSummary
     records: list[AnswerRecord]
 
@@ -204,7 +205,9 @@ def write_results_md(retrieval: list[RetrievalResult], report: AnswerReport | No
         "Recall@k: share of a question's evidence groups (one per bank or year it needs) with a gold page",
         "among the top k chunks, averaged over answerable questions. MRR: mean reciprocal rank of the first",
         "gold page in the top 30. Routed: search only the banks and years the question names.",
-        "Danish glossary: add English report wording for Danish finance terms.",
+        "Danish glossary: add English report wording for Danish finance terms. Dense: cosine similarity of",
+        f"`{EMBED_MODEL}` embeddings in Qdrant. Hybrid: reciprocal rank fusion of BM25 and dense. Reranker:",
+        f"`{RERANK_MODEL}` reorders the hybrid top 30.",
         "",
         "| Config | " + " | ".join(f"Recall@{k}" for k in K_VALUES) + " | MRR |",
         "|---|" + "---|" * (len(K_VALUES) + 1),
@@ -218,7 +221,8 @@ def write_results_md(retrieval: list[RetrievalResult], report: AnswerReport | No
             "",
             "## Answers",
             "",
-            f"From the last answer run on {report.run_date.isoformat()} with `{report.model}`. Every question and",
+            f"From the last answer run on {report.run_date.isoformat()} with `{report.model}` and the "
+            f"`{report.retriever}` retriever. Every question and",
             "answer, with the passages it cites, is in [ANSWERS.md](ANSWERS.md).",
             "",
             "| Metric | Value |",
@@ -331,13 +335,19 @@ def main() -> int:
     args = parser.parse_args()
 
     questions = load_questions(EVAL_DIR / "questions.yaml")
-    structure = BM25Retriever(load_chunks("structure"))
-    fixed = BM25Retriever(load_chunks("fixed"))
+    chunks = load_chunks("structure")
+    bm25 = BM25Retriever(chunks)
+    dense = build_retriever("dense", chunks)
+    best = build_retriever(DEFAULT_RETRIEVER, chunks)
     configs = [
-        RetrievalConfig("BM25, fixed chunks", fixed, route=False, expand=False),
-        RetrievalConfig("BM25, structure chunks", structure, route=False, expand=False),
-        RetrievalConfig("BM25, structure chunks, routed", structure, route=True, expand=False),
-        RetrievalConfig("BM25, structure chunks, routed, Danish glossary", structure, route=True, expand=True),
+        RetrievalConfig("BM25, fixed chunks", BM25Retriever(load_chunks("fixed")), route=False, expand=False),
+        RetrievalConfig("BM25, structure chunks", bm25, route=False, expand=False),
+        RetrievalConfig("BM25, structure chunks, routed", bm25, route=True, expand=False),
+        RetrievalConfig("BM25, structure chunks, routed, Danish glossary", bm25, route=True, expand=True),
+        RetrievalConfig("Dense, routed", dense, route=True, expand=False),
+        RetrievalConfig("Dense, routed, Danish glossary", dense, route=True, expand=True),
+        RetrievalConfig("Hybrid, routed, Danish glossary", build_retriever("hybrid", chunks), route=True, expand=True),
+        RetrievalConfig("Hybrid + reranker, routed, Danish glossary", best, route=True, expand=True),
     ]
     retrieval = retrieval_eval(questions, configs)
     RESULTS_DIR.mkdir(exist_ok=True)
@@ -349,8 +359,14 @@ def main() -> int:
     report = _load_last_answers()
     if args.answers:
         print("\nanswering...")
-        records, summary = answer_eval(questions, structure, args.k)
-        report = AnswerReport(run_date=date.today(), model=ANSWER_MODEL, summary=summary, records=records)
+        records, summary = answer_eval(questions, best, args.k)
+        report = AnswerReport(
+            run_date=date.today(),
+            model=ANSWER_MODEL,
+            retriever=DEFAULT_RETRIEVER,
+            summary=summary,
+            records=records,
+        )
         ANSWERS_FILE.write_text(report.model_dump_json(indent=2) + "\n", encoding="utf-8", newline="\n")
         print(summary.model_dump_json(indent=2))
 

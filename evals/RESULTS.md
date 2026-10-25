@@ -8,26 +8,32 @@ Do not edit by hand.
 Recall@k: share of a question's evidence groups (one per bank or year it needs) with a gold page
 among the top k chunks, averaged over answerable questions. MRR: mean reciprocal rank of the first
 gold page in the top 30. Routed: search only the banks and years the question names.
-Danish glossary: add English report wording for Danish finance terms.
+Danish glossary: add English report wording for Danish finance terms. Dense: cosine similarity of
+`BAAI/bge-m3` embeddings in Qdrant. Hybrid: reciprocal rank fusion of BM25 and dense. Reranker:
+`BAAI/bge-reranker-v2-m3` reorders the hybrid top 30.
 
 | Config | Recall@1 | Recall@3 | Recall@6 | Recall@10 | MRR |
 |---|---|---|---|---|---|
-| BM25, fixed chunks | 0.17 | 0.17 | 0.52 | 0.68 | 0.34 |
+| BM25, fixed chunks | 0.17 | 0.17 | 0.52 | 0.68 | 0.35 |
 | BM25, structure chunks | 0.11 | 0.31 | 0.52 | 0.76 | 0.32 |
 | BM25, structure chunks, routed | 0.16 | 0.50 | 0.80 | 0.82 | 0.43 |
-| BM25, structure chunks, routed, Danish glossary | 0.16 | 0.59 | 0.89 | 0.91 | 0.45 |
+| BM25, structure chunks, routed, Danish glossary | 0.16 | 0.59 | 0.89 | 0.91 | 0.46 |
+| Dense, routed | 0.17 | 0.52 | 0.70 | 0.81 | 0.43 |
+| Dense, routed, Danish glossary | 0.17 | 0.52 | 0.74 | 0.81 | 0.44 |
+| Hybrid, routed, Danish glossary | 0.36 | 0.64 | 0.85 | 0.87 | 0.58 |
+| Hybrid + reranker, routed, Danish glossary | 0.41 | 0.83 | 0.94 | 0.98 | 0.65 |
 
 ## Answers
 
-From the last answer run on 2026-10-25 with `claude-haiku-5-5`. Every question and
+From the last answer run on 2026-10-25 with `claude-haiku-5-5` and the `hybrid-rerank` retriever. Every question and
 answer, with the passages it cites, is in [ANSWERS.md](ANSWERS.md).
 
 | Metric | Value |
 |---|---|
-| Numeric answers exact | 94% of 17 |
+| Numeric answers exact | 100% of 17 |
 | Answerable questions answered with a citation | 100% |
 | Answers whose figures all appear in a cited passage | 95% of 19 |
 | Answerable questions wrongly refused | 0 |
 | Unanswerable questions refused | 5 of 5 |
-| Cost per question, mean / p95 (USD) | 0.00093 / 0.00128 |
-| Latency per question, mean / p95 (s) | 4.2 / 6.4 |
+| Cost per question, mean / p95 (USD) | 0.00103 / 0.00136 |
+| Latency per question, mean / p95 (s) | 4.5 / 6.9 |
