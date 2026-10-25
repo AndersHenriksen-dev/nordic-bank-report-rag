@@ -57,8 +57,9 @@ The `make` targets wrap the same commands.
 - `src/bankrag/ingest/`: PDF parsing (`pdf.py`), chunking (`chunk.py`), pipeline with a per-report page cache (`pipeline.py`) that runs each report in a crash-safe child process (`worker.py`)
 - `src/bankrag/retrieve/`: BM25 (`bm25.py`), vectors in embedded Qdrant (`dense.py`), the local models (`neural.py`), rank fusion (`hybrid.py`), cross-encoder reranking (`rerank.py`), building a retriever by name (`factory.py`), bank and year routing (`route.py`), Danish query glossary (`rewrite.py`)
 - `src/bankrag/answer/generate.py`: Claude call with `search_result` blocks, citations, prompt caching, refusals, cost, trace log
-- `src/bankrag/ui/`: Streamlit page (`app.py`) and cited-passage highlighting on PDF pages (`highlight.py`)
+- `src/bankrag/ui/`: Streamlit page (`app.py`, which also replays saved answers from the trace log) and cited-passage highlighting on PDF pages (`highlight.py`)
 - `src/bankrag/figures.py`: number and figure parsing in English and Danish formats, used by the evals and the UI
-- `src/bankrag/evaluate.py`: metrics; `src/bankrag/judge.py`: the LLM judge; `evals/run_evals.py` runs them and writes `evals/RESULTS.md` and `evals/ANSWERS.md` (generated, do not edit by hand)
+- `src/bankrag/evaluate.py`: metrics; `src/bankrag/judge.py`: the LLM judge; `evals/run_evals.py` runs them and writes `evals/RESULTS.md` with its chart and `evals/ANSWERS.md` (generated, do not edit by hand)
+- `docs/images/`: README screenshots, made from saved answers so they cost nothing to retake
 - `docs/documents.md`: the six reports, their checksums and what to know about them
 - `docs/concepts.md`: study guide to every concept the system uses, from BM25 to CET1; update it when a new technique is added

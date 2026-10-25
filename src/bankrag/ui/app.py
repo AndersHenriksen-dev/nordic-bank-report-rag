@@ -2,21 +2,23 @@
 
 Run with `make app` or `uv run streamlit run src/bankrag/ui/app.py`. It needs the PDFs in data/raw/ for the page
 images, the chunks and vector index from `bankrag ingest`, and ANTHROPIC_API_KEY in .env. Each question costs about
-USD 0.001.
+USD 0.001. Saved answers from the trace log are shown again without the API, the key or the search models.
 """
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
+from datetime import datetime
 from textwrap import shorten
 
 import streamlit as st
 
-from bankrag.answer import answer, log_trace
+from bankrag.answer import answer, load_traces, log_trace, mark_quotes
 from bankrag.config import DISCLAIMER, RAW_DIR, Bank, bank_name
 from bankrag.figures import figures_in
 from bankrag.ingest import load_chunks
-from bankrag.models import Answer, Source
+from bankrag.models import Answer, Chunk, Source, TracedAnswer
 from bankrag.retrieve import DEFAULT_RETRIEVER, Hit, Retriever, build_retriever, routed_search
 from bankrag.ui.highlight import HighlightedPage, focus_passage, render_highlighted_page
 
@@ -38,11 +40,17 @@ class Result:
 
     answer: Answer
     hits: list[Hit]
+    saved_at: datetime | None = None  # set when the answer was replayed from the trace log
 
 
 @st.cache_resource(show_spinner="Loading the search index...")
 def _retriever() -> Retriever:
     return build_retriever(DEFAULT_RETRIEVER, load_chunks("structure"))
+
+
+@st.cache_resource(show_spinner="Loading the chunks...")
+def _chunks_by_id() -> dict[str, Chunk]:
+    return {chunk.id: chunk for chunk in load_chunks("structure")}
 
 
 @st.cache_data(show_spinner=False)
@@ -65,14 +73,31 @@ def _ask(question: str) -> Result:
     return Result(result, hits)
 
 
+def _replay(traced: TracedAnswer) -> Result:
+    """Rebuild a saved answer and the passages its search found, without calling the API or the search models.
+
+    The trace keeps the ids of the retrieved chunks but not their reranker scores, so those show as blank.
+    """
+    chunks = _chunks_by_id()
+    hits = [Hit(chunks[chunk_id], math.nan) for chunk_id in traced.retrieved if chunk_id in chunks]
+    return Result(traced, hits, saved_at=traced.time)
+
+
+def _saved_answers() -> dict[str, TracedAnswer]:
+    """Return the latest saved answer to each question in the trace log, newest first."""
+    latest = {traced.question: traced for traced in load_traces()}
+    return dict(sorted(latest.items(), key=lambda item: item[1].time, reverse=True))
+
+
 def _markdown(text: str) -> str:
     """Escape dollar signs, which Streamlit would otherwise render as maths."""
     return text.replace("$", r"\$")
 
 
-def _show_answer(result: Answer) -> None:
+def _show_answer(result: Answer, hits: list[Hit]) -> None:
     st.subheader("Answer")
-    st.markdown(_markdown(result.text))
+    bodies = {hit.chunk.id: hit.chunk.body for hit in hits}
+    st.markdown(_markdown(mark_quotes(result.text, result.sources, bodies)))
     latency, cost, tokens, cached = st.columns(4)
     latency.metric("Latency", f"{result.latency_s:.1f} s")
     cost.metric("Cost", f"DKK {result.cost_dkk:.3f}", help=f"USD {result.cost_usd:.5f}")
@@ -130,7 +155,7 @@ def _show_retrieved(hits: list[Hit], sources: list[Source]) -> None:
                     "Report": f"{bank_name(hit.chunk.bank)} {hit.chunk.year}",
                     "Page": hit.chunk.page,
                     "Section": hit.chunk.heading or hit.chunk.section,
-                    "Reranker score": round(hit.score, 2),
+                    "Reranker score": None if math.isnan(hit.score) else round(hit.score, 2),
                     "Cited": "yes" if hit.chunk.id in cited else "",
                 }
                 for rank, hit in enumerate(hits, 1)
@@ -145,6 +170,17 @@ def _sidebar() -> None:
         if st.sidebar.button(example, width="stretch"):
             st.session_state["question"] = example
             st.session_state["ask_now"] = True
+    saved = _saved_answers()
+    if saved:
+        st.sidebar.header("Saved answers")
+        choice = st.sidebar.selectbox(
+            "Show an earlier answer again, without calling the API",
+            list(saved),
+            index=None,
+            placeholder="Pick a question",
+        )
+        if choice and st.sidebar.button("Show saved answer", width="stretch"):
+            st.session_state["result"] = _replay(saved[choice])
     st.sidebar.divider()
     st.sidebar.caption(
         "Six annual reports: Danske Bank, Nordea and Jyske Bank, 2024 and 2025. Search combines BM25 and bge-m3 "
@@ -173,8 +209,13 @@ def main() -> None:
     result: Result | None = st.session_state.get("result")
     if result is None:
         return
+    if result.saved_at:
+        st.info(
+            f"A saved answer from {result.saved_at:%d %B %Y, %H:%M} UTC, shown again without a new API call. "
+            "Cost and latency are from when it was made.",
+        )
     _show_thinking(result.answer)
-    _show_answer(result.answer)
+    _show_answer(result.answer, result.hits)
     _show_sources(result.answer)
     _show_retrieved(result.hits, result.answer.sources)
 

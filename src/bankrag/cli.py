@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-from bankrag.answer import answer, log_trace
+from bankrag.answer import answer, log_trace, mark_quotes
 from bankrag.config import DISCLAIMER
 from bankrag.ingest import load_chunks, run
 from bankrag.retrieve import (
@@ -38,7 +38,7 @@ def ask(question: str, k: int, retriever: RetrieverKind) -> None:
     hits = routed_search(build_retriever(retriever, load_chunks("structure")), question, k=k)
     result = answer(question, hits)
     log_trace(result)
-    print(result.text + "\n")
+    print(mark_quotes(result.text, result.sources, {hit.chunk.id: hit.chunk.body for hit in hits}) + "\n")
     for source in result.sources:
         print(f"[{source.n}] {source.label}  ({source.section})")
     print(

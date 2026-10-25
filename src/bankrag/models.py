@@ -6,6 +6,7 @@ nothing untyped moves past the function that read it.
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel, Field, computed_field
@@ -107,6 +108,13 @@ class Answer(BaseModel):
     def cost_dkk(self) -> float:
         """Cost in Danish kroner at the fixed exchange rate in the config."""
         return self.cost_usd * USD_TO_DKK
+
+
+class TracedAnswer(Answer):
+    """One line of the trace log: an answer, when it was made, and the eval question it answered, if any."""
+
+    time: datetime
+    eval_id: str | None = None
 
 
 class Verdict(BaseModel):

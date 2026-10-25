@@ -23,6 +23,11 @@ Danish glossary: add English report wording for Danish finance terms. Dense: cos
 | Hybrid, routed, Danish glossary | 0.38 | 0.64 | 0.82 | 0.86 | 0.61 |
 | Hybrid + reranker, routed, Danish glossary | 0.50 | 0.84 | 0.95 | 0.98 | 0.71 |
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="results/retrieval-dark.svg">
+  <img alt="Dot plot of recall@1, @3 and @6 for each search setup. The highest recall@6 is 0.95, for Hybrid + reranker, routed, Danish glossary." src="results/retrieval-light.svg" width="760">
+</picture>
+
 ## Answers
 
 From the last answer run on 2026-10-25 with `claude-haiku-5-5` and the `hybrid-rerank` retriever. Every question and

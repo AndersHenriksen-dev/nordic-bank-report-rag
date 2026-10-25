@@ -4,6 +4,8 @@ I built a question answering system over the 2024 and 2025 annual reports of Dan
 
 Not investment advice. Figures should be checked against the source page.
 
+![The web page answering "Compare the CET1 ratio of the three banks at the end of 2025": Danske Bank 17.3%, Jyske Bank 16.1% and Nordea 15.7%, each sentence with a numbered citation, plus latency, cost and tokens](docs/images/web-answer.png)
+
 ## Headline results
 
 Measured on 44 eval questions, 35 of them answerable from the reports ([evals/RESULTS.md](evals/RESULTS.md)):
@@ -15,17 +17,19 @@ Measured on 44 eval questions, 35 of them answerable from the reports ([evals/RE
 
 ## What an answer looks like
 
-From the last eval run ([evals/ANSWERS.md](evals/ANSWERS.md#q30)), shown as the system returned it. The text after Claude's own sentences is the passage it cites, and `[1]` points to the source:
+From the last eval run ([evals/ANSWERS.md](evals/ANSWERS.md#q30)), as the web page shows it. Text in quotation marks is copied word for word from the cited page, and `[1]` points to the source:
 
 > **What net profit does Danske Bank expect for 2026, according to its 2025 annual report?**
 >
-> For 2026, Danske Bank's own projection is a net profit of DKK 22-24 billion. The report links this to a return on equity above the bank's 2026 ambition of 13%. This is the bank's expectation as stated in its report, not a forecast from me. Net profit is expected to be in the range of DKK 22-24 billion, reflecting a return on equity above our 2026 ambition of 13%. [1]
+> For 2026, Danske Bank's own projection is a net profit of DKK 22-24 billion. The report links this to a return on equity above the bank's 2026 ambition of 13%. This is the bank's expectation as stated in its report, not a forecast from me. “Net profit is expected to be in the range of DKK 22-24 billion, reflecting a return on equity above our 2026 ambition of 13%.” [1]
 >
 > [1] Danske Bank, Annual Report 2025, p. 6, Executive summary
 
 A question such as "What will Danske Bank's share price be next year?" gets "Not in the documents." and an explanation that the system only reports what the reports say.
 
-The web page shows the same answer with Claude's reasoning summary, the cost and time, and each cited report page as an image with the cited passage highlighted.
+The web page shows the same answer with Claude's reasoning summary, the cost and time, and each cited report page as an image with the cited passage highlighted. Here is source [3] of the CET1 answer above, Nordea's report, page 40:
+
+![The Sources section of the web page: three tabs, one per cited page, and Nordea's page 40 with the cited paragraph on its CET1 ratio highlighted in yellow](docs/images/web-source.png)
 
 ## How it works
 
@@ -109,6 +113,8 @@ make app                      # the web page on http://localhost:8501
 
 The web page listens on localhost only, because every question spends the key's credit. Qdrant runs inside the process and locks its folder, so run one of the web page, the CLI or the evals at a time.
 
+Every answer is logged to `data/traces/answers.jsonl`, and the web page's "Saved answers" menu shows any of them again, with its reasoning, sources and highlighted pages, without calling the API or loading the search models. After `make eval` that includes all 44 eval questions, which is how the screenshots above were made.
+
 ### Evals
 
 ```bash
@@ -116,7 +122,7 @@ make eval-retrieval   # recall@k and MRR for 8 search setups, free, a few minute
 make eval             # also answers all 44 questions and grades them with the judge: about USD 0.05
 ```
 
-Both write [evals/RESULTS.md](evals/RESULTS.md); the full run also writes [evals/ANSWERS.md](evals/ANSWERS.md) with every question, gold answer, answer, cited passage and verdict.
+Both write [evals/RESULTS.md](evals/RESULTS.md), with a chart of the retrieval comparison; the full run also writes [evals/ANSWERS.md](evals/ANSWERS.md) with every question, gold answer, answer, cited passage and verdict.
 
 ### Settings
 
