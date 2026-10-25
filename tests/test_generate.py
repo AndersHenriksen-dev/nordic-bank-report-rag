@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from anthropic.types import Message
 
-from bankrag.answer.generate import render_with_citations, search_result_block
+from bankrag.answer.generate import is_refusal, render_with_citations, search_result_block
 from bankrag.models import Chunk
 from bankrag.retrieve import Hit
 
@@ -83,3 +83,35 @@ def test_render_ignores_citations_outside_the_hits() -> None:
     text, sources = render_with_citations(response, [hit(40, "a")])
     assert text == "Something"
     assert sources == []
+
+
+def test_is_refusal_ignores_case_and_markdown() -> None:
+    assert is_refusal("Not in the documents. The reports do not forecast share prices.")
+    assert is_refusal("**Not in the documents.** This system only reports what the reports say.")
+    assert is_refusal("Ikke i dokumenterne. Rapporterne nævner ikke udbyttet for 2027.")
+    assert not is_refusal("Danske Bank's cost/income ratio was 45.5% in 2025.")
+
+
+def test_cited_quotes_stay_inline_after_own_words() -> None:
+    hits = [hit(40, "a")]
+    response = message(
+        [
+            {"type": "text", "text": "Nordeas egenkapitalforrentning var 15,5 % i 2025: ", "citations": None},
+            {"type": "text", "text": "Return on equity was 15.5% (16.7%).", "citations": [citation(0, "RoE")]},
+        ],
+    )
+
+    text, _ = render_with_citations(response, hits)
+
+    assert text == "Nordeas egenkapitalforrentning var 15,5 % i 2025: Return on equity was 15.5% (16.7%). [1]"
+
+
+def test_space_is_added_where_a_cited_block_follows_a_full_stop() -> None:
+    response = message(
+        [
+            {"type": "text", "text": "Egenkapitalforrentningen var 15,5 %.", "citations": None},
+            {"type": "text", "text": "Return on equity was 15.5%.", "citations": [citation(0, "RoE")]},
+        ],
+    )
+    text, _ = render_with_citations(response, [hit(40, "a")])
+    assert text == "Egenkapitalforrentningen var 15,5 %. Return on equity was 15.5%. [1]"
