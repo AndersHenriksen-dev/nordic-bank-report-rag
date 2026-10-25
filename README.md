@@ -1,20 +1,155 @@
 # Nordic Bank Report RAG
 
-I am building a question answering system over the 2024 and 2025 annual reports of Danske Bank, Nordea and Jyske Bank. Every answer cites the report and page it comes from, and the system is measured against a test set of questions with known answers.
+I built a question answering system over the 2024 and 2025 annual reports of Danske Bank, Nordea and Jyske Bank: 1,867 PDF pages. Ask a question in English or Danish and it answers from the reports, cites the report and page behind every claim, and refuses forecasts and investment advice. A test set of 44 questions with known answers measures every part of it.
 
-Work in progress. The full README, setup steps and a demo will follow here. What exists so far:
+Not investment advice. Figures should be checked against the source page.
 
-- A web page (`make app`): ask a question in English or Danish and see Claude's reasoning, the answer with citations, and each cited report page with the passage highlighted. It runs on your own machine, because it needs the downloaded PDFs and an API key.
-- [docs/documents.md](docs/documents.md): the six reports, where they come from, and what to know when reading them.
-- [evals/RESULTS.md](evals/RESULTS.md): retrieval and answer metrics from the latest eval run.
-- [evals/ANSWERS.md](evals/ANSWERS.md): every eval question with its gold answer, the system's answer and the passages it cites.
-- [evals/judge_rubric.md](evals/judge_rubric.md): the written rubric an LLM judge uses to grade each answer against its gold answer.
-- [docs/decisions.md](docs/decisions.md): the design choices and why I made them.
-- [docs/experiments.md](docs/experiments.md): every strategy I tried, what it did to the numbers, and what I kept.
+## Headline results
+
+Measured on 44 eval questions, 35 of them answerable from the reports ([evals/RESULTS.md](evals/RESULTS.md)):
+
+- **Recall@6 0.95** with hybrid search and a reranker, against 0.80 for keyword search alone: the 6 passages Claude reads hold the needed evidence 95% of the time, counting each bank or year a question needs.
+- **27 of 28 numeric answers exact.**
+- **9 of 9 unanswerable questions refused**, and no answerable question refused.
+- **USD 0.001 (DKK 0.007) and about 5 seconds per question**, with Claude Haiku 5.5 and local open models for search.
+
+## What an answer looks like
+
+From the last eval run ([evals/ANSWERS.md](evals/ANSWERS.md#q30)), shown as the system returned it. The text after Claude's own sentences is the passage it cites, and `[1]` points to the source:
+
+> **What net profit does Danske Bank expect for 2026, according to its 2025 annual report?**
+>
+> For 2026, Danske Bank's own projection is a net profit of DKK 22-24 billion. The report links this to a return on equity above the bank's 2026 ambition of 13%. This is the bank's expectation as stated in its report, not a forecast from me. Net profit is expected to be in the range of DKK 22-24 billion, reflecting a return on equity above our 2026 ambition of 13%. [1]
+>
+> [1] Danske Bank, Annual Report 2025, p. 6, Executive summary
+
+A question such as "What will Danske Bank's share price be next year?" gets "Not in the documents." and an explanation that the system only reports what the reports say.
+
+The web page shows the same answer with Claude's reasoning summary, the cost and time, and each cited report page as an image with the cited passage highlighted.
+
+## How it works
+
+```mermaid
+flowchart LR
+    subgraph once["Once: bankrag ingest"]
+        P[6 PDFs] --> PA[Parse pages, tables and sections]
+        PA --> CH[Chunks: about 500 tokens, tables whole]
+        CH --> BM[BM25 keyword index]
+        CH --> QD[bge-m3 vectors in Qdrant]
+    end
+    subgraph each["Each question"]
+        Q[Question] --> RT[Route to the banks and years it names]
+        RT --> GL[Add English terms for Danish words]
+        GL --> S1[BM25 top 30]
+        GL --> S2[Vector search top 30]
+        S1 --> RRF[Reciprocal rank fusion]
+        S2 --> RRF
+        RRF --> RR[Cross-encoder reranks to top 6]
+        RR --> CL[Claude Haiku 5.5 answers with citations]
+    end
+    BM -.-> S1
+    QD -.-> S2
+```
+
+1. **Parse.** PyMuPDF reads every page. Tables are rebuilt row by row from word positions, because the library's own cell output merged columns on many report tables. Each page keeps its bank, year, PDF page number and section. Each report is parsed in a child process that restarts after a crash, because PyMuPDF's layout model crashed the process on 2 of the 1,867 pages.
+2. **Chunk.** Paragraphs are packed into chunks of about 500 tokens that never cross a page, so every chunk cites one page. A table is never split unless it is very long. That gives 4,882 chunks.
+3. **Route.** The question's bank and year names become filters. A question about three banks is searched once per bank and the results are interleaved, so one bank cannot take every slot.
+4. **Expand Danish.** A glossary of 25 Danish finance terms adds the English wording the reports use ("egenkapitalforrentning" adds "return on equity").
+5. **Search twice and fuse.** BM25 matches exact terms and figures. Dense vectors from `BAAI/bge-m3`, stored in embedded Qdrant, match meaning across languages. Reciprocal rank fusion merges the two rankings by rank, not score.
+6. **Rerank.** The cross-encoder `BAAI/bge-reranker-v2-m3` reads the question and each of the top 30 passages together and keeps the best 6. Both models run locally, on the GPU when there is one.
+7. **Answer.** Claude Haiku 5.5 gets the 6 passages as `search_result` blocks with citations turned on, and a cached system prompt with the rules: answer only from the passages, cite every figure, answer Danish questions in Danish, refuse forecasts and advice, but report a bank's own published outlook.
+8. **Log.** Every answer goes to `data/traces/answers.jsonl` with its sources, tokens, cost and latency.
+
+The reasons behind each choice are in [docs/decisions.md](docs/decisions.md). A study guide to the concepts (BM25, embeddings, rank fusion, rerankers, citations, the eval metrics, and the banking terms in the reports) is in [docs/concepts.md](docs/concepts.md).
+
+## Try it
+
+### What you need
+
+- [uv](https://docs.astral.sh/uv/getting-started/installation/), which also installs Python 3.12, and git.
+- About 10 GB of free disk: the two local models are 2.3 GB each, and PyTorch with CUDA is several GB. The reports, parsed pages and index take about 170 MB.
+- An NVIDIA GPU is optional. On Windows uv installs the CUDA 13.0 build of PyTorch; on Linux the CPU build. I built and measured everything on Windows 11 with an RTX 5070. On a CPU the search works but is slower, and I have not measured how much. macOS is untested.
+- An [Anthropic API key](https://console.anthropic.com/) for answers only. Search and the retrieval evals need no key.
+
+### Steps
+
+```bash
+git clone https://github.com/AndersHenriksen-dev/nordic-bank-report-rag.git
+cd nordic-bank-report-rag
+make setup          # uv sync, and the pre-commit hooks
+make download       # the six PDFs into data/raw/, checked against their SHA-256
+```
+
+Jyske Bank's website blocks scripted downloads. The script then prints the URL: open it in a browser, save the PDF under the name the script gives in `data/raw/`, and run `make download` again to check it.
+
+```bash
+make ingest         # parse, chunk and index: about 30 minutes the first time
+```
+
+Parsing is the slow part, and its result is cached per report. The first run also downloads `bge-m3` from Hugging Face and builds the vector index (about 2 minutes on my GPU, including the download). Running `ingest` again parses only reports without a cache, and rebuilds the index only when the chunks or the embedding model changed.
+
+Search without an API key:
+
+```bash
+uv run bankrag search "What was Nordea's CET1 ratio at the end of 2025?"
+uv run bankrag search "Hvad var Nordeas egenkapitalforrentning i 2025?" --retriever bm25
+```
+
+It prints the top passages with their page and score. `--retriever` takes `bm25`, `dense`, `hybrid` or `hybrid-rerank` (the default), so you can compare them on your own questions. The first search downloads the reranker.
+
+Then add the API key and ask:
+
+```bash
+cp .env.example .env          # then put your key after ANTHROPIC_API_KEY=
+make ask Q="How did Nordea's net interest income change from 2024 to 2025, and why?"
+make app                      # the web page on http://localhost:8501
+```
+
+The web page listens on localhost only, because every question spends the key's credit. Qdrant runs inside the process and locks its folder, so run one of the web page, the CLI or the evals at a time.
+
+### Evals
+
+```bash
+make eval-retrieval   # recall@k and MRR for 8 search setups, free, a few minutes
+make eval             # also answers all 44 questions and grades them with the judge: about USD 0.05
+```
+
+Both write [evals/RESULTS.md](evals/RESULTS.md); the full run also writes [evals/ANSWERS.md](evals/ANSWERS.md) with every question, gold answer, answer, cited passage and verdict.
+
+### Settings
+
+All optional, in `.env`:
+
+| Variable | Default | What it changes |
+|---|---|---|
+| `BANKRAG_MODEL` | `claude-haiku-5-5` | The answer model |
+| `BANKRAG_JUDGE_MODEL` | `claude-haiku-5-5` | The eval's LLM judge |
+| `BANKRAG_EMBED_MODEL` | `BAAI/bge-m3` | The embedding model; changing it rebuilds the index on the next `ingest` |
+| `BANKRAG_RERANK_MODEL` | `BAAI/bge-reranker-v2-m3` | The reranker |
+| `BANKRAG_USD_TO_DKK` | `6.8` | The fixed rate for costs in DKK |
+
+### Development
+
+```bash
+make check    # ruff, ruff format, mypy and pytest: what CI runs
+```
+
+The 67 tests need no API key, models or PDFs: they use small fakes, an in-memory Qdrant and a fake HTTP transport for the Claude API. Pre-commit runs ruff, mypy and a gitleaks secret scan on every commit, and GitHub Actions runs the checks and the secret scan on every pull request.
+
+## How it is measured
+
+The eval set ([evals/questions.yaml](evals/questions.yaml)) has 44 questions: 10 lookups, 6 comparisons across years, 6 across banks, 7 "why" questions, 6 Danish questions and 9 that the reports cannot answer (forecasts, advice, years not covered). Each answerable question has a gold answer and the PDF pages that hold it, checked in the page text.
+
+- **Retrieval:** recall@k (the share of a question's needed evidence found in the top k passages) and MRR (how high the first right page ranks).
+- **Numbers:** every figure the gold answer requires must appear in the answer, within rounding.
+- **Grounding:** every figure in an answer must appear in a passage the answer cites.
+- **Refusals:** unanswerable questions must be refused, answerable ones must not.
+- **LLM judge:** Claude grades each answer as correct, complete and consistent against the gold answer, by a [written rubric](evals/judge_rubric.md). It catches what figure checks cannot, such as a comparison that contradicts itself.
+- **Cost and latency:** mean and 95th percentile per question.
 
 ## What I tried
 
-Each step was measured on the 35 answerable questions of a 44-question eval set (lookups, comparisons across banks and years, "why" questions, 8 in Danish, and 9 the reports cannot answer). Recall@k is the share of the needed evidence found in the top k passages; Claude reads the top 6.
+Each step was measured on the 35 answerable questions. Claude reads the top 6 passages.
 
 | Step | Recall@1 | Recall@3 | Recall@6 |
 |---|---|---|---|
@@ -30,16 +165,50 @@ Answers on all 44 questions with the reranked search and Claude Haiku 5.5 (the l
 
 - 27 of 28 numeric answers exact, and 26 of 32 answers with every figure in a cited passage (29 in the run before).
 - All 9 questions the reports cannot answer refused, and no answerable question refused.
-- An LLM judge with a [written rubric](evals/judge_rubric.md) passed 27 of 35 answers as correct, complete and consistent. Reading the 8 fails, 7 are real faults.
-- USD 0.001 and 5 s per question, plus USD 0.0002 per verdict.
+- The LLM judge passed 27 of 35 answers as correct, complete and consistent. Reading the 8 fails, 7 are real faults.
+- USD 0.001 and 5 s per question, plus USD 0.0002 per judge verdict.
 
 What I take from it:
 
-- **Search quality came from the documents and the search, not the model.** Rebuilding tables row by row, routing by bank and year, and reranking moved the numbers; the answer model stayed the cheapest one (Claude Haiku 5.5, about USD 0.001 per question).
+- **Search quality came from the documents and the search, not the model.** Rebuilding tables row by row, routing by bank and year, and reranking moved the numbers; the answer model stayed the cheapest one.
 - **Dense vectors alone do not replace BM25 on annual reports**, which are full of exact terms and figures. They put the right page first a little more often (recall@1 0.24 against 0.20) but find less of the evidence in the top 6 (0.74 against 0.80). Fused with BM25 they nearly double how often the right page comes first, and the reranker lifts that to 2.5 times BM25.
-- **The eval had to be debugged too.** My first citation metric scored 50%, but it measured my gold page lists more than the answers. Its replacement checks that every figure in an answer appears in a passage the answer cites: 18 or 19 of 19 answers pass, depending on the run. Better searches also kept finding pages that hold the answer but were missing from my gold lists; each one is checked in the PDF text before it is added.
+- **The eval had to be debugged too.** My first citation metric scored 50%, but it measured my gold page lists more than the answers. Its replacement checks that every figure in an answer appears in a passage the answer cites. Better searches also kept finding pages that hold the answer but were missing from my gold lists; each one is checked in the page text before it is added.
 - **A judge needs checking too.** The LLM judge caught comparisons that contradict themselves and business-unit figures offered as the group's, which no figure check could see. At low effort it also failed 3 good answers, and a sharper rubric alone only moved those errors around. Judging the same answers at medium effort cut the wrong verdicts to 1 of 34.
-- **Where it breaks:** group versus business-unit pages (the answer offers a business unit's figure next to the group's and will not choose), paragraphs the parser splits into pieces so a citation covers only part of a sentence, and sentences quoted without a citation marker. My first refusal rule also refused questions about a bank's own published outlook; a new eval question caught it, and the fix removed the last wrong refusal. Details, and every other strategy with its result, are in [docs/experiments.md](docs/experiments.md).
+- **Where it breaks:** group versus business-unit pages (the answer offers a business unit's figure next to the group's and will not choose), paragraphs the parser splits into pieces so a citation covers only part of a sentence, and sentences quoted without a citation marker. My first refusal rule also refused questions about a bank's own published outlook; a new eval question caught it, and the fix removed the last wrong refusal.
+
+Every strategy, with its numbers and what I kept, is in [docs/experiments.md](docs/experiments.md).
+
+## Repository layout
+
+```
+src/bankrag/
+    cli.py                 bankrag ingest | search | ask
+    config.py              paths, model names, prices
+    models.py              Pydantic models for everything that crosses a boundary
+    figures.py             number parsing in English and Danish formats
+    ingest/                PDF parsing, chunking, the crash-safe pipeline
+    retrieve/              BM25, Qdrant vectors, fusion, reranking, routing, Danish glossary
+    answer/generate.py     the Claude call with citations, refusals, cost and the trace log
+    judge.py               the LLM judge
+    evaluate.py            recall@k, MRR, number and grounding checks
+    ui/                    the Streamlit page and the passage highlighter
+evals/                     questions, judge rubric, the eval runner and its generated results
+scripts/                   download the reports; search the parsed pages to check a gold answer
+tests/                     unit tests, no network or models needed
+docs/                      decisions, experiments, documents, concepts, build log
+.claude/                   Claude Code setup: style guide, hook, project skill, permissions
+```
+
+## How I built it
+
+I built this with Claude Code, and the setup is part of the repository:
+
+- [CLAUDE.md](CLAUDE.md) holds the project's rules: how to run things, never commit data or keys, every new feature gets an eval case, refuse investment advice.
+- A [Python style guide](.claude/reference/python-style.md) with a hook that blocks an agent from editing Python before it has read the guide. Ruff, mypy and pre-commit enforce the parts a tool can check.
+- A project skill, [add-eval-case](.claude/skills/add-eval-case/SKILL.md), which makes every new eval question's figures and pages checked in the parsed report text.
+- [docs/BUILD_LOG.md](docs/BUILD_LOG.md) records each session: what was built, what Claude Code did, and what I decided.
+
+Not done yet: an MCP server, retrieval evals in CI against a small index fixture, a demo GIF, and my own check of every gold answer against the PDFs (all are marked `verified: false` until then).
 
 ## Disclaimer
 
