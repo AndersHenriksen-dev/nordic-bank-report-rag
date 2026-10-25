@@ -66,6 +66,8 @@ flowchart LR
 7. **Answer.** Claude Haiku 5.5 gets the 6 passages as `search_result` blocks with citations turned on, and a cached system prompt with the rules: answer only from the passages, cite every figure, answer Danish questions in Danish, refuse forecasts and advice, but report a bank's own published outlook.
 8. **Log.** Every answer goes to `data/traces/answers.jsonl` with its sources, tokens, cost and latency.
 
+Next to the answers sits a **KPI table** ([kpi/figures.yaml](kpi/figures.yaml)): net profit, total income, cost/income ratio, return on equity, CET1 ratio, loan impairment charges and lending, for each bank and year. Each of the 42 figures has its page and the exact table row it came from. Claude Haiku read them with structured output from each report's key figure pages and the search results, for USD 0.05 in total. Three automatic checks (the page was sent, the row is on the page, the value is in the row) passed on all 42, and the figures agree with every gold answer that states the same number. They are marked `verified: false` until I have checked them against the PDFs. `bankrag kpi show` prints the table from SQLite, which the MCP server will query.
+
 The reasons behind each choice are in [docs/decisions.md](docs/decisions.md). A study guide to the concepts (BM25, embeddings, rank fusion, rerankers, citations, the eval metrics, and the banking terms in the reports) is in [docs/concepts.md](docs/concepts.md).
 
 ## Try it
@@ -102,6 +104,8 @@ uv run bankrag search "Hvad var Nordeas egenkapitalforrentning i 2025?" --retrie
 ```
 
 It prints the top passages with their page and score. `--retriever` takes `bm25`, `dense`, `hybrid` or `hybrid-rerank` (the default), so you can compare them on your own questions. The first search downloads the reranker.
+
+`uv run bankrag kpi show` prints the KPI table, also without a key. `bankrag kpi extract` reads it again with Claude (about USD 0.05) and keeps every figure already marked `verified: true`.
 
 Then add the API key and ask:
 
@@ -197,10 +201,12 @@ src/bankrag/
     ingest/                PDF parsing, chunking, the crash-safe pipeline
     retrieve/              BM25, Qdrant vectors, fusion, reranking, routing, Danish glossary
     answer/generate.py     the Claude call with citations, refusals, cost and the trace log
+    kpi/                   the KPI table: extraction with structured output, automatic checks, SQLite queries
     judge.py               the LLM judge
     evaluate.py            recall@k, MRR, number and grounding checks
     ui/                    the Streamlit page and the passage highlighter
 evals/                     questions, judge rubric, the eval runner and its generated results
+kpi/figures.yaml           the 42 key figures with page and source row, for review by hand
 scripts/                   download the reports; search the parsed pages to check a gold answer
 tests/                     unit tests, no network or models needed
 docs/                      decisions, experiments, documents, concepts, build log
@@ -216,7 +222,7 @@ I built this with Claude Code, and the setup is part of the repository:
 - A project skill, [add-eval-case](.claude/skills/add-eval-case/SKILL.md), which makes every new eval question's figures and pages checked in the parsed report text.
 - [docs/BUILD_LOG.md](docs/BUILD_LOG.md) records each session: what was built, what Claude Code did, and what I decided.
 
-Not done yet: an MCP server, retrieval evals in CI against a small index fixture, a demo GIF, and my own check of every gold answer against the PDFs (all are marked `verified: false` until then).
+Not done yet: an MCP server, retrieval evals in CI against a small index fixture, a demo GIF, and my own check of every gold answer and KPI figure against the PDFs (all are marked `verified: false` until then).
 
 ## Disclaimer
 
