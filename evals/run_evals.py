@@ -1,7 +1,7 @@
 """Run the eval set and write evals/results/*.json, evals/RESULTS.md and evals/ANSWERS.md.
 
 python evals/run_evals.py              # retrieval metrics only, no API key needed
-python evals/run_evals.py --answers    # also answer every question with Claude (costs money)
+python evals/run_evals.py --answers    # also answer every question with Claude and grade the answers (costs money)
 """
 
 from __future__ import annotations
@@ -18,10 +18,11 @@ from typing import NamedTuple
 from pydantic import BaseModel, TypeAdapter, ValidationError
 
 from bankrag.answer import answer, log_trace
-from bankrag.config import ANSWER_MODEL, EMBED_MODEL, RERANK_MODEL, bank_name, parse_bank
+from bankrag.config import ANSWER_MODEL, EMBED_MODEL, JUDGE_MODEL, RERANK_MODEL, bank_name, parse_bank
 from bankrag.evaluate import figures_grounded, load_questions, numbers_match, page_key, percentile, retrieval_scores
 from bankrag.ingest import load_chunks
-from bankrag.models import Question, Source
+from bankrag.judge import judge
+from bankrag.models import Question, Source, Verdict
 from bankrag.retrieve import DEFAULT_RETRIEVER, BM25Retriever, Retriever, build_retriever, routed_search
 
 EVAL_DIR = Path(__file__).resolve().parent
@@ -66,6 +67,21 @@ class AnswerRecord(BaseModel):
     cache_read_tokens: int
     answer: str
     sources: list[Source]
+    judge: Verdict | None = None  # None for refusals, unanswerable questions and runs before the judge existed
+    judge_cost_usd: float = 0.0
+
+
+class JudgeSummary(BaseModel):
+    """How the LLM judge graded the answers it read: every answerable question that was not refused."""
+
+    n: int
+    passed: float
+    correct: float
+    complete: float
+    consistent: float
+    why_n: int
+    why_passed: float | None
+    cost_usd: float
 
 
 class AnswerSummary(BaseModel):
@@ -83,6 +99,7 @@ class AnswerSummary(BaseModel):
     cost_usd_p95: float
     latency_s_mean: float
     latency_s_p95: float
+    judge: JudgeSummary | None = None
 
 
 class AnswerReport(BaseModel):
@@ -91,6 +108,7 @@ class AnswerReport(BaseModel):
     run_date: date
     model: str
     retriever: str = "bm25"  # answer runs before the hybrid retriever all used BM25
+    judge_model: str | None = None
     summary: AnswerSummary
     records: list[AnswerRecord]
 
@@ -134,6 +152,12 @@ def _answer_one(question: Question, retriever: Retriever, k: int) -> AnswerRecor
     hits = routed_search(retriever, question.question, k=k)
     result = answer(question.question, hits)
     log_trace(result, eval_id=question.id)
+    verdict, judge_cost = None, 0.0
+    if question.answerable and not result.refused:
+        try:
+            verdict, judge_cost = judge(question, result.text)
+        except RuntimeError as error:
+            print(f"  {error}")
     return AnswerRecord(
         id=question.id,
         category=question.category,
@@ -147,11 +171,30 @@ def _answer_one(question: Question, retriever: Retriever, k: int) -> AnswerRecor
         cache_read_tokens=result.cache_read_tokens,
         answer=result.text,
         sources=result.sources,
+        judge=verdict,
+        judge_cost_usd=judge_cost,
     )
 
 
 def _share(flags: list[bool]) -> float | None:
     return sum(flags) / len(flags) if flags else None
+
+
+def _summarize_judge(records: list[AnswerRecord]) -> JudgeSummary | None:
+    verdicts = [record.judge for record in records if record.judge]
+    if not verdicts:
+        return None
+    why = [record.judge.passed for record in records if record.judge and record.category == "why"]
+    return JudgeSummary(
+        n=len(verdicts),
+        passed=statistics.mean(verdict.passed for verdict in verdicts),
+        correct=statistics.mean(verdict.correct for verdict in verdicts),
+        complete=statistics.mean(verdict.complete for verdict in verdicts),
+        consistent=statistics.mean(verdict.consistent for verdict in verdicts),
+        why_n=len(why),
+        why_passed=_share(why),
+        cost_usd=sum(record.judge_cost_usd for record in records),
+    )
 
 
 def _summarize(records: list[AnswerRecord]) -> AnswerSummary:
@@ -174,22 +217,41 @@ def _summarize(records: list[AnswerRecord]) -> AnswerSummary:
         cost_usd_p95=percentile(costs, 95),
         latency_s_mean=statistics.mean(latencies),
         latency_s_p95=percentile(latencies, 95),
+        judge=_summarize_judge(records),
     )
 
 
 def answer_eval(questions: list[Question], retriever: Retriever, k: int) -> tuple[list[AnswerRecord], AnswerSummary]:
-    """Answer every question with Claude and score the answers. Calls the paid API once per question."""
+    """Answer every question with Claude and score the answers.
+
+    Calls the paid API once per question, and once more per answer the judge grades.
+    """
     records = []
     for question in questions:
         record = _answer_one(question, retriever, k)
         status = "REFUSED" if record.refused else ("ok" if record.numbers_ok in (True, None) else "WRONG NUMBER")
-        print(f"  {record.id} {status:12s} {record.latency_s:4.1f}s  {record.answer[:90]!r}")
+        verdict = "" if record.judge is None else ("judge pass" if record.judge.passed else "JUDGE FAIL")
+        print(f"  {record.id} {status:12s} {verdict:10s} {record.latency_s:4.1f}s  {record.answer[:80]!r}")
         records.append(record)
     return records, _summarize(records)
 
 
 def _percent(value: float | None) -> str:
     return "n/a" if value is None else f"{value:.0%}"
+
+
+def _judge_rows(judged: JudgeSummary, model: str) -> list[str]:
+    """Return the judge's rows of the answer table and a note on how it grades."""
+    criteria = " / ".join(_percent(share) for share in (judged.correct, judged.complete, judged.consistent))
+    return [
+        f"| Answers the judge passed (correct, complete and consistent) | {_percent(judged.passed)} of {judged.n} |",
+        f'| "Why" answers the judge passed | {_percent(judged.why_passed)} of {judged.why_n} |',
+        f"| Judge criteria met: correct / complete / consistent | {criteria} |",
+        f"| Judge cost for the whole run (USD) | {judged.cost_usd:.4f} |",
+        "",
+        f"The judge (`{model}`) grades every answered question against its gold answer, by the rubric in",
+        "[judge_rubric.md](judge_rubric.md). Refusals are not judged; they are counted above.",
+    ]
 
 
 def write_results_md(retrieval: list[RetrievalResult], report: AnswerReport | None, n_questions: int) -> None:
@@ -236,11 +298,17 @@ def write_results_md(retrieval: list[RetrievalResult], report: AnswerReport | No
             f"| Cost per question, mean / p95 (USD) | {answers.cost_usd_mean:.5f} / {answers.cost_usd_p95:.5f} |",
             f"| Latency per question, mean / p95 (s) | {answers.latency_s_mean:.1f} / {answers.latency_s_p95:.1f} |",
         ]
+        if answers.judge:
+            lines += _judge_rows(answers.judge, report.judge_model or JUDGE_MODEL)
     (EVAL_DIR / "RESULTS.md").write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
 
 
 def _yes_no(value: bool | None) -> str:
     return "n/a" if value is None else ("yes" if value else "no")
+
+
+def _verdict(verdict: Verdict | None) -> str:
+    return "n/a" if verdict is None else ("pass" if verdict.passed else "fail")
 
 
 def _page_label(key: str) -> str:
@@ -282,6 +350,13 @@ def _question_section(question: Question, record: AnswerRecord) -> list[str]:
         f"{_yes_no(record.figures_grounded)}. Refused: {_yes_no(record.refused)}.",
         "",
     ]
+    if record.judge:
+        lines += [
+            f"**Judge:** {_verdict(record.judge)}. Correct: {_yes_no(record.judge.correct)}. "
+            f"Complete: {_yes_no(record.judge.complete)}. Consistent: {_yes_no(record.judge.consistent)}. "
+            f"{record.judge.reason}",
+            "",
+        ]
     return lines
 
 
@@ -299,14 +374,15 @@ def write_answers_md(questions: list[Question], report: AnswerReport) -> None:
         "and the start of the passage Claude cited. Page numbers are PDF page numbers. Gold answers are drafts",
         "until checked by hand against the PDFs. The reports are listed in [docs/documents.md](../docs/documents.md).",
         "",
-        "| ID | Category | Question | Figures exact | Figures in cited passages | Refused |",
-        "|---|---|---|---|---|---|",
+        "| ID | Category | Question | Figures exact | Figures in cited passages | Refused | Judge |",
+        "|---|---|---|---|---|---|---|",
     ]
     for question in asked:
         record = records[question.id]
         lines.append(
             f"| [{question.id}](#{question.id}) | {question.category} | {question.question} | "
-            f"{_yes_no(record.numbers_ok)} | {_yes_no(record.figures_grounded)} | {_yes_no(record.refused)} |",
+            f"{_yes_no(record.numbers_ok)} | {_yes_no(record.figures_grounded)} | {_yes_no(record.refused)} | "
+            f"{_verdict(record.judge)} |",
         )
     lines.append("")
     for question in asked:
@@ -364,6 +440,7 @@ def main() -> int:
             run_date=date.today(),
             model=ANSWER_MODEL,
             retriever=DEFAULT_RETRIEVER,
+            judge_model=JUDGE_MODEL,
             summary=summary,
             records=records,
         )

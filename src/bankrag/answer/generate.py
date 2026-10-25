@@ -71,7 +71,12 @@ def is_refusal(text: str) -> bool:
     return text.lstrip(" \n*_#>").lower().startswith(REFUSAL_PREFIXES)
 
 
-def _client() -> anthropic.Anthropic:
+def api_client() -> anthropic.Anthropic:
+    """Return an Anthropic client, or stop with a clear message when no API key is set.
+
+    Raises:
+        SystemExit: If no API key is configured.
+    """
     if not (os.getenv("ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_AUTH_TOKEN")):
         raise SystemExit("No API key. Copy .env.example to .env and set ANTHROPIC_API_KEY.")
     return anthropic.Anthropic()
@@ -102,7 +107,8 @@ def _user_content(question: str, hits: list[Hit]) -> list[ContentBlockParam]:
     return content
 
 
-def _cost_usd(model: str, usage: Usage) -> float:
+def cost_usd(model: str, usage: Usage) -> float:
+    """Price one API call from its token usage, counting cache writes and reads at their own rates."""
     price_in, price_out = PRICES_USD_PER_MTOK.get(model, PRICES_USD_PER_MTOK["claude-haiku-5-5"])
     cache_write = usage.cache_creation_input_tokens or 0
     cache_read = usage.cache_read_input_tokens or 0
@@ -176,7 +182,7 @@ def answer(question: str, hits: list[Hit]) -> Answer:
         SystemExit: If no API key is configured.
     """
     start = time.perf_counter()
-    response = _client().messages.create(
+    response = api_client().messages.create(
         model=ANSWER_MODEL,
         max_tokens=MAX_OUTPUT_TOKENS,
         system=[{"type": "text", "text": SYSTEM_PROMPT, "cache_control": {"type": "ephemeral"}}],
@@ -205,7 +211,7 @@ def answer(question: str, hits: list[Hit]) -> Answer:
         output_tokens=usage.output_tokens,
         cache_read_tokens=usage.cache_read_input_tokens or 0,
         cache_write_tokens=usage.cache_creation_input_tokens or 0,
-        cost_usd=_cost_usd(ANSWER_MODEL, usage),
+        cost_usd=cost_usd(ANSWER_MODEL, usage),
         latency_s=latency,
         retrieved=[hit.chunk.id for hit in hits],
     )

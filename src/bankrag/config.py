@@ -32,6 +32,8 @@ DISCLAIMER = (
 )
 
 ANSWER_MODEL = os.getenv("BANKRAG_MODEL", "claude-haiku-5-5")
+# The eval's LLM judge. The same cheap model as the answers by default; a stronger judge is one variable away.
+JUDGE_MODEL = os.getenv("BANKRAG_JUDGE_MODEL", "claude-haiku-5-5")
 
 # Local open models from Hugging Face, multilingual because questions come in Danish and English. Changing the
 # embedding model makes `bankrag ingest` rebuild the vector index.
