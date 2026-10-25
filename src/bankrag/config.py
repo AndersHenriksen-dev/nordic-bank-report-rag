@@ -1,4 +1,4 @@
-"""Settings shared by the whole package: paths, the three banks, the answer model and its prices."""
+"""Settings shared by the whole package: paths, the three banks, the search and answer models, and prices."""
 
 from __future__ import annotations
 
@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = ROOT / "data"
 RAW_DIR = DATA_DIR / "raw"
 PROCESSED_DIR = DATA_DIR / "processed"
+INDEX_DIR = DATA_DIR / "index"
 TRACE_DIR = DATA_DIR / "traces"
 
 load_dotenv(ROOT / ".env")
@@ -31,6 +32,11 @@ DISCLAIMER = (
 )
 
 ANSWER_MODEL = os.getenv("BANKRAG_MODEL", "claude-haiku-5-5")
+
+# Local open models from Hugging Face, multilingual because questions come in Danish and English. Changing the
+# embedding model makes `bankrag ingest` rebuild the vector index.
+EMBED_MODEL = os.getenv("BANKRAG_EMBED_MODEL", "BAAI/bge-m3")
+RERANK_MODEL = os.getenv("BANKRAG_RERANK_MODEL", "BAAI/bge-reranker-v2-m3")
 
 # USD per million tokens: (input, output). Cache writes cost 1.25x input, cache reads 0.1x.
 # Source: Anthropic pricing, checked October 2026.

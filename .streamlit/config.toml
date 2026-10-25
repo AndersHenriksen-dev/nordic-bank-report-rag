@@ -2,6 +2,9 @@
 headless = true
 # Only this machine can reach the app: every question spends the API key's credit.
 address = "localhost"
+# The file watcher walks every loaded module; with transformers loaded it tries to import image models that need
+# torchvision, which fails noisily. Restart the app after changing code instead.
+fileWatcherType = "none"
 
 [browser]
 gatherUsageStats = false
