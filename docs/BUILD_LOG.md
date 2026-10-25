@@ -1,0 +1,8 @@
+# Build log
+
+One line per session: date, hours, what was built, what Claude Code did and what I decided.
+
+| Date | Hours | Built | Claude Code did | I decided |
+|---|---|---|---|---|
+| 2026-10-24 | 2.5 (estimate) | M1 start: repo, download script, PDF parsing and chunking, BM25 search with bank and year routing, cited answers with Claude Haiku 5.5, first 19 eval questions, eval runner | Found the six report URLs (Danske Bank's 2024 file only through their file API), wrote all code and tests, drafted gold answers from the PDFs. Caught that PyMuPDF's table cells merge columns and switched to rebuilding rows from word positions. | Repo name and public visibility, cheapest model for answers, Jyske Bank PDFs downloaded by hand instead of working around the site's bot check |
+| 2026-10-25 | 1.0 (07:45 to 08:45; about 30 minutes of it was parsing) | Full ingest of all six reports (1,867 pages, 4,882 chunks), crash-safe parsing, section detection, interleaved routing, Danish glossary, 8 Jyske and three-bank eval questions, first retrieval results: recall@6 0.52 for plain BM25, 0.89 with routing and the glossary | Traced the ingest crash to PyMuPDF 2.0's layout model (page 3 of Nordea 2025) and built a restart-with-fallback around it. Its own tests caught a bug in its first version, which would have left crashing pages empty. Found and fixed two of its own mistakes from the day before: routed results were sorted by score, which undid the balancing, and the eval cut one deep search to k instead of searching at each k. After the first run it added evidence pages to 3 gold entries, each checked in the PDF text. | Downloaded the Jyske Bank PDFs, narrowed the `.env` deny rule, held off on the API key until answers are ready to test |

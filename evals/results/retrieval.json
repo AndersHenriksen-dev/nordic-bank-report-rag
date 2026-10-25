@@ -1,0 +1,38 @@
+[
+  {
+    "config": "BM25, fixed chunks",
+    "questions": 22,
+    "mrr": 0.3428309064672701,
+    "recall@1": 0.17424242424242425,
+    "recall@3": 0.17424242424242425,
+    "recall@6": 0.5227272727272727,
+    "recall@10": 0.6818181818181818
+  },
+  {
+    "config": "BM25, structure chunks",
+    "questions": 22,
+    "mrr": 0.3163961038961039,
+    "recall@1": 0.11363636363636363,
+    "recall@3": 0.3106060606060606,
+    "recall@6": 0.5227272727272727,
+    "recall@10": 0.7575757575757576
+  },
+  {
+    "config": "BM25, structure chunks, routed",
+    "questions": 22,
+    "mrr": 0.4255509641873278,
+    "recall@1": 0.1590909090909091,
+    "recall@3": 0.5,
+    "recall@6": 0.803030303030303,
+    "recall@10": 0.8181818181818182
+  },
+  {
+    "config": "BM25, structure chunks, routed, Danish glossary",
+    "questions": 22,
+    "mrr": 0.45151515151515154,
+    "recall@1": 0.1590909090909091,
+    "recall@3": 0.5909090909090909,
+    "recall@6": 0.8939393939393939,
+    "recall@10": 0.9090909090909091
+  }
+]
