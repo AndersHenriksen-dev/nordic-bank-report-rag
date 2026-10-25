@@ -16,7 +16,7 @@ from typing import NamedTuple
 from pydantic import BaseModel, TypeAdapter
 
 from bankrag.answer import answer, log_trace
-from bankrag.evaluate import citation_ok, load_questions, numbers_match, page_key, percentile, retrieval_scores
+from bankrag.evaluate import figures_grounded, load_questions, numbers_match, page_key, percentile, retrieval_scores
 from bankrag.ingest import load_chunks
 from bankrag.models import Question
 from bankrag.retrieve import BM25Retriever, Retriever, routed_search
@@ -54,7 +54,7 @@ class AnswerRecord(BaseModel):
     refused: bool
     numbers_ok: bool | None
     has_citation: bool
-    citations_ok: bool | None
+    figures_grounded: bool | None
     cost_usd: float
     latency_s: float
     cache_read_tokens: int
@@ -68,7 +68,8 @@ class AnswerSummary(BaseModel):
     numeric_exact: float | None
     numeric_n: int
     answered_with_citation: float
-    citations_correct: float | None
+    figures_grounded: float | None
+    figures_grounded_n: int
     false_refusals: int
     unanswerable_refused: int
     unanswerable_n: int
@@ -124,7 +125,6 @@ def _answer_one(question: Question, retriever: Retriever, k: int) -> AnswerRecor
     hits = routed_search(retriever, question.question, k=k)
     result = answer(question.question, hits)
     log_trace(result, eval_id=question.id)
-    citations = [citation_ok(question, source) for source in result.sources]
     return AnswerRecord(
         id=question.id,
         category=question.category,
@@ -132,7 +132,7 @@ def _answer_one(question: Question, retriever: Retriever, k: int) -> AnswerRecor
         refused=result.refused,
         numbers_ok=numbers_match(question, result.text) if question.answerable else None,
         has_citation=bool(result.sources),
-        citations_ok=all(citations) if citations else None,
+        figures_grounded=figures_grounded(result.text, result.sources) if question.answerable else None,
         cost_usd=result.cost_usd,
         latency_s=result.latency_s,
         cache_read_tokens=result.cache_read_tokens,
@@ -149,14 +149,15 @@ def _summarize(records: list[AnswerRecord]) -> AnswerSummary:
     answerable = [record for record in records if record.answerable]
     unanswerable = [record for record in records if not record.answerable]
     numeric = [record.numbers_ok for record in answerable if record.numbers_ok is not None]
-    cited = [record.citations_ok for record in answerable if record.citations_ok is not None]
+    grounded = [record.figures_grounded for record in answerable if record.figures_grounded is not None]
     costs = [record.cost_usd for record in records]
     latencies = [record.latency_s for record in records]
     return AnswerSummary(
         numeric_exact=_share(numeric),
         numeric_n=len(numeric),
         answered_with_citation=_share([r.has_citation and not r.refused for r in answerable]) or 0.0,
-        citations_correct=_share(cited),
+        figures_grounded=_share(grounded),
+        figures_grounded_n=len(grounded),
         false_refusals=sum(record.refused for record in answerable),
         unanswerable_refused=sum(record.refused for record in unanswerable),
         unanswerable_n=len(unanswerable),
@@ -212,13 +213,14 @@ def write_results_md(retrieval: list[RetrievalResult], answers: AnswerSummary | 
             "|---|---|",
             f"| Numeric answers exact | {_percent(answers.numeric_exact)} of {answers.numeric_n} |",
             f"| Answerable questions answered with a citation | {_percent(answers.answered_with_citation)} |",
-            f"| Answers whose citations all check out | {_percent(answers.citations_correct)} |",
+            f"| Answers whose figures all appear in a cited passage | {_percent(answers.figures_grounded)} of "
+            f"{answers.figures_grounded_n} |",
             f"| Answerable questions wrongly refused | {answers.false_refusals} |",
             f"| Unanswerable questions refused | {answers.unanswerable_refused} of {answers.unanswerable_n} |",
             f"| Cost per question, mean / p95 (USD) | {answers.cost_usd_mean:.5f} / {answers.cost_usd_p95:.5f} |",
             f"| Latency per question, mean / p95 (s) | {answers.latency_s_mean:.1f} / {answers.latency_s_p95:.1f} |",
         ]
-    (EVAL_DIR / "RESULTS.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (EVAL_DIR / "RESULTS.md").write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
 
 
 def main() -> int:
@@ -251,7 +253,11 @@ def main() -> int:
         print("\nanswering...")
         records, summary = answer_eval(questions, structure, args.k)
         report = AnswerReport(summary=summary, records=records)
-        (RESULTS_DIR / "answers.json").write_text(report.model_dump_json(indent=2) + "\n", encoding="utf-8")
+        (RESULTS_DIR / "answers.json").write_text(
+            report.model_dump_json(indent=2) + "\n",
+            encoding="utf-8",
+            newline="\n",
+        )
         print(summary.model_dump_json(indent=2))
 
     write_results_md(retrieval, summary, len(questions))
