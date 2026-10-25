@@ -153,13 +153,15 @@ def render_with_citations(response: Message, hits: list[Hit]) -> tuple[str, list
         The answer text with markers, and one source per cited page, numbered in order of first citation.
     """
     sources: dict[int, Source] = {}
-    parts: list[str] = []
+    text = ""
     for block in response.content:
         if block.type != "text":
             continue
-        parts.append(block.text)
-        parts.extend(f" [{n}]" for n in _register_citations(block, hits, sources))
-    return "".join(parts).strip(), sorted(sources.values(), key=lambda source: source.n)
+        # A cited block often starts a new sentence straight after the previous block's full stop.
+        if text.endswith((".", "!", "?", ":")) and block.text[:1].isalnum():
+            text += " "
+        text += block.text + "".join(f" [{n}]" for n in _register_citations(block, hits, sources))
+    return text.strip(), sorted(sources.values(), key=lambda source: source.n)
 
 
 def answer(question: str, hits: list[Hit]) -> Answer:
