@@ -12,6 +12,15 @@ from bankrag.models import Chunk, Question, Source
 
 NUMBER_RE = re.compile(r"-?\d+(?:[.,]\d+)*")
 NUMBER_TOLERANCE = 0.011  # allows rounding to one decimal, e.g. 45.46 matches 45.5
+YEARS_NOT_FIGURES = range(1990, 2036)
+# Citation markers and page or note references, which hold numbers that are not figures from a report.
+REFERENCE_RE = re.compile(
+    r"\[\d+\]"  # citation markers
+    r"|\b(?:pages?|p\.|sider?|note)\s+[A-Z]?\d+(?:\s*(?:and|og|,|-|\u2013)\s*\d+)*"  # page and note references
+    r"|\b[A-Z]\d{1,3}\b"  # note numbers such as G41 or P30
+    r"|\b(?:Microsoft|Office|M)\s?365\b",  # product names
+    re.IGNORECASE,
+)
 
 _QUESTIONS_ADAPTER: TypeAdapter[list[Question]] = TypeAdapter(list[Question])
 
@@ -51,17 +60,23 @@ def numbers_in(text: str) -> set[float]:
 
     "23,037" and "23.037" can each mean 23037 or 23.037, so both readings are kept.
     """
-    found: set[float] = set()
-    for raw in NUMBER_RE.findall(text):
-        for thousands, decimal in ((",", "."), (".", ",")):
-            parts = raw.split(decimal)
-            if len(parts) > 2:
-                continue
-            whole = parts[0]
-            if thousands in whole and not all(len(group) == 3 for group in whole.split(thousands)[1:]):
-                continue
-            found.add(float(whole.replace(thousands, "") + ("." + parts[1] if len(parts) == 2 else "")))
-    return found
+    return {value for raw in NUMBER_RE.findall(text) for value, _ in _readings(raw)}
+
+
+def _readings(raw: str) -> list[tuple[float, int]]:
+    """Return the valid readings of a number token as (absolute value, decimals shown)."""
+    readings = []
+    for thousands, decimal in ((",", "."), (".", ",")):
+        parts = raw.lstrip("-").split(decimal)
+        if len(parts) > 2:
+            continue
+        whole, fraction = parts[0], parts[1] if len(parts) == 2 else ""
+        if thousands in fraction:  # "1,022.3" read the Danish way: not a valid number
+            continue
+        if thousands in whole and not all(len(group) == 3 for group in whole.split(thousands)[1:]):
+            continue
+        readings.append((float(whole.replace(thousands, "") + ("." + fraction if fraction else "")), len(fraction)))
+    return readings
 
 
 def numbers_match(question: Question, answer_text: str) -> bool | None:
@@ -79,12 +94,39 @@ def numbers_match(question: Question, answer_text: str) -> bool | None:
     )
 
 
-def citation_ok(question: Question, source: Source) -> bool:
-    """Check a cited source: it counts as correct if it is a gold page or quotes a gold figure."""
-    if any(page_key(source) in group for group in question.evidence):
-        return True
-    quoted = numbers_in(" ".join(source.cited_text))
-    return any(abs(number - alt) < 1e-6 for alts in question.numbers for alt in alts for number in quoted)
+def _is_figure(readings: list[tuple[float, int]]) -> bool:
+    """Tell figures from years and small counts, which an answer can state without a source."""
+    return any(not value.is_integer() or not (value < 10 or int(value) in YEARS_NOT_FIGURES) for value, _ in readings)
+
+
+def _rounds_to(value: float, decimals: int, pool: set[float]) -> bool:
+    return any(abs(round(candidate, decimals) - value) < 1e-9 for candidate in pool)
+
+
+def figures_grounded(answer_text: str, sources: list[Source]) -> bool | None:
+    """Check that every figure in an answer appears in a passage the answer cites.
+
+    A figure counts as grounded if a cited passage holds it at the precision the answer gives (23.0 billion matches
+    23,037 million), or if it is the difference or percentage change between two other figures in the answer (a fall
+    of 0.1 points from 45.6% to 45.5%). Years, numbers below 10, page and note references, product names and citation
+    markers are not figures.
+
+    Returns:
+        None if the answer states no figures.
+    """
+    text = REFERENCE_RE.sub(" ", answer_text)
+    figures = [readings for raw in NUMBER_RE.findall(text) if _is_figure(readings := _readings(raw))]
+    if not figures:
+        return None
+    cited = {value for source in sources for passage in source.cited_text for value in numbers_in(passage)}
+    cited |= {value / 1000 for value in cited}  # millions restated as billions
+    stated = [value for readings in figures for value, _ in readings]
+    # Sums cover changes across zero, such as from a reversal of 543 to a charge of 294 (figures are unsigned).
+    derived = {abs(a - b) for a in stated for b in stated} | {a + b for a in stated for b in stated}
+    derived |= {abs(a - b) / b * 100 for a in stated for b in stated if b}
+    return all(
+        any(_rounds_to(value, decimals, cited | derived) for value, decimals in readings) for readings in figures
+    )
 
 
 def percentile(values: list[float], p: float) -> float:
