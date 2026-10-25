@@ -5,76 +5,68 @@ from __future__ import annotations
 import argparse
 import sys
 
+from bankrag.answer import answer, log_trace
+from bankrag.ingest import ChunkStrategy, load_chunks, run
+from bankrag.retrieve import BM25Retriever, routed_search
+
 DISCLAIMER = (
     "Built on public annual reports for demonstration. Not investment advice. "
     "Figures should be checked against the source page."
 )
 
 
-def _retriever(strategy: str):
-    from bankrag.ingest.pipeline import load_chunks
-    from bankrag.retrieve.bm25 import BM25Retriever
-
-    return BM25Retriever(load_chunks(strategy))
-
-
-def cmd_ingest(args: argparse.Namespace) -> None:
-    from bankrag.ingest.pipeline import run
-
-    run(force=args.force)
+def search(question: str, k: int, strategy: ChunkStrategy, route: bool) -> None:
+    """Print the chunks retrieved for a question. Needs no API key."""
+    hits = routed_search(BM25Retriever(load_chunks(strategy)), question, k=k, route=route)
+    for rank, hit in enumerate(hits, 1):
+        chunk = hit.chunk
+        print(f"{rank}. {chunk.id}  score {hit.score:.2f}  {chunk.heading or chunk.section}")
+        print("   " + chunk.body[:300].replace("\n", "\n   ") + "\n")
 
 
-def cmd_search(args: argparse.Namespace) -> None:
-    from bankrag.retrieve.route import routed_search
-
-    hits = routed_search(_retriever(args.strategy), args.question, k=args.k, route=not args.no_route)
-    for i, h in enumerate(hits, 1):
-        c = h.chunk
-        print(f"{i}. {c.id}  score {h.score:.2f}  {c.heading or c.section}")
-        print("   " + c.body[:300].replace("\n", "\n   ") + "\n")
-
-
-def cmd_ask(args: argparse.Namespace) -> None:
-    from bankrag.answer.generate import answer, log_trace
-    from bankrag.retrieve.route import routed_search
-
-    hits = routed_search(_retriever(args.strategy), args.question, k=args.k)
-    ans = answer(args.question, hits)
-    log_trace(ans)
-    print(ans.text + "\n")
-    for s in ans.sources:
-        print(f"[{s.n}] {s.label}  ({s.section})")
+def ask(question: str, k: int, strategy: ChunkStrategy) -> None:
+    """Answer a question with citations, and print its sources, cost and latency."""
+    hits = routed_search(BM25Retriever(load_chunks(strategy)), question, k=k)
+    result = answer(question, hits)
+    log_trace(result)
+    print(result.text + "\n")
+    for source in result.sources:
+        print(f"[{source.n}] {source.label}  ({source.section})")
     print(
-        f"\n{ans.model} | {ans.input_tokens} in, {ans.cache_read_tokens} cached, {ans.output_tokens} out"
-        f" | USD {ans.cost_usd:.5f} (DKK {ans.cost_dkk:.4f}) | {ans.latency_s:.1f}s"
+        f"\n{result.model} | {result.input_tokens} in, {result.cache_read_tokens} cached, {result.output_tokens} out"
+        f" | USD {result.cost_usd:.5f} (DKK {result.cost_dkk:.4f}) | {result.latency_s:.1f}s",
     )
     print(f"\n{DISCLAIMER}")
 
 
-def main(argv: list[str] | None = None) -> None:
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8")
+def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="bankrag", description="Questions over Nordic bank annual reports")
-    sub = parser.add_subparsers(required=True)
+    commands = parser.add_subparsers(dest="command", required=True)
 
-    p = sub.add_parser("ingest", help="parse the PDFs in data/raw and build chunks")
-    p.add_argument("--force", action="store_true", help="parse again even if pages are cached")
-    p.set_defaults(func=cmd_ingest)
+    ingest_parser = commands.add_parser("ingest", help="parse the PDFs in data/raw and build chunks")
+    ingest_parser.add_argument("--force", action="store_true", help="parse again even if pages are cached")
 
-    for name, func, help_text in [
-        ("search", cmd_search, "show the retrieved chunks for a question"),
-        ("ask", cmd_ask, "answer a question with citations"),
-    ]:
-        p = sub.add_parser(name, help=help_text)
-        p.add_argument("question")
-        p.add_argument("--k", type=int, default=6, help="number of chunks to retrieve")
-        p.add_argument("--strategy", default="structure", choices=["structure", "fixed"])
+    for name, help_text in [("search", "show the retrieved chunks for a question"), ("ask", "answer with citations")]:
+        command = commands.add_parser(name, help=help_text)
+        command.add_argument("question")
+        command.add_argument("--k", type=int, default=6, help="number of chunks to retrieve")
+        command.add_argument("--strategy", default="structure", choices=["structure", "fixed"])
         if name == "search":
-            p.add_argument("--no-route", action="store_true", help="ignore banks and years in the question")
-        p.set_defaults(func=func)
+            command.add_argument("--no-route", action="store_true", help="ignore banks and years in the question")
+    return parser
 
-    args = parser.parse_args(argv)
-    args.func(args)
+
+def main(argv: list[str] | None = None) -> None:
+    """Parse the command line and run the chosen command."""
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")  # Windows consoles default to a code page without "æøå"
+    args = _build_parser().parse_args(argv)
+    if args.command == "ingest":
+        run(force=args.force)
+    elif args.command == "search":
+        search(args.question, k=args.k, strategy=args.strategy, route=not args.no_route)
+    else:
+        ask(args.question, k=args.k, strategy=args.strategy)
 
 
 if __name__ == "__main__":

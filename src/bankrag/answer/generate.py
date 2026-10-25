@@ -1,10 +1,8 @@
 """Answer a question from retrieved chunks, with a citation for every claim.
 
-Chunks are passed to Claude as `search_result` blocks with citations enabled.
-Claude then returns text blocks whose citations point at a search result and
-the exact paragraphs it used, so each claim maps back to a bank, year and page.
-
-The system prompt is identical on every call and marked for prompt caching.
+Chunks are passed to Claude as `search_result` blocks with citations enabled. Claude returns text blocks whose
+citations point at a search result and the paragraphs it used, so each claim maps back to a bank, year and page. The
+system prompt is the same on every call and marked for prompt caching.
 """
 
 from __future__ import annotations
@@ -12,15 +10,17 @@ from __future__ import annotations
 import json
 import os
 import time
-from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 
 import anthropic
+from anthropic.types import ContentBlockParam, Message, SearchResultBlockParam, Usage
 
-from bankrag.config import ANSWER_MODEL, PRICES_USD_PER_MTOK, TRACE_DIR, USD_TO_DKK, bank_name
-from bankrag.retrieve.bm25 import Hit
+from bankrag.config import ANSWER_MODEL, PRICES_USD_PER_MTOK, TRACE_DIR, bank_name
+from bankrag.models import Answer, Source
+from bankrag.retrieve import Hit
 
 REFUSAL_PREFIXES = ("Not in the documents", "Ikke i dokumenterne")
+MAX_OUTPUT_TOKENS = 2048
 
 SYSTEM_PROMPT = """\
 You answer questions about the annual reports of three Nordic banks: Danske Bank, Nordea and Jyske Bank, \
@@ -62,56 +62,38 @@ outlook or guidance, with citations.
 """
 
 
-@dataclass
-class Source:
-    n: int
-    chunk_id: str
-    bank: str
-    year: int
-    page: int
-    section: str
-    cited_text: list[str] = field(default_factory=list)
-
-    @property
-    def label(self) -> str:
-        return f"{bank_name(self.bank)}, Annual Report {self.year}, p. {self.page}"
+def _client() -> anthropic.Anthropic:
+    if not (os.getenv("ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_AUTH_TOKEN")):
+        raise SystemExit("No API key. Copy .env.example to .env and set ANTHROPIC_API_KEY.")
+    return anthropic.Anthropic()
 
 
-@dataclass
-class Answer:
-    question: str
-    text: str
-    sources: list[Source]
-    refused: bool
-    model: str
-    input_tokens: int
-    output_tokens: int
-    cache_read_tokens: int
-    cache_write_tokens: int
-    cost_usd: float
-    latency_s: float
-    retrieved: list[str]
+def search_result_block(hit: Hit) -> SearchResultBlockParam:
+    """Turn a retrieved chunk into a `search_result` block that Claude can cite.
 
-    @property
-    def cost_dkk(self) -> float:
-        return self.cost_usd * USD_TO_DKK
-
-
-def _search_result_block(hit: Hit) -> dict:
-    c = hit.chunk
-    where = f", {c.heading or c.section}" if (c.heading or c.section) else ""
-    # One text block per paragraph or table gives Claude finer citation boundaries.
-    parts = [p for p in c.body.split("\n\n") if p.strip()]
+    Each paragraph or table is its own text block, which gives Claude finer citation boundaries.
+    """
+    chunk = hit.chunk
+    where = f", {chunk.heading or chunk.section}" if (chunk.heading or chunk.section) else ""
+    paragraphs = [part for part in chunk.body.split("\n\n") if part.strip()]
     return {
         "type": "search_result",
-        "source": f"{c.bank}-{c.year}-p{c.page}",
-        "title": f"{bank_name(c.bank)}, Annual Report {c.year}, page {c.page}{where}",
-        "content": [{"type": "text", "text": p} for p in parts],
+        "source": f"{chunk.bank}-{chunk.year}-p{chunk.page}",
+        "title": f"{bank_name(chunk.bank)}, Annual Report {chunk.year}, page {chunk.page}{where}",
+        "content": [{"type": "text", "text": paragraph} for paragraph in paragraphs],
         "citations": {"enabled": True},
     }
 
 
-def _cost_usd(model: str, usage: anthropic.types.Usage) -> float:
+def _user_content(question: str, hits: list[Hit]) -> list[ContentBlockParam]:
+    content: list[ContentBlockParam] = [search_result_block(hit) for hit in hits]
+    if not hits:
+        content.append({"type": "text", "text": "The search returned no passages for this question."})
+    content.append({"type": "text", "text": f"Question: {question}"})
+    return content
+
+
+def _cost_usd(model: str, usage: Usage) -> float:
     price_in, price_out = PRICES_USD_PER_MTOK.get(model, PRICES_USD_PER_MTOK["claude-haiku-5-5"])
     cache_write = usage.cache_creation_input_tokens or 0
     cache_read = usage.cache_read_input_tokens or 0
@@ -123,35 +105,68 @@ def _cost_usd(model: str, usage: anthropic.types.Usage) -> float:
     ) / 1e6
 
 
-def _client() -> anthropic.Anthropic:
-    if not (os.getenv("ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_AUTH_TOKEN")):
-        raise SystemExit("No API key. Copy .env.example to .env and set ANTHROPIC_API_KEY.")
-    return anthropic.Anthropic()
+def render_with_citations(response: Message, hits: list[Hit]) -> tuple[str, list[Source]]:
+    """Join Claude's text blocks and turn their citations into numbered markers like [1].
+
+    Args:
+        response: Claude's reply to a request built from `hits`.
+        hits: The hits in the order they were sent, which is what `search_result_index` refers to.
+
+    Returns:
+        The answer text with markers, and one source per cited page, numbered in order of first citation.
+    """
+    sources: dict[int, Source] = {}
+    parts: list[str] = []
+    for block in response.content:
+        if block.type != "text":
+            continue
+        parts.append(block.text)
+        markers: list[int] = []
+        for citation in block.citations or []:
+            if citation.type != "search_result_location" or citation.search_result_index >= len(hits):
+                continue
+            chunk = hits[citation.search_result_index].chunk
+            source = sources.setdefault(
+                citation.search_result_index,
+                Source(
+                    n=len(sources) + 1,
+                    chunk_id=chunk.id,
+                    bank=chunk.bank,
+                    year=chunk.year,
+                    page=chunk.page,
+                    section=chunk.heading or chunk.section,
+                ),
+            )
+            if citation.cited_text not in source.cited_text:
+                source.cited_text.append(citation.cited_text)
+            if source.n not in markers:
+                markers.append(source.n)
+        if markers:
+            parts.append("".join(f" [{n}]" for n in markers))
+    return "".join(parts).strip(), sorted(sources.values(), key=lambda source: source.n)
 
 
-def answer(
-    question: str, hits: list[Hit], model: str = ANSWER_MODEL, client: anthropic.Anthropic | None = None
-) -> Answer:
-    client = client or _client()
-    content: list[dict] = [_search_result_block(h) for h in hits]
-    if not hits:
-        content.append({"type": "text", "text": "The search returned no passages for this question."})
-    content.append({"type": "text", "text": f"Question: {question}"})
+def answer(question: str, hits: list[Hit]) -> Answer:
+    """Ask Claude to answer from the retrieved chunks only, and measure the call.
 
+    Raises:
+        SystemExit: If no API key is configured.
+    """
     start = time.perf_counter()
-    response = client.messages.create(
-        model=model,
-        max_tokens=2048,
+    response = _client().messages.create(
+        model=ANSWER_MODEL,
+        max_tokens=MAX_OUTPUT_TOKENS,
         system=[{"type": "text", "text": SYSTEM_PROMPT, "cache_control": {"type": "ephemeral"}}],
-        messages=[{"role": "user", "content": content}],
+        messages=[{"role": "user", "content": _user_content(question, hits)}],
         output_config={"effort": "low"},
     )
     latency = time.perf_counter() - start
 
+    sources: list[Source]
     if response.stop_reason == "refusal":
         text, sources = "The model declined to answer this question.", []
     else:
-        text, sources = _render(response, hits)
+        text, sources = render_with_citations(response, hits)
 
     usage = response.usage
     return Answer(
@@ -159,57 +174,20 @@ def answer(
         text=text,
         sources=sources,
         refused=text.lstrip().startswith(REFUSAL_PREFIXES),
-        model=model,
+        model=ANSWER_MODEL,
         input_tokens=usage.input_tokens,
         output_tokens=usage.output_tokens,
         cache_read_tokens=usage.cache_read_input_tokens or 0,
         cache_write_tokens=usage.cache_creation_input_tokens or 0,
-        cost_usd=_cost_usd(model, usage),
+        cost_usd=_cost_usd(ANSWER_MODEL, usage),
         latency_s=latency,
-        retrieved=[h.chunk.id for h in hits],
+        retrieved=[hit.chunk.id for hit in hits],
     )
 
 
-def _render(response: anthropic.types.Message, hits: list[Hit]) -> tuple[str, list[Source]]:
-    """Join the text blocks and turn citations into numbered markers like [1]."""
-    sources: dict[int, Source] = {}
-    out = []
-    for block in response.content:
-        if block.type != "text":
-            continue
-        out.append(block.text)
-        markers = []
-        for cit in block.citations or []:
-            if cit.type != "search_result_location" or cit.search_result_index >= len(hits):
-                continue
-            chunk = hits[cit.search_result_index].chunk
-            src = sources.get(cit.search_result_index)
-            if src is None:
-                src = Source(
-                    n=len(sources) + 1,
-                    chunk_id=chunk.id,
-                    bank=chunk.bank,
-                    year=chunk.year,
-                    page=chunk.page,
-                    section=chunk.heading or chunk.section,
-                )
-                sources[cit.search_result_index] = src
-            if cit.cited_text not in src.cited_text:
-                src.cited_text.append(cit.cited_text)
-            if src.n not in markers:
-                markers.append(src.n)
-        if markers:
-            out.append("".join(f" [{n}]" for n in markers))
-    return "".join(out).strip(), sorted(sources.values(), key=lambda s: s.n)
-
-
-def log_trace(ans: Answer, extra: dict | None = None) -> None:
+def log_trace(result: Answer, eval_id: str | None = None) -> None:
+    """Append the answer, its sources, tokens, cost and latency to data/traces/answers.jsonl."""
     TRACE_DIR.mkdir(parents=True, exist_ok=True)
-    record = {
-        "time": datetime.now(UTC).isoformat(timespec="seconds"),
-        **asdict(ans),
-        "cost_dkk": ans.cost_dkk,
-        **(extra or {}),
-    }
-    with (TRACE_DIR / "answers.jsonl").open("a", encoding="utf-8") as f:
-        f.write(json.dumps(record, ensure_ascii=False) + "\n")
+    record = {"time": datetime.now(UTC).isoformat(timespec="seconds"), "eval_id": eval_id, **result.model_dump()}
+    with (TRACE_DIR / "answers.jsonl").open("a", encoding="utf-8") as trace:
+        trace.write(json.dumps(record, ensure_ascii=False) + "\n")

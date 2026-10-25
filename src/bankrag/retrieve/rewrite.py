@@ -1,12 +1,8 @@
 """Query rewriting before keyword search.
 
-The reports are in English, but questions may come in Danish. Keyword search
-cannot match "egenkapitalforrentning" to "return on equity", so Danish finance
-terms in the question get their English report wording appended. The original
-words stay in the query.
-
-This is a fixed glossary, cheap and easy to inspect. Multilingual embeddings
-(milestone 2) should make it matter less; the evals show how much it adds.
+The reports are in English, but questions may come in Danish. Keyword search cannot match "egenkapitalforrentning" to
+"return on equity", so Danish finance terms in a question get the English wording of the reports appended. The original
+words stay in the query. A fixed glossary is cheap and easy to inspect, and the evals show how much it adds.
 """
 
 from __future__ import annotations
@@ -41,20 +37,26 @@ GLOSSARY = {
     r"risiko\w*|risici": "risk",
     r"kapital\w*": "capital",
 }
-_PATTERNS = [(re.compile(rf"\b(?:{da})\b", re.I), en) for da, en in GLOSSARY.items()]
-DANISH_RE = re.compile(r"[æøå]|\b(hvad|hvordan|hvorfor|hvilke|hvilken|hvor|hvem|blev|bliver|var)\b", re.I)
+_GLOSSARY_PATTERNS = [
+    (re.compile(rf"\b(?:{danish})\b", re.IGNORECASE), english) for danish, english in GLOSSARY.items()
+]
+DANISH_RE = re.compile(r"[æøå]|\b(hvad|hvordan|hvorfor|hvilke|hvilken|hvor|hvem|blev|bliver|var)\b", re.IGNORECASE)
 
 
 def is_danish(question: str) -> bool:
+    """Tell whether a question looks Danish, from æ, ø, å or Danish question words."""
     return bool(DANISH_RE.search(question))
 
 
 def expand_danish(question: str) -> str:
-    """Append the English report wording for every Danish finance term in the question."""
+    """Append the English report wording for every Danish finance term in a Danish question.
+
+    English questions come back unchanged, because some glossary entries (such as "strategi") also match English.
+    """
     if not is_danish(question):
         return question
-    added = []
-    for pattern, english in _PATTERNS:
+    added: list[str] = []
+    for pattern, english in _GLOSSARY_PATTERNS:
         if pattern.search(question) and english not in added:
             added.append(english)
     return f"{question} {' '.join(added)}" if added else question
