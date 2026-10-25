@@ -11,7 +11,10 @@
 # Gold answers drafted by Claude Code from the PDFs on 2026-10-24. On 2026-10-25 q02, q24 and q26
 # got extra evidence pages after the first retrieval run surfaced pages that also hold the answer
 # (checked in the PDF text, not taken on trust from the retriever). Later the same day q27 got pages 23 and 140,
-# which the reranked search found and which hold both figures.
+# which the reranked search found and which hold both figures. Also on 2026-10-25, q28 to q44 were added with the
+# add-eval-case skill (.claude/skills/add-eval-case), each figure and page checked in the parsed page text. The first
+# retrieval run on them found two more pages that state a gold figure (Jyske Bank 2025 p140 and Danske Bank 2024 p9),
+# added to q20, q35 and q36 after checking.
 
 - id: q01
   question: What was Danske Bank's cost/income ratio in 2025, and how did it change from 2024?
@@ -242,7 +245,7 @@
   gold_answer: DKK 5,414 million (2024 DKK 5,312 million), about DKK 5.4 billion.
   numbers: [[5414, 5.4]]
   evidence:
-    - [jyske-2025-p21, jyske-2025-p11]
+    - [jyske-2025-p21, jyske-2025-p11, jyske-2025-p7, jyske-2025-p140]
   verified: false
 
 - id: q21
@@ -338,4 +341,223 @@
   numbers: [[8842], [9544]]
   evidence:
     - [jyske-2025-p7, jyske-2025-p21, jyske-2025-p23, jyske-2025-p140]
+  verified: false
+
+- id: q28
+  question: What was Jyske Bank's net profit in 2024?
+  lang: en
+  category: lookup
+  answerable: true
+  gold_answer: DKK 5,312 million (DKK 5.3bn, or DKK 80 per share), the second best result in its history (2023 DKK 5,904 million).
+  numbers: [[5312, 5.3]]
+  evidence:
+    - [jyske-2024-p4, jyske-2024-p6, jyske-2024-p7, jyske-2024-p9, jyske-2024-p13, jyske-2024-p21, jyske-2024-p166, jyske-2025-p7, jyske-2025-p21, jyske-2025-p133]
+  verified: false
+
+- id: q29
+  question: What was Nordea's return on equity in 2024?
+  lang: en
+  category: lookup
+  answerable: true
+  gold_answer: 16.7% in 2024 (16.9% in 2023).
+  numbers: [[16.7]]
+  evidence:
+    - [nordea-2024-p5, nordea-2024-p40, nordea-2024-p43, nordea-2025-p40, nordea-2025-p43]
+  verified: false
+
+- id: q30
+  question: What net profit does Danske Bank expect for 2026, according to its 2025 annual report?
+  lang: en
+  category: lookup
+  answerable: true
+  gold_answer: >-
+    Net profit in the range of DKK 22-24 billion, which would mean a return on equity above its 2026
+    ambition of 13%. This is the bank's own published outlook, so the system should report it with a
+    citation rather than refuse.
+  numbers: [[22], [24]]
+  evidence:
+    - [danske-2025-p5, danske-2025-p6]
+  verified: false
+
+- id: q31
+  question: How did Nordea's cost-to-income ratio change from 2024 to 2025?
+  lang: en
+  category: compare_years
+  answerable: true
+  gold_answer: >-
+    It rose from 44.1% to 46.0%, as total operating income fell 3% and total operating expenses rose
+    to EUR 5,405 million. Excluding regulatory fees it rose from 43.1% to 45.0%.
+  numbers: [[46.0, 45.0], [44.1, 43.1]]
+  evidence:
+    - [nordea-2025-p40, nordea-2025-p43]
+    - [nordea-2025-p40, nordea-2025-p43, nordea-2024-p40, nordea-2024-p43]
+  verified: false
+
+- id: q32
+  question: How did Danske Bank's total income change from 2024 to 2025?
+  lang: en
+  category: compare_years
+  answerable: true
+  gold_answer: >-
+    It rose 1%, from DKK 56,405 million to DKK 56,840 million, driven by strong net fee income (high
+    performance fees, higher investment fees as assets under management grew, and strong customer
+    activity). Net interest income was stable.
+  numbers: [[56840, 56.8], [56405, 56.4]]
+  evidence:
+    - [danske-2025-p4, danske-2025-p10]
+    - [danske-2025-p4, danske-2025-p10, danske-2024-p4]
+  verified: false
+
+- id: q33
+  question: Compare the return on equity of Danske Bank and Nordea in 2025.
+  lang: en
+  category: compare_banks
+  answerable: true
+  gold_answer: Danske Bank 13.3% and Nordea 15.5%, so Nordea's was 2.2 percentage points higher.
+  numbers: [[13.3], [15.5]]
+  evidence:
+    - [danske-2025-p4, danske-2025-p5, danske-2025-p6]
+    - [nordea-2025-p5, nordea-2025-p40, nordea-2025-p43]
+  verified: false
+
+- id: q34
+  question: Compare the cost/income ratios of the three banks in 2025.
+  lang: en
+  category: compare_banks
+  answerable: true
+  gold_answer: >-
+    Danske Bank 45.5%, Nordea 46.0% (45.0% excluding regulatory fees) and Jyske Bank 48.3%. Danske
+    Bank had the lowest ratio and Jyske Bank the highest.
+  numbers: [[45.5], [46.0, 45.0], [48.3, 48]]
+  evidence:
+    - [danske-2025-p4, danske-2025-p5]
+    - [nordea-2025-p40, nordea-2025-p43]
+    - [jyske-2025-p8, jyske-2025-p11]
+  verified: false
+
+- id: q35
+  question: Compare the net profit of the three banks in 2025.
+  lang: en
+  category: compare_banks
+  answerable: true
+  gold_answer: >-
+    Danske Bank DKK 23,037 million, Jyske Bank DKK 5,414 million and Nordea EUR 4,840 million. Nordea
+    reports in euros, so its figure is not directly comparable with the two Danish banks' without
+    converting currency.
+  numbers: [[23037, 23.0, 23.04], [5414, 5.4], [4840, 4.8, 4.84]]
+  evidence:
+    - [danske-2025-p4, danske-2025-p6, danske-2025-p10, danske-2025-p136]
+    - [nordea-2025-p40, nordea-2025-p42]
+    - [jyske-2025-p7, jyske-2025-p11, jyske-2025-p21, jyske-2025-p140]
+  verified: false
+
+- id: q36
+  question: Sammenlign Danske Banks og Nordeas nettoresultat for 2024.
+  lang: da
+  category: danish
+  answerable: true
+  gold_answer: >-
+    Danske Bank 23.629 mio. kr. og Nordea 5.059 mio. euro. Nordea rapporterer i euro, så tallene kan
+    ikke sammenlignes direkte uden at omregne valuta.
+  numbers: [[23629, 23.6], [5059, 5.06, 5.1]]
+  evidence:
+    - [danske-2024-p4, danske-2024-p6, danske-2024-p9, danske-2025-p4]
+    - [nordea-2024-p40, nordea-2024-p42, nordea-2025-p40, nordea-2025-p42]
+  verified: false
+
+- id: q37
+  question: What drove the increase in Danske Bank's net interest income in 2024?
+  lang: en
+  category: why
+  answerable: true
+  gold_answer: >-
+    Net interest income rose 5% to DKK 36,697 million (2023 DKK 34,972 million), driven by higher
+    interest on shareholders' equity and higher income from interest rate risk management in Group
+    Treasury. These more than offset narrower deposit margins as central banks began cutting rates.
+  numbers: []
+  evidence:
+    - [danske-2024-p6, danske-2024-p9]
+  verified: false
+
+- id: q38
+  question: Why did Jyske Bank's net interest income fall in 2024?
+  lang: en
+  category: why
+  answerable: true
+  gold_answer: >-
+    It fell 3% to DKK 9,455 million (2023 DKK 9,722 million), mainly because Danmarks Nationalbank cut
+    its deposit rate from 3.6% in mid-2024 to 2.6% at the end of the year, which narrowed the deposit
+    margin. A better offer of savings products also raised the cost of deposits. The 2025 report
+    restates 2024 to DKK 9,544 million and 2023 to DKK 9,764 million.
+  numbers: []
+  evidence:
+    - [jyske-2024-p9, jyske-2024-p22]
+  verified: false
+
+- id: q39
+  question: Hvorfor faldt Jyske Banks egentlige kernekapitalprocent fra 2024 til 2025?
+  lang: da
+  category: danish
+  answerable: true
+  gold_answer: >-
+    Den faldt fra 17,6% til 16,1%, fordi indførelsen af Basel IV/CRR III øgede de risikovægtede
+    eksponeringer med 9% til 249,3 mia. kr. Desuden blev der trukket forventede udlodninger fra
+    kernekapitalen.
+  numbers: [[17.6], [16.1]]
+  evidence:
+    - [jyske-2025-p5, jyske-2025-p34]
+  verified: false
+
+- id: q40
+  question: Hvor mange fuldtidsansatte havde Jyske Bank ved udgangen af 2025?
+  lang: da
+  category: danish
+  answerable: true
+  gold_answer: >-
+    3.794 ifølge hoved- og nøgletallene, hvor 23 eksternt finansierede medarbejdere er trukket fra.
+    Noten på side 139 siger 3.817 inklusive dem, og bæredygtighedsredegørelsen på side 95 siger 3.844.
+    Moderselskabet Jyske Bank A/S havde 3.527.
+  numbers: [[3794, 3817, 3844]]
+  evidence:
+    - [jyske-2025-p8, jyske-2025-p11, jyske-2025-p95, jyske-2025-p139]
+  verified: false
+
+- id: q41
+  question: Should I move my savings from Danske Bank to Jyske Bank?
+  lang: en
+  category: unanswerable
+  answerable: false
+  gold_answer: Refuse. This is a request for financial advice.
+  numbers: []
+  evidence: []
+  verified: false
+
+- id: q42
+  question: Hvad bliver Nordeas aktiekurs ved udgangen af 2026?
+  lang: da
+  category: unanswerable
+  answerable: false
+  gold_answer: Afvis. En kursprognose står ikke i rapporterne og ville være investeringsrådgivning.
+  numbers: []
+  evidence: []
+  verified: false
+
+- id: q43
+  question: What was Nordea's net profit in the first quarter of 2026?
+  lang: en
+  category: unanswerable
+  answerable: false
+  gold_answer: Refuse. The 2025 report was published before the first quarter of 2026 ended.
+  numbers: []
+  evidence: []
+  verified: false
+
+- id: q44
+  question: Which of the three banks will pay the highest dividend for the financial year 2026?
+  lang: en
+  category: unanswerable
+  answerable: false
+  gold_answer: Refuse. Dividends for 2026 are not in the reports, and predicting them would be a forecast.
+  numbers: []
+  evidence: []
   verified: false
