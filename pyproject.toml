@@ -13,6 +13,7 @@ dependencies = [
     "pymupdf>=2.0",
     "python-dotenv>=1.0",
     "pyyaml>=6.0",
+    "streamlit>=1.40",
 ]
 
 [project.scripts]

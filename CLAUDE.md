@@ -11,6 +11,7 @@ uv run python scripts/download.py        # fetch PDFs into data/raw/ (Jyske Bank
 uv run bankrag ingest                    # parse PDFs (about 30 min the first time), write data/processed/
 uv run bankrag search "question"         # show retrieved chunks, no API key needed
 uv run bankrag ask "question"            # answer with citations, needs ANTHROPIC_API_KEY in .env
+uv run streamlit run src/bankrag/ui/app.py   # web page on localhost:8501, needs the key and the PDFs
 uv run python evals/run_evals.py         # retrieval evals, no API key needed
 uv run python evals/run_evals.py --answers   # full evals, costs money: ask first
 uv run ruff check . && uv run ruff format --check . && uv run mypy src && uv run pytest   # what CI runs
@@ -51,5 +52,7 @@ The `make` targets wrap the same commands.
 - `src/bankrag/ingest/`: PDF parsing (`pdf.py`), chunking (`chunk.py`), pipeline with a per-report page cache (`pipeline.py`) that runs each report in a crash-safe child process (`worker.py`)
 - `src/bankrag/retrieve/`: BM25 (`bm25.py`), bank and year routing (`route.py`), Danish query glossary (`rewrite.py`)
 - `src/bankrag/answer/generate.py`: Claude call with `search_result` blocks, citations, prompt caching, refusals, cost, trace log
+- `src/bankrag/ui/`: Streamlit page (`app.py`) and cited-passage highlighting on PDF pages (`highlight.py`)
+- `src/bankrag/figures.py`: number and figure parsing in English and Danish formats, used by the evals and the UI
 - `src/bankrag/evaluate.py`: metrics; `evals/run_evals.py` runs them and writes `evals/RESULTS.md` and `evals/ANSWERS.md` (generated, do not edit by hand)
 - `docs/documents.md`: the six reports, their checksums and what to know about them
