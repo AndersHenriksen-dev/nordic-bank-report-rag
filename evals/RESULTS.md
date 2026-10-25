@@ -14,18 +14,18 @@ Danish glossary: add English report wording for Danish finance terms. Dense: cos
 
 | Config | Recall@1 | Recall@3 | Recall@6 | Recall@10 | MRR |
 |---|---|---|---|---|---|
-| BM25, fixed chunks | 0.12 | 0.19 | 0.48 | 0.61 | 0.31 |
-| BM25, structure chunks | 0.17 | 0.33 | 0.50 | 0.69 | 0.35 |
-| BM25, structure chunks, routed | 0.20 | 0.45 | 0.71 | 0.73 | 0.43 |
-| BM25, structure chunks, routed, Danish glossary | 0.20 | 0.54 | 0.80 | 0.82 | 0.46 |
+| BM25, fixed chunks | 0.14 | 0.25 | 0.39 | 0.61 | 0.31 |
+| BM25, structure chunks | 0.19 | 0.28 | 0.47 | 0.56 | 0.33 |
+| BM25, structure chunks, routed | 0.23 | 0.44 | 0.68 | 0.70 | 0.44 |
+| BM25, structure chunks, routed, Danish glossary | 0.23 | 0.53 | 0.77 | 0.79 | 0.47 |
 | Dense, routed | 0.24 | 0.54 | 0.71 | 0.79 | 0.49 |
 | Dense, routed, Danish glossary | 0.24 | 0.57 | 0.74 | 0.79 | 0.50 |
-| Hybrid, routed, Danish glossary | 0.38 | 0.64 | 0.82 | 0.86 | 0.61 |
-| Hybrid + reranker, routed, Danish glossary | 0.50 | 0.84 | 0.95 | 0.98 | 0.71 |
+| Hybrid, routed, Danish glossary | 0.39 | 0.68 | 0.82 | 0.92 | 0.62 |
+| Hybrid + reranker, routed, Danish glossary | 0.50 | 0.84 | 0.94 | 0.98 | 0.71 |
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="results/retrieval-dark.svg">
-  <img alt="Dot plot of recall@1, @3 and @6 for each search setup. The highest recall@6 is 0.95, for Hybrid + reranker, routed, Danish glossary." src="results/retrieval-light.svg" width="760">
+  <img alt="Dot plot of recall@1, @3 and @6 for each search setup. The highest recall@6 is 0.94, for Hybrid + reranker, routed, Danish glossary." src="results/retrieval-light.svg" width="760">
 </picture>
 
 ## Answers

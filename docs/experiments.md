@@ -6,6 +6,8 @@ Every change below was measured on the eval set: 44 questions, 35 of them answer
 
 ## Retrieval, one change at a time
 
+Measured over the six 2024 and 2025 reports. The same steps over all twelve reports follow in the next section.
+
 | # | Change | Recall@1 | Recall@3 | Recall@6 | MRR | Kept? |
 |---|---|---|---|---|---|---|
 | 1 | BM25 over fixed 500-token windows (baseline) | 0.12 | 0.19 | 0.48 | 0.31 | Baseline |
@@ -19,6 +21,27 @@ Every change below was measured on the eval set: 44 questions, 35 of them answer
 From step 1 to step 7 the right page comes first 4 times as often (recall@1 0.12 to 0.50), recall@3 rises from 0.19 to 0.84, and recall@6 from 0.48 to 0.95.
 
 On the first 27 questions the same steps scored recall@6 0.52, 0.52, 0.80, 0.89, 0.74, 0.85 and 0.94. The 17 new questions (more 2024 figures, Jyske Bank, three-bank comparisons and Danish) are harder for BM25, whose recall@6 fell from 0.89 to 0.80, and for plain fusion (0.85 to 0.82), but not for the reranked search (0.94 to 0.95). Dense search alone gained at rank 1 (0.17 to 0.24) and now beats BM25 there.
+
+## Adding the 2022 and 2023 reports
+
+Twelve reports instead of six: 3,553 pages instead of 1,867, and 8,700 chunks instead of 4,882. The same 44 questions, none of which names 2022 or 2023:
+
+| # | Change | Recall@1 | Recall@3 | Recall@6 | MRR |
+|---|---|---|---|---|---|
+| 1 | BM25 over fixed 500-token windows | 0.14 | 0.25 | 0.39 | 0.31 |
+| 2 | Chunks that follow sections | 0.19 | 0.28 | 0.47 | 0.33 |
+| 3 | Routing by bank and year | 0.23 | 0.44 | 0.68 | 0.44 |
+| 4 | Danish glossary | 0.23 | 0.53 | 0.77 | 0.47 |
+| 5 | Dense vectors instead of BM25 | 0.24 | 0.57 | 0.74 | 0.50 |
+| 6 | Hybrid | 0.39 | 0.68 | 0.82 | 0.62 |
+| 7 | Hybrid with the reranker | **0.50** | **0.84** | **0.94** | **0.71** |
+
+- **Routing keeps doubling the corpus cheap.** Every question that names a year searches only that year's reports, so the reranked search is unchanged except recall@6 (0.95 to 0.94).
+- **Searches without routing pay the price.** Fixed windows lose most (recall@6 0.48 to 0.39): more reports means more passages about the same topic from other years.
+- **The one lost point is not a new report.** For q01 (Danske Bank's cost/income ratio, 2025 against 2024) an investor relations page of the 2025 report now outranks page 5 of the 2024 report ("Danske Bank at a glance"). BM25 counts how rare a term is across all chunks, so a bigger corpus moves scores even inside the routed reports.
+- **Older pages appear only where a question names no year.** q12 (how Nordea describes AI) now also gets a page of the 2023 report, but still finds its 2025 gold pages.
+- **The new reports exposed a parser bug.** Nordea's 2023 outline has an entry that points at page -1, and the parser took it to start before every page, so 383 of 386 pages were labelled "Annual General Meeting 21 March 2024". Jyske Bank's 2022 and 2023 outlines only name the report. Skipping such entries and ignoring outlines with fewer than 5 usable entries fixed both (D18), checked by re-parsing the three reports.
+- **Parsing the six new reports took 23.5 minutes**, with 3 reports at a time in child processes. The layout model crashed on one more page (Nordea 2022, p. 26), which the worker re-parsed without it.
 
 ## Answers: BM25 against the reranked search
 

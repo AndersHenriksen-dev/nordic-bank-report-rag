@@ -35,7 +35,7 @@ SENTENCE_ENDS = (".", "!", "?", ":", ";", ")")
 
 SYSTEM_PROMPT = """\
 You answer questions about the annual reports of three Nordic banks: Danske Bank, Nordea and Jyske Bank, \
-for the financial years 2024 and 2025. Each user message contains search results taken from those reports, \
+for the financial years 2022 to 2025. Each user message contains search results taken from those reports, \
 followed by the question. Every search result is one passage from one page of one report, and its title \
 says which bank, which report and which page it comes from.
 
