@@ -107,3 +107,21 @@ class Answer(BaseModel):
     def cost_dkk(self) -> float:
         """Cost in Danish kroner at the fixed exchange rate in the config."""
         return self.cost_usd * USD_TO_DKK
+
+
+class Verdict(BaseModel):
+    """The LLM judge's grading of one answer against the gold answer, by the rubric in evals/judge_rubric.md.
+
+    The field descriptions are part of the JSON schema the judge fills in. `reason` comes first so the judge explains
+    before it decides.
+    """
+
+    reason: str = Field(description="One or two sentences on what is wrong with the answer, or why it passes.")
+    correct: bool = Field(description="Every figure and claim that the gold answer also covers agrees with it.")
+    complete: bool = Field(description="The answer gives everything the question asks for.")
+    consistent: bool = Field(description="The answer does not contradict itself.")
+
+    @property
+    def passed(self) -> bool:
+        """True when the answer meets all three criteria."""
+        return self.correct and self.complete and self.consistent
