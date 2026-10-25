@@ -15,6 +15,8 @@
 # add-eval-case skill (.claude/skills/add-eval-case), each figure and page checked in the parsed page text. The first
 # retrieval run on them found two more pages that state a gold figure (Jyske Bank 2025 p140 and Danske Bank 2024 p9),
 # added to q20, q35 and q36 after checking.
+# Later the same day the 2022 and 2023 reports were added; q17's gold answer was updated after checking that they
+# do not state Nordea's 2012 net profit.
 
 - id: q01
   question: What was Danske Bank's cost/income ratio in 2025, and how did it change from 2024?
@@ -212,7 +214,9 @@
   lang: en
   category: unanswerable
   answerable: false
-  gold_answer: Refuse. The 2024 and 2025 reports cover 2020 to 2025 at most.
+  gold_answer: >-
+    Refuse. The 2022 to 2025 reports give Nordea's net profit back to 2018 at most; 2012 appears only in chart
+    axes, share data and board members' biographies.
   numbers: []
   evidence: []
   verified: false

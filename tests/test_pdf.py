@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 import pytest
 
-from bankrag.ingest.pdf import Word, _render_table, fill_sections, is_title
+from bankrag.ingest.pdf import Word, _render_table, _toc_sections, fill_sections, is_title
 from bankrag.models import Page
 
 
@@ -49,3 +51,26 @@ def test_fill_sections_carries_forward_and_resets_on_a_new_part() -> None:
         "Management's report > Financial review",
         "Financial statements",
     ]
+
+
+@dataclass
+class FakeOutline:
+    """Stands in for a PDF document: only the outline is read."""
+
+    toc: list[list[object]]
+
+    def get_toc(self) -> list[list[object]]:
+        return self.toc
+
+
+def test_outline_entries_without_a_page_are_skipped() -> None:
+    sections = [[2, name, page] for page, name in enumerate(["Who we are", "CEO letter", "Strategy", "Risk"], 4)]
+    toc = [[1, "Annual Report 2023", 1], *sections, [2, "Annual General Meeting", -1], [2, "Financial calendar", 384]]
+    entries = _toc_sections(FakeOutline(toc))  # type: ignore[arg-type]
+    assert (-1, "Annual General Meeting") not in entries
+    assert entries[-1] == (384, "Financial calendar")
+
+
+def test_an_outline_that_only_names_the_report_is_ignored() -> None:
+    toc = [[1, "Annual report 2022", 1], [1, "Statement by the Executive and Supervisory Boards", 140]]
+    assert _toc_sections(FakeOutline(toc)) == []  # type: ignore[arg-type]

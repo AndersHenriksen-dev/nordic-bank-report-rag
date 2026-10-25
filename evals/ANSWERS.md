@@ -467,7 +467,7 @@ Category: unanswerable. Language: en. Gold answer checked by hand: no.
 
 Category: unanswerable. Language: en. Gold answer checked by hand: no.
 
-**Gold answer:** Refuse. The 2024 and 2025 reports cover 2020 to 2025 at most.
+**Gold answer:** Refuse. The 2022 to 2025 reports give Nordea's net profit back to 2018 at most; 2012 appears only in chart axes, share data and board members' biographies.
 
 **Answer** (3.3 s, USD 0.00104):
 

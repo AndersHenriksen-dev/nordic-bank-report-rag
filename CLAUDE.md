@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Question answering over the 2024 and 2025 annual reports of Danske Bank, Nordea and Jyske Bank, with page citations and evals. Public portfolio repo: everything here is read by recruiters.
+Question answering over the 2022 to 2025 annual reports of Danske Bank, Nordea and Jyske Bank, with page citations and evals. Public portfolio repo: everything here is read by recruiters.
 
 ## Run things
 
@@ -8,7 +8,7 @@ Question answering over the 2024 and 2025 annual reports of Danske Bank, Nordea 
 uv sync                                  # install
 uv run pre-commit install                # once: ruff, mypy, line endings and gitleaks on every commit
 uv run python scripts/download.py        # fetch PDFs into data/raw/ (Jyske Bank: download by hand, see script output)
-uv run bankrag ingest                    # parse PDFs (about 30 min the first time), chunk, build the Qdrant index
+uv run bankrag ingest                    # parse PDFs (about 55 min the first time), chunk, build the Qdrant index
 uv run bankrag search "question"         # show retrieved chunks, no API key needed; --retriever bm25|dense|hybrid|hybrid-rerank
 uv run bankrag ask "question"            # answer with citations, needs ANTHROPIC_API_KEY in .env
 uv run bankrag kpi show                  # the KPI table; `kpi extract` reads it with Claude (about USD 0.05: ask first)
@@ -63,5 +63,5 @@ The `make` targets wrap the same commands.
 - `src/bankrag/evaluate.py`: metrics; `src/bankrag/judge.py`: the LLM judge; `evals/run_evals.py` runs them and writes `evals/RESULTS.md` with its chart and `evals/ANSWERS.md` (generated, do not edit by hand)
 - `docs/images/`: README screenshots, made from saved answers so they cost nothing to retake
 - `src/bankrag/kpi/`: the KPI table: extraction with structured output and automatic checks (`extract.py`), YAML and SQLite store with queries (`store.py`); the reviewed figures are in `kpi/figures.yaml`
-- `docs/documents.md`: the six reports, their checksums and what to know about them
+- `docs/documents.md`: the twelve reports, their checksums and what to know about them
 - `docs/concepts.md`: study guide to every concept the system uses, from BM25 to CET1; update it when a new technique is added

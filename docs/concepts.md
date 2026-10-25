@@ -27,7 +27,7 @@ Contents:
 
 **The idea.** A language model answers from what is in its prompt and what it learned in training. Training knowledge is old, cannot be cited, and is sometimes wrong. Retrieval-augmented generation (RAG) puts a search step in front of the model: find the few passages that hold the answer, give only those to the model, and ask it to answer from them and say which passage supports each claim.
 
-**Why not give the model the whole report?** The six reports are about 2.3 million tokens (a token is roughly 3 to 4 characters). That is more than Claude Haiku 5.5's 1 million token context window. Even one report, about 390,000 tokens, would cost about USD 0.20 per question at Haiku's price for long prompts, against USD 0.001 for the 6 passages this system sends. Retrieval also makes each step measurable: you can test whether the search found the right page separately from whether the model read it correctly.
+**Why not give the model the whole report?** The twelve reports are about 4.1 million tokens (a token is roughly 3 to 4 characters). That is four times Claude Haiku 5.5's 1 million token context window. Even one report, about 350,000 tokens on average, would cost about USD 0.17 per question at Haiku's price for long prompts, against USD 0.001 for the 6 passages this system sends. Retrieval also makes each step measurable: you can test whether the search found the right page separately from whether the model read it correctly.
 
 **The two halves.** Retrieval quality and generation quality fail in different ways. If the right page is not among the passages, no model can answer well. If it is, a cheap model usually can. In this project most of the gains came from the retrieval half (see [experiments.md](experiments.md)).
 
@@ -41,7 +41,7 @@ In this project: the whole pipeline is in the README's "How it works"; the searc
 
 - **Words with positions.** PyMuPDF returns every word with its coordinates. Lines and paragraphs are rebuilt from those.
 - **Tables row by row.** PyMuPDF can find where a table is, but its cell output merged columns on many report tables, separating a row's label from its figures. So the parser takes the table's area and rebuilds each row from the words' vertical positions, writing it as `| label | 2025 figure | 2024 figure |`. A row whose label and figures stay together is what lets a search for "Cost/income ratio" find "45.5".
-- **Layout model.** PyMuPDF 2.0 has a layout model (an ONNX neural network) that finds tables without ruling lines, which Nordea uses. It crashed the whole Python process on 2 of 1,867 pages, so each report is parsed in a child process. When the child dies, the parent restarts it at the crashing page with the layout model turned off for that page. No page is lost.
+- **Layout model.** PyMuPDF 2.0 has a layout model (an ONNX neural network) that finds tables without ruling lines, which Nordea uses. It crashed the whole Python process on 3 of 3,553 pages, so each report is parsed in a child process. When the child dies, the parent restarts it at the crashing page with the layout model turned off for that page. No page is lost.
 - **Sections.** Each page gets a section name from the PDF's outline, the active tab of the report's navigation bar, or a large heading. A chunk's section ("Financial review", "Notes to the financial statements") helps both the search and the reader.
 - **Page numbers.** Everything uses the PDF page number (the one a viewer jumps to), not the printed page label. They differ: Nordea's printed numbers are one lower.
 
@@ -62,7 +62,7 @@ In this project: `src/bankrag/ingest/pdf.py`, `pipeline.py`, `worker.py`; decisi
 
 **A context line.** Each chunk's indexed text starts with a line such as `[Danske Bank | Annual Report 2025 | page 6 | Executive summary]`, so the bank, year and section are searchable too. Claude gets the body without it.
 
-In this project: `src/bankrag/ingest/chunk.py`; 4,882 structure chunks, 1,558 of them with a table. Decision 3.
+In this project: `src/bankrag/ingest/chunk.py`; 8,700 structure chunks, 2,902 of them with a table. Decision 3.
 
 ## 4. Keyword search with BM25
 
@@ -84,7 +84,7 @@ score(chunk, query) = sum over query terms t of
 
 **Strengths and limits.** BM25 is exact, fast (under a millisecond here), needs no model, and is very good at the precise terms and figures annual reports are full of. It has no idea that "profit" and "earnings" mean the same, or that "egenkapitalforrentning" is Danish for "return on equity".
 
-In this project: `src/bankrag/retrieve/bm25.py`, built with the `bm25s` library in memory at start-up (about a second for 4,882 chunks).
+In this project: `src/bankrag/retrieve/bm25.py`, built with the `bm25s` library in memory at start-up (a second or two for 8,700 chunks).
 
 ## 5. Routing and query rewriting
 
@@ -92,7 +92,7 @@ In this project: `src/bankrag/retrieve/bm25.py`, built with the `bm25s` library 
 
 **Balancing comparisons.** "Compare the CET1 ratio of the three banks" needs evidence from each bank. A single search tends to fill every slot with the bank whose wording matches best. So each bank is searched on its own and the results are interleaved by rank: each bank's best passage, then each bank's second best, and so on. With 6 slots and 3 banks, each bank gets 2. An early version sorted the merged list by score, which undid the balance; it was caught by reading the eval misses.
 
-**Query rewriting.** Danish questions meet English reports. A glossary of 25 Danish finance terms appends the English wording the reports use: "Hvad var Nordeas egenkapitalforrentning i 2025?" gets "return on equity" added. The original words stay. It is cheap and easy to inspect, and it lifted keyword recall@6 from 0.71 to 0.80.
+**Query rewriting.** Danish questions meet English reports. A glossary of 25 Danish finance terms appends the English wording the reports use: "Hvad var Nordeas egenkapitalforrentning i 2025?" gets "return on equity" added. The original words stay. It is cheap and easy to inspect, and it lifted keyword recall@6 from 0.68 to 0.77.
 
 In this project: `src/bankrag/retrieve/route.py` and `rewrite.py`; decisions 4 and 11.
 
@@ -102,13 +102,13 @@ In this project: `src/bankrag/retrieve/route.py` and `rewrite.py`; decisions 4 a
 
 **Similarity.** Closeness is measured with cosine similarity: the cosine of the angle between two vectors, 1 for the same direction and 0 for unrelated. The vectors are normalized to length 1, so cosine similarity is just the dot product.
 
-**Bi-encoder.** The question and each passage are embedded separately. That is what makes vector search fast: all 4,882 passages are embedded once at ingest, and a question needs one embedding and a comparison against the stored vectors.
+**Bi-encoder.** The question and each passage are embedded separately. That is what makes vector search fast: all 8,700 passages are embedded once at ingest, and a question needs one embedding and a comparison against the stored vectors.
 
 **Vector database.** Qdrant stores the vectors with a payload (bank, year, chunk id), so the routing filters from section 5 work here too. It runs embedded, inside the Python process, with its data in `data/index/qdrant`: no server and no Docker, at the price of a folder lock that lets only one process search at a time. Large deployments use an approximate index such as HNSW (a graph of near neighbours) to search millions of vectors; at this size every vector can simply be compared.
 
 **The index fingerprint.** The index stores a hash of the model name and every chunk's text. `bankrag ingest` rebuilds it only when that hash changes.
 
-**Strengths and limits.** Dense search handles paraphrase and language well. It is weaker on exact figures and rare terms: "CET1" and "Common Equity Tier 1" may embed close together, but "23,037" is not a meaning. On this eval set dense search alone put the right page first more often than BM25 (recall@1 0.24 against 0.20) but found less of the evidence in the top 6 (0.74 against 0.80).
+**Strengths and limits.** Dense search handles paraphrase and language well. It is weaker on exact figures and rare terms: "CET1" and "Common Equity Tier 1" may embed close together, but "23,037" is not a meaning. On this eval set dense search alone put the right page first about as often as BM25 (recall@1 0.24 against 0.23) but found less of the evidence in the top 6 (0.74 against 0.77).
 
 **On the GPU.** The model has about 570 million parameters (2.3 GB in 32-bit floats). On a GPU it runs in 16-bit floats, which halves memory and time with no change in the results measured here.
 
@@ -128,7 +128,7 @@ fused(passage) = 1 / (60 + rank in BM25) + 1 / (60 + rank in dense)
 
 A passage ranked 1st by BM25 and 5th by dense scores 1/61 + 1/65 = 0.0318. One ranked 1st by BM25 and missing from dense scores 1/61 = 0.0164. Agreement wins. The constant `k = 60` comes from the original paper and damps the difference between rank 1 and rank 2, so one search's top hit cannot dominate. Each search contributes its top 30.
 
-**What it did.** Recall@1 rose from 0.20 (BM25) to 0.38. Recall@6 rose only slightly, from 0.80 to 0.82, because fusion also pulls in passages that are merely on topic.
+**What it did.** Recall@1 rose from 0.23 (BM25) to 0.39. Recall@6 rose only slightly, from 0.77 to 0.82, because fusion also pulls in passages that are merely on topic.
 
 In this project: `src/bankrag/retrieve/hybrid.py`.
 
@@ -136,11 +136,11 @@ In this project: `src/bankrag/retrieve/hybrid.py`.
 
 **Cross-encoder against bi-encoder.** A bi-encoder (section 6) embeds question and passage separately and compares the results; the two texts never "see" each other. A cross-encoder reads the question and the passage together as one input and outputs one relevance score. It can notice that a passage about Personal Customers' fee income does not answer a question about the group's, which a similarity of topics cannot.
 
-**Why only the top 30.** A cross-encoder must run once per question-passage pair, so it cannot score 4,882 passages per question. The usual pattern is two stages: a cheap search narrows to a few dozen candidates, and the expensive model reorders them. Here the fused top 30 are reranked and the best 6 go to Claude. On the GPU that takes about half a second.
+**Why only the top 30.** A cross-encoder must run once per question-passage pair, so it cannot score 8,700 passages per question. The usual pattern is two stages: a cheap search narrows to a few dozen candidates, and the expensive model reorders them. Here the fused top 30 are reranked and the best 6 go to Claude. On the GPU that takes about half a second.
 
 **Scores.** The model outputs a raw score (a logit); higher is better. The default squashes it through a sigmoid into 0 to 1, but then every good match reads 0.999, so the system shows raw scores. The order is the same either way. (A printout rounded to two decimals once made the scores look tied; a full-precision rerun showed they were not.)
 
-**What it did.** Recall@3 from 0.64 to 0.84, recall@6 from 0.82 to 0.95, MRR from 0.61 to 0.71. It still prefers business-unit pages over the group's financial review for some questions, the main weakness left.
+**What it did.** Recall@3 from 0.68 to 0.84, recall@6 from 0.82 to 0.94, MRR from 0.62 to 0.71. It still prefers business-unit pages over the group's financial review for some questions, the main weakness left.
 
 In this project: `src/bankrag/retrieve/rerank.py` with `BAAI/bge-reranker-v2-m3`; decision 15.
 
@@ -276,13 +276,13 @@ In this project: `src/bankrag/judge.py`; decision 16 and the judge tables in [ex
 
 Short answers below each; the sections above have the details.
 
-1. **Why retrieval instead of sending the whole report?** 2.3 million tokens do not fit in the context window, one report alone would cost about 200 times more per question, and retrieval gives page-level citations and a step you can measure on its own.
+1. **Why retrieval instead of sending the whole report?** 4.1 million tokens do not fit in the context window, one report alone would cost about 160 times more per question, and retrieval gives page-level citations and a step you can measure on its own.
 2. **Why do chunks never cross a page?** So every citation is one page a reader can open and check.
 3. **What does BM25 reward, and what can it not do?** Rare query terms that appear in a chunk, with diminishing returns for repeats and a penalty for length. It cannot match synonyms or another language.
 4. **Why use both BM25 and dense vectors?** They fail on different questions: BM25 on paraphrase and Danish, dense on exact figures and terms. Pages both rank high are usually right.
 5. **Why reciprocal rank fusion rather than adding scores?** The two scores are on different, query-dependent scales; ranks are comparable.
 6. **What is the difference between a bi-encoder and a cross-encoder, and why use both?** A bi-encoder embeds texts separately, so passages can be embedded in advance and searched fast. A cross-encoder reads question and passage together, which is more accurate but needs one model run per pair, so it only reranks the top 30.
-7. **What does recall@6 = 0.95 mean here?** Averaged over 35 questions, 95% of the evidence groups they need (one per bank or year) have a gold page among the 6 passages Claude reads.
+7. **What does recall@6 = 0.94 mean here?** Averaged over 35 questions, 94% of the evidence groups they need (one per bank or year) have a gold page among the 6 passages Claude reads.
 8. **What does MRR add to recall?** Recall says whether the right page is in the top k; MRR says how high it is.
 9. **How do you catch a made-up figure?** Citations come from the API and point at real passages, and the grounding check requires every figure in the answer to be in a cited passage.
 10. **How do you trust an LLM judge?** Read its verdicts against the answers, change one thing at a time on the same saved answers, and report its error rate with the score.

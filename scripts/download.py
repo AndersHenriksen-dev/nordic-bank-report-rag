@@ -1,4 +1,4 @@
-"""Download the six annual reports into data/raw/ and verify their checksums.
+"""Download the twelve annual reports into data/raw/ and verify their checksums.
 
 The reports belong to the banks and are not committed to this repository. This script fetches them from each bank's
 investor relations site, so anyone can rebuild the same data set.
@@ -40,8 +40,20 @@ class Report:
         return f"{self.bank}_{self.year}.pdf"
 
 
-# Found on each bank's investor relations site in October 2026.
+# Found on each bank's investor relations site in October 2026. Jyske Bank's 2023 report is filed as "2023 Q4 UK".
 REPORTS = [
+    Report(
+        bank="danske",
+        year=2022,
+        url="https://danskebank.com/-/media/danske-bank-com/file-cloud/2023/2/danske-bank-annual-report-2022.pdf",
+        sha256="59ddd318ea16fce202b4be7dbffbdc1d4a03da9f79e6ef05c83beaff66c6ed13",
+    ),
+    Report(
+        bank="danske",
+        year=2023,
+        url="https://danskebank.com/-/media/danske-bank-com/file-cloud/2024/2/danske-bank---annual-report-2023.pdf",
+        sha256="982705c52fd32ea3bdd562eb2ba79a6ebbccdda1a82241cb29027da653680e54",
+    ),
     Report(
         bank="danske",
         year=2024,
@@ -56,6 +68,18 @@ REPORTS = [
     ),
     Report(
         bank="nordea",
+        year=2022,
+        url="https://www.nordea.com/en/doc/annual-report-nordea-bank-abp-2022.pdf",
+        sha256="487cc5f188457dc8267a4d1244a03dbba609ea48694b8d5ecf7faff2baa36252",
+    ),
+    Report(
+        bank="nordea",
+        year=2023,
+        url="https://www.nordea.com/en/doc/annual-report-nordea-bank-abp-2023.pdf",
+        sha256="9dbeda045a8fa38301584d55f93083ce9dd6e89c18507923a80d84c2ccd53a05",
+    ),
+    Report(
+        bank="nordea",
         year=2024,
         url="https://www.nordea.com/en/doc/annual-report-nordea-bank-abp-2024-0.pdf",
         sha256="4e729ee653f35ead55030884f0f3b84c1e03b6593012fbe9d9f0ff5b44797054",
@@ -65,6 +89,18 @@ REPORTS = [
         year=2025,
         url="https://www.nordea.com/en/doc/nordea-annual-report-2025.pdf",
         sha256="cce7c2004fbeca8b652ea9977be08500c1297c0cd307349bd016c1dc4de11e1e",
+    ),
+    Report(
+        bank="jyske",
+        year=2022,
+        url="https://jyskebank.com/wps/wcm/connect/jbc/dd93d631-bd2b-48d6-a1dd-2536c1474fdd/Jyske+Bank+Annual+Report+2022.pdf",
+        sha256="94adf4300f359ff8e0240c1578c6c0fc1237a58408e382687400f70dde32ca75",
+    ),
+    Report(
+        bank="jyske",
+        year=2023,
+        url="https://jyskebank.com/wps/wcm/connect/jbc/7b369504-8d5d-4957-ab94-9f10522702ce/Jyske+Bank+2023+Q4+UK.pdf?MOD=AJPERES",
+        sha256="886bede4a164d687e19d3362f78569aaa5d75b67d3cc1e11ec50e186071484e9",
     ),
     Report(
         bank="jyske",
