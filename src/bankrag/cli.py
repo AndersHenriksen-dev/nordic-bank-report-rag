@@ -6,13 +6,9 @@ import argparse
 import sys
 
 from bankrag.answer import answer, log_trace
+from bankrag.config import DISCLAIMER
 from bankrag.ingest import ChunkStrategy, load_chunks, run
 from bankrag.retrieve import BM25Retriever, routed_search
-
-DISCLAIMER = (
-    "Built on public annual reports for demonstration. Not investment advice. "
-    "Figures should be checked against the source page."
-)
 
 
 def search(question: str, k: int, strategy: ChunkStrategy, route: bool) -> None:
