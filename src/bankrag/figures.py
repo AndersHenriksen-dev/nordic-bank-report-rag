@@ -19,7 +19,14 @@ REFERENCE_RE = re.compile(
     re.IGNORECASE,
 )
 
+NUMBER_TOLERANCE = 0.011  # allows rounding to one decimal, e.g. 45.46 matches 45.5
+
 Reading = tuple[float, int]  # absolute value, decimals shown
+
+
+def close_to(number: float, target: float) -> bool:
+    """Tell whether a number is the target within rounding: one decimal for small figures, about 0.01% for large."""
+    return abs(number - target) <= NUMBER_TOLERANCE * max(1.0, abs(target) / 100)
 
 
 def readings(raw: str) -> list[Reading]:

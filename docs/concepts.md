@@ -160,7 +160,7 @@ In this project: `src/bankrag/retrieve/rerank.py` with `BAAI/bge-reranker-v2-m3`
 
 **Pricing in tokens.** Haiku 5.5 costs USD 0.10 per million input tokens and USD 0.50 per million output tokens, cache reads USD 0.01. Cost per question is computed from the token counts the API returns, and logged.
 
-**Structured output.** The judge (section 12) uses another feature: the request carries a JSON schema (built from a Pydantic model), and the response is guaranteed to match it, so the code never has to parse free text.
+**Structured output.** The judge (section 12) uses another feature: the request carries a JSON schema (built from a Pydantic model), and the response is guaranteed to match it, so the code never has to parse free text. The KPI table uses it too: for each bank, year and metric, Claude returns the value, unit, page and the exact table row it read. Structured output and citations cannot be combined in one request, so the copied row stands in for a citation, and code checks that the row is on that page and holds the value.
 
 In this project: `src/bankrag/answer/generate.py`, `src/bankrag/judge.py`; decisions 5, 13 and 14.
 

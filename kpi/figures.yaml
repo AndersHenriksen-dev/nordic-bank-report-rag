@@ -1,0 +1,526 @@
+# Key figures for each bank and year, read by `bankrag kpi extract` from the bank's own annual report for that year.
+#
+# Fields:
+#   value, unit:   the figure in the unit the report uses. Loan impairment charges are positive for a net charge.
+#   page, quote:   the PDF page and the table row or sentence the figure was read from.
+#   label, note:   the report's own name for the figure, and how it differs from the metric, if it does.
+#   failed_checks: automatic checks that failed: the page was not among the passages, the quote is not on the page,
+#                  or the value is not in the quote. Empty when all passed.
+#   verified:      false until Anders has checked the figure against the PDF himself. Extraction keeps verified figures.
+
+- bank: danske
+  year: 2024
+  metric: net_profit
+  value: 23629.0
+  unit: DKK million
+  page: 4
+  quote: Net profit | 23,629 | 21,262 | 111 | -4,580 | 13,001 | 4,589 |
+  label: Net profit
+  note: Group-level figure from the Danske Bank Group income statement. The Danske Bank A/S parent-company net profit for
+    2024 is DKK 23,640 million, which is not used here.
+  failed_checks: []
+  verified: false
+- bank: danske
+  year: 2024
+  metric: total_income
+  value: 56405.0
+  unit: DKK million
+  page: 4
+  quote: '| Total income | 56,405 | 52,422 | 108 | 41,811 | 42,665 | 40,928 |'
+  label: Total income
+  note: Danske Bank reports this as Total income for the Group, matching the requested definition; 2024 figure is the first
+    column of the income statement table.
+  failed_checks: []
+  verified: false
+- bank: danske
+  year: 2024
+  metric: cost_income_ratio
+  value: 45.6
+  unit: '%'
+  page: 4
+  quote: Cost/income ratio (C/I), (%) | 45.6 | 48.6 | 100.5 | 60.2 | 66.0
+  label: Cost/income ratio (C/I), (%)
+  note: This is the headline group cost/income ratio for 2024. The report also gives an income/cost ratio of 223.9% for the
+    group on page 241 (the inverse measure, not a cost/income ratio), and an income/cost ratio of 233.0% for Danske Bank A/S
+    on page 262, which is the parent company alone and not the group figure.
+  failed_checks: []
+  verified: false
+- bank: danske
+  year: 2024
+  metric: return_on_equity
+  value: 13.4
+  unit: '%'
+  page: 4
+  quote: Return on avg. shareholders' equity (% p.a.) | 13.4 | 12.7 | -2.8 | 7.6 | 2.6
+  label: Return on avg. shareholders' equity (% p.a.)
+  note: Danske Bank reports return on average shareholders' equity, not profit for the year over average equity as the Jyske
+    Bank convention in the question specifies. Page 241 (G41) reports the same 13.4% for 2024 as 'Return on equity after tax
+    (%)'. The page 4 row is used as the group figure.
+  failed_checks: []
+  verified: false
+- bank: danske
+  year: 2024
+  metric: cet1_ratio
+  value: 17.8
+  unit: '%'
+  page: 4
+  quote: Common equity tier 1 capital ratio (%) | 17.8 | 18.8 | 17.8 | 17.7 | 18.3
+  label: Common equity tier 1 capital ratio (%)
+  note: Group-level CET1 capital ratio at end of 2024 per the Financial highlights table; the same 17.8% is confirmed on page
+    209 and page 31.
+  failed_checks: []
+  verified: false
+- bank: danske
+  year: 2024
+  metric: loan_impairment_charges
+  value: -543.0
+  unit: DKK million
+  page: 4
+  quote: '| Loan impairment charges | -543 | 262 | - | 1,502 | 348 | 7,001 |'
+  label: Loan impairment charges
+  note: Group figure for 2024 is a net reversal of DKK 543 million, shown as -543 per the sign convention; the report describes
+    it as a net reversal, not a charge.
+  failed_checks: []
+  verified: false
+- bank: danske
+  year: 2024
+  metric: lending
+  value: 1674680.0
+  unit: DKK million
+  page: 4
+  quote: '| Loans*** | 1,674,680 | 1,673,094 | 100 | 1,799,581 | 1,834,372 | 1,838,126 |'
+  label: Loans
+  note: Balance sheet line 'Loans' at end of 2024, which the bank reports as total lending. It is the same figure as 'Total
+    lending' of DKK 1,674.7 billion on page 11. The report gives it in DKK million on the page 4 table, so the value is stated
+    in DKK million.
+  failed_checks: []
+  verified: false
+- bank: danske
+  year: 2025
+  metric: net_profit
+  value: 23037.0
+  unit: DKK million
+  page: 4
+  quote: '| Net profit | 23,037 | 23,629 | 97 | 20,782 | -4,580 | 13,001 |'
+  label: Net profit
+  note: ''
+  failed_checks: []
+  verified: false
+- bank: danske
+  year: 2025
+  metric: total_income
+  value: 56840.0
+  unit: DKK million
+  page: 4
+  quote: '| Total income | 56,840 | 56,405 | 101 | 51,773 | 41,811 | 42,665 |'
+  label: Total income
+  note: ''
+  failed_checks: []
+  verified: false
+- bank: danske
+  year: 2025
+  metric: cost_income_ratio
+  value: 45.5
+  unit: '%'
+  page: 4
+  quote: Cost/income ratio (C/I), (%) | 45.5 | 45.6 | 49.2 | 100.5 | 60.2
+  label: Cost/income ratio (C/I), (%)
+  note: Group headline ratio for 2025. The 2024 figure is 45.6. The parent company Danske Bank A/S reports a different measure,
+    Income/cost ratio (%), of 220.6 for 2025 on page 268, which is not comparable and is not the group figure.
+  failed_checks: []
+  verified: false
+- bank: danske
+  year: 2025
+  metric: return_on_equity
+  value: 13.3
+  unit: '%'
+  page: 4
+  quote: Return on avg. total equity (% p.a.) | 13.3 | 13.5 | 12.4 | -2.8 | 7.6
+  label: Return on avg. total equity (% p.a.)
+  note: Danske Bank reports return on average total equity, which is the closest match to the requested return on equity.
+    The passages do not spell out its formula, so I cannot confirm it equals profit for the year divided by average equity.
+    The Group's 2025 return after tax in the G40 table is 13.0%, a different measure, so I did not use it.
+  failed_checks: []
+  verified: false
+- bank: danske
+  year: 2025
+  metric: cet1_ratio
+  value: 17.3
+  unit: '%'
+  page: 4
+  quote: Common equity tier 1 capital ratio (%) | 17.3 | 17.8 | 18.8 | 17.8 | 17.7 |
+  label: Common equity tier 1 capital ratio (%)
+  note: ''
+  failed_checks: []
+  verified: false
+- bank: danske
+  year: 2025
+  metric: loan_impairment_charges
+  value: 294.0
+  unit: DKK million
+  page: 4
+  quote: '| Loan impairment charges | 294 | -543 | - | 262 | 1,502 | 348 |'
+  label: Loan impairment charges
+  note: Group-wide net charge for 2025 in the Danske Bank Group income statement. Note G11 gives the same total of DKK 294
+    million. The Profit before tax section on page 21 cites DKK 1,260 million, which is not the group figure.
+  failed_checks: []
+  verified: false
+- bank: danske
+  year: 2025
+  metric: lending
+  value: 1758110.0
+  unit: DKK million
+  page: 4
+  quote: Loans | 1,758,110 | 1,674,680 | 105 | 1,673,094 | 1,799,581 | 1,834,372 |
+  label: Loans
+  note: ''
+  failed_checks: []
+  verified: false
+- bank: nordea
+  year: 2024
+  metric: net_profit
+  value: 5059.0
+  unit: EUR million
+  page: 40
+  quote: '| Net profit for the year | 5,059 | 4,934 | 3 |'
+  label: Net profit for the year
+  note: Figure is reported in EURm (euro millions), not DKK; the unit field uses the closest allowed option, EUR million.
+    Group-level figure for 2024.
+  failed_checks: []
+  verified: false
+- bank: nordea
+  year: 2024
+  metric: total_income
+  value: 12084.0
+  unit: EUR million
+  page: 40
+  quote: '| Total operating income | 12,084 | 11,743 | 3 |'
+  label: Total operating income
+  note: Nordea reports in EUR million, not DKK; the figure is the group's total operating income for 2024, the closest equivalent
+    to total income.
+  failed_checks: []
+  verified: false
+- bank: nordea
+  year: 2024
+  metric: cost_income_ratio
+  value: 44.1
+  unit: '%'
+  page: 40
+  quote: '| Cost-to-income ratio, % | 44.1 | 44.6 | – |'
+  label: Cost-to-income ratio, %
+  note: Headline group figure from the Group results and key ratios table on page 40. The ratios table on page 43 shows the
+    same ratio rounded to 44. Nordea also reports a cost-to-income ratio excluding regulatory fees of 43.1% on page 43. The
+    second ratios table on page 43 gives 47, which is not the group figure (it appears under the parent company heading).
+  failed_checks: []
+  verified: false
+- bank: nordea
+  year: 2024
+  metric: return_on_equity
+  value: 16.7
+  unit: '%'
+  page: 40
+  quote: '| Return on equity, % | 16.7 | 16.9 | – |'
+  label: Return on equity, %
+  note: The passages do not define Nordea's return on equity calculation, so this is the group's reported figure, not confirmed
+    as profit for the year over average equity. The Group ratios table on page 43 also shows 16.7 for 2024.
+  failed_checks: []
+  verified: false
+- bank: nordea
+  year: 2024
+  metric: cet1_ratio
+  value: 15.8
+  unit: '%'
+  page: 43
+  quote: Common Equity Tier 1 capital ratio2, 4, % | 15.8 | 17.0 | 16.4 | 17.0 | 17.1 |
+  label: Common Equity Tier 1 capital ratio
+  note: Group CET1 capital ratio at end of 2024 as reported in the Group ratios and key figures table; the Group table is
+    used rather than the Nordea Kredit-related ratios table, which gives 16.9%.
+  failed_checks: []
+  verified: false
+- bank: nordea
+  year: 2024
+  metric: loan_impairment_charges
+  value: 206.0
+  unit: EUR million
+  page: 40
+  quote: '| Net loan losses and similar net result1 | -206 | -167 | 23 |'
+  label: Net loan losses and similar net result
+  note: The report prints this as -206 because it is shown as a deduction in the income table; the net charge is EUR 206m,
+    shown here as positive. This figure includes EUR 8m of fair value losses on the Danish mortgage portfolio. Excluding those,
+    net loan losses were EUR 198m (page 40, five-year overview).
+  failed_checks: []
+  verified: false
+- bank: nordea
+  year: 2024
+  metric: lending
+  value: 357588.0
+  unit: EUR million
+  page: 42
+  quote: Loans to the public | 357,588 | 344,828 | 345,743 | 345,050 | 329,765
+  label: Loans to the public
+  note: Group balance sheet figure at 31 Dec 2024, as the report labels it. The balance sheet on page 41 shows a broader 'Loans'
+    line of 364,613, which also includes loans to central banks and credit institutions (EUR 7bn).
+  failed_checks: []
+  verified: false
+- bank: nordea
+  year: 2025
+  metric: net_profit
+  value: 4840.0
+  unit: EUR million
+  page: 40
+  quote: '| Net profit for the year | 4,840 | 5,059 | -4 |'
+  label: Net profit for the year
+  note: ''
+  failed_checks: []
+  verified: false
+- bank: nordea
+  year: 2025
+  metric: total_income
+  value: 11743.0
+  unit: EUR million
+  page: 40
+  quote: '| Total operating income | 11,743 | 12,084 | -3 |'
+  label: Total operating income
+  note: Nordea reports total operating income in EUR, which is the sum of all income lines (net interest income, net fee and
+    commission income, net insurance result, net result from items at fair value, equity method result and other operating
+    income). The figure is stated in EUR million, not DKK.
+  failed_checks: []
+  verified: false
+- bank: nordea
+  year: 2025
+  metric: cost_income_ratio
+  value: 46.0
+  unit: '%'
+  page: 40
+  quote: '| Cost-to-income ratio, % | 46.0 | 44.1 | – |'
+  label: Cost-to-income ratio, %
+  note: Headline group ratio for 2025 as reported on page 40. The group ratios table on page 43 shows the same figure rounded
+    to 46. The bank also reports a cost-to-income ratio excluding regulatory fees of 45.0% for 2025 (page 43).
+  failed_checks: []
+  verified: false
+- bank: nordea
+  year: 2025
+  metric: return_on_equity
+  value: 15.5
+  unit: '%'
+  page: 40
+  quote: '| Return on equity, % | 15.5 | 16.7 | – |'
+  label: Return on equity, %
+  note: ''
+  failed_checks: []
+  verified: false
+- bank: nordea
+  year: 2025
+  metric: cet1_ratio
+  value: 15.7
+  unit: '%'
+  page: 43
+  quote: Common Equity Tier 1 capital ratio2, 4, % | 15.7 | 15.8 | 17.0 | 16.4 | 17.0 |
+  label: Common Equity Tier 1 capital ratio
+  note: Group figure for 2025 from the group ratios table; the parent company table on the same page shows a different CET1
+    ratio (14.1%), which is not used. Figure is end-of-year.
+  failed_checks: []
+  verified: false
+- bank: nordea
+  year: 2025
+  metric: loan_impairment_charges
+  value: 22.0
+  unit: EUR million
+  page: 40
+  quote: Net loan losses and similar net result amounted to EUR 22m (1bp) compared with EUR 206m (6bp) in 2024.
+  label: Net loan losses and similar net result
+  note: Reported as -22 in the group results table, printed with a negative sign because it reduces income. Shown here as
+    a positive net charge of 22. The bank's line includes fair value adjustments to loans held at fair value at Nordea Kredit.
+    The five-year overview shows net loan losses of -21 plus a -1 result on loans mandatorily held at fair value, which together
+    make the same -22.
+  failed_checks: []
+  verified: false
+- bank: nordea
+  year: 2025
+  metric: lending
+  value: 381871.0
+  unit: EUR million
+  page: 42
+  quote: '| Loans to the public | 381,871 | 357,588 | 344,828 | 345,743 | 345,050 |'
+  label: Loans to the public
+  note: Group balance sheet figure at 31 Dec 2025 in the five-year overview. The parent company's loans to the public (EUR
+    168bn) are excluded, and the funding table's 'Loans' line of EUR 392,856m is a different, broader measure.
+  failed_checks: []
+  verified: false
+- bank: jyske
+  year: 2024
+  metric: net_profit
+  value: 5312.0
+  unit: DKK million
+  page: 7
+  quote: '| Profit for the year | 5,312 | 5,904 | 90 | 3,752 | 3,176 | 1,609 |'
+  label: Profit for the year
+  note: Bank reports this as profit for the year after tax; it is before AT1 capital interest of DKK 262m, which is charged
+    against equity.
+  failed_checks: []
+  verified: false
+- bank: jyske
+  year: 2024
+  metric: total_income
+  value: 13693.0
+  unit: DKK million
+  page: 7
+  quote: Core income | 13,693 | 14,356 | 95 | 9,106 | 8,652 | 7,982 | Total assets | 750.2 | 779.7 | 96 | 750.0 | 647.1 |
+    672.6 |
+  label: Core income
+  note: 'Jyske Bank does not report a line called total income. Its core income is the closest equivalent: net interest income,
+    net fee and commission income, value adjustments, other income and income from operating lease, before core expenses,
+    loan impairment charges and investment portfolio earnings. The IFRS group income statement on page 166 does not show this
+    subtotal, so this is the bank''s own measure rather than the IFRS line items.'
+  failed_checks: []
+  verified: false
+- bank: jyske
+  year: 2024
+  metric: cost_income_ratio
+  value: 46.8
+  unit: '%'
+  page: 8
+  quote: '| Expenses as a percentage of income | 46.8 | 42.5 | 53.6 | 56.7 | 60.7 |'
+  label: Expenses as a percentage of income
+  note: Jyske Bank reports this as 'Expenses as a percentage of income' rather than a cost/income ratio. Its 'Income/cost
+    ratio' (2.0 for 2024, page 172) is a multiple, not a percentage, and is not used here. Page 11 rounds the 2024 figure
+    to 47.
+  failed_checks: []
+  verified: false
+- bank: jyske
+  year: 2024
+  metric: return_on_equity
+  value: 11.4
+  unit: '%'
+  page: 172
+  quote: '| Net profit for the year as a percentage of average equity (%)* | 11.4 | 14.4 | 10.0 | 8.8 | 4.4 |'
+  label: Net profit for the year as a percentage of average equity (%)
+  note: Jyske Bank's ratio is profit for the year as a percentage of average equity, as requested, not return on tangible
+    equity (12.4%). The bank calculates it as if AT1 capital is recognised as a liability. The same 11.4% figure appears on
+    page 8 as 'Profit for the year as a percentage of average equity'.
+  failed_checks: []
+  verified: false
+- bank: jyske
+  year: 2024
+  metric: cet1_ratio
+  value: 17.6
+  unit: '%'
+  page: 169
+  quote: '| Common equity tier 1 capital ratio (%) | 17.6 | 16.9 |'
+  label: Common equity tier 1 capital ratio (%)
+  note: ''
+  failed_checks: []
+  verified: false
+- bank: jyske
+  year: 2024
+  metric: loan_impairment_charges
+  value: 21.0
+  unit: DKK million
+  page: 7
+  quote: Loan impairment charges | 21 | 127 | 17 | -605 | -218 | 968 | – of which bank deposits | 190.2 | 199.8 | 95 | 189.1
+    | 121.5 | 127.5 |
+  label: Loan impairment charges
+  note: Group figure from the core income statement table in the financial highlights, in DKKm. Page 27 also states the 2024
+    charge as DKK 21m. Page 38 cites DKK 90m for 2023 against the 127 shown in this table, which may reflect a different basis,
+    but the 2024 figure is consistent.
+  failed_checks: []
+  verified: false
+- bank: jyske
+  year: 2024
+  metric: lending
+  value: 567.2
+  unit: DKK billion
+  page: 25
+  quote: '| Loans and advances | 567.2 | 557.3 | 102 | 567.2 | 557.7 | 549.5 | 556.7 | 557.3 |'
+  label: Loans and advances
+  note: Includes repo loans of DKK 56.7bn. Total loans and advances exclusive of repo loans were DKK 510.5bn at the end of
+    2024, as stated in the business volumes text on page 25.
+  failed_checks: []
+  verified: false
+- bank: jyske
+  year: 2025
+  metric: net_profit
+  value: 5414.0
+  unit: DKK million
+  page: 7
+  quote: '| Profit for the year | 5,414 | 5,312 | 102 | 5,904 | 3,752 | 3,176 |'
+  label: Profit for the year
+  note: The bank reports this figure as 'Profit for the year' on page 7 and as 'Net profit for the period' on page 21. It
+    is after tax and before AT1 capital interest of DKK 264m, which is charged against equity.
+  failed_checks: []
+  verified: false
+- bank: jyske
+  year: 2025
+  metric: total_income
+  value: 13654.0
+  unit: DKK million
+  page: 7
+  quote: '| Core income | 13,654 | 13,693 | 100 | 14,356 | 9,106 | 8,652 |'
+  label: Core income
+  note: The figure asked for is total income, which the definition says is called core income at Jyske Bank. Core income is
+    an alternative performance measure that excludes investment portfolio earnings, so it is not the IFRS total of income
+    lines.
+  failed_checks: []
+  verified: false
+- bank: jyske
+  year: 2025
+  metric: cost_income_ratio
+  value: 48.3
+  unit: '%'
+  page: 8
+  quote: Cost/income ratio | 48.3 | 46.8 | 42.5 | 53.6 | 56.7 |
+  label: Cost/income ratio
+  note: Headline group cost/income ratio for 2025, from the key figures table on page 8; page 11 rounds it to 48%. The bank
+    also reports an 'Income/cost ratio' of 2.0 (pages 139 and 229), which is a different measure (income divided by costs)
+    and is not used here.
+  failed_checks: []
+  verified: false
+- bank: jyske
+  year: 2025
+  metric: return_on_equity
+  value: 11.1
+  unit: '%'
+  page: 8
+  quote: Profit for the year as a percentage of average equity | 11.1 | 11.4 | 14.4 | 10.0 | 8.8 |
+  label: Profit for the year as a percentage of average equity
+  note: Jyske Bank's figure is profit for the year as a percentage of average equity, which is the measure requested. The
+    bank calculates its financial ratios as if additional tier 1 capital (AT1) is recognised as a liability (see the asterisk
+    note on page 8). The 2025 figure is 11.1%, against 12.4% for return on tangible equity, which was not used.
+  failed_checks: []
+  verified: false
+- bank: jyske
+  year: 2025
+  metric: cet1_ratio
+  value: 16.1
+  unit: '%'
+  page: 136
+  quote: Common equity tier 1 capital ratio (%) | 16.1 | 17.6
+  label: Common equity tier 1 capital ratio (%)
+  note: ''
+  failed_checks: []
+  verified: false
+- bank: jyske
+  year: 2025
+  metric: loan_impairment_charges
+  value: 2.0
+  unit: DKK million
+  page: 7
+  quote: Loan impairment charges | 2 | 21 | 10 | 127 | -605 | -218
+  label: Loan impairment charges
+  note: Taken from the core profit table, which shows the group's loan impairment charges as a net charge of DKK 2m in 2025.
+    The group note on page 148 shows a small reversal in the balance of impairment charges and provisions, which is a different
+    measure.
+  failed_checks: []
+  verified: false
+- bank: jyske
+  year: 2025
+  metric: lending
+  value: 577.2
+  unit: DKK billion
+  page: 7
+  quote: Loans and advances | 577.2 | 567.2 | 102 | 557.3 | 541.7 | 485.2
+  label: Loans and advances
+  note: Includes repo loans of DKK 58.9bn. Excluding repo loans, the bank reports total loans and advances of DKK 518.2bn
+    at the end of 2025 (page 27). Page 140 gives the same group figure as DKK 577,168 million.
+  failed_checks: []
+  verified: false

@@ -3,10 +3,7 @@ handoff_*.md
 private/
 
 # Data: the reports belong to the banks and are downloaded by scripts/download.py
-data/raw/
-data/processed/
-data/index/
-data/traces/
+data/
 *.pdf
 
 # Secrets

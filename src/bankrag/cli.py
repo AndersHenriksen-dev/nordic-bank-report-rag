@@ -1,4 +1,4 @@
-"""Command line entry point: `bankrag ingest | search | ask`."""
+"""Command line entry point: `bankrag ingest | search | ask | kpi`."""
 
 from __future__ import annotations
 
@@ -6,8 +6,10 @@ import argparse
 import sys
 
 from bankrag.answer import answer, log_trace, mark_quotes
-from bankrag.config import DISCLAIMER
+from bankrag.config import BANK_NAMES, DISCLAIMER, YEARS
 from bankrag.ingest import load_chunks, run
+from bankrag.kpi import METRICS, build_db, compare_banks, extract_table, load_figures, save_figures
+from bankrag.models import KpiFigure
 from bankrag.retrieve import (
     DEFAULT_RETRIEVER,
     RETRIEVER_KINDS,
@@ -48,6 +50,45 @@ def ask(question: str, k: int, retriever: RetrieverKind) -> None:
     print(f"\n{DISCLAIMER}")
 
 
+def _shown(figure: KpiFigure | None) -> str:
+    """Format a figure for the terminal: thousands separators for millions, one decimal otherwise."""
+    if figure is None or figure.value is None:
+        return "-"
+    if figure.unit == "%":
+        return f"{figure.value:.1f}%"
+    digits = 0 if figure.unit and figure.unit.endswith("million") else 1
+    return f"{figure.value:,.{digits}f} {figure.unit}"
+
+
+def kpi_extract() -> None:
+    """Read every figure of the KPI table with Claude and check it, keeping figures already verified by hand."""
+    chunks = load_chunks("structure")
+    figures, total = [], 0.0
+    for figure, cost in extract_table(build_retriever(DEFAULT_RETRIEVER, chunks), chunks, load_figures()):
+        figures.append(figure)
+        total += cost
+        status = "verified" if figure.verified else "; ".join(figure.failed_checks) or "checks passed"
+        print(f"{figure.bank:7s} {figure.year} {figure.metric:24s} {_shown(figure):>22s}  p. {figure.page}  {status}")
+    save_figures(figures)
+    build_db(figures)
+    print(f"\n{len(figures)} figures written to kpi/figures.yaml and data/kpi.sqlite. Cost: USD {total:.4f}")
+
+
+def kpi_show() -> None:
+    """Print the KPI table from the database, one row per metric and year, marking figures not yet checked by hand."""
+    print(f"{'':30s}" + "".join(f"{name:>24s}" for name in BANK_NAMES.values()))
+    for metric in METRICS:
+        for year in YEARS:
+            by_bank = {figure.bank: figure for figure in compare_banks(metric, year)}
+            cells = []
+            for bank in BANK_NAMES:
+                figure = by_bank.get(bank)
+                mark = "" if figure is None or figure.verified else ("!" if figure.failed_checks else "*")
+                cells.append(f"{_shown(figure) + mark:>24s}")
+            print(f"{metric + ' ' + str(year):30s}" + "".join(cells))
+    print("\n* not yet checked by hand   ! failed an automatic check")
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="bankrag", description="Questions over Nordic bank annual reports")
     commands = parser.add_subparsers(dest="command", required=True)
@@ -62,6 +103,14 @@ def _build_parser() -> argparse.ArgumentParser:
         command.add_argument("--retriever", default=DEFAULT_RETRIEVER, choices=RETRIEVER_KINDS)
         if name == "search":
             command.add_argument("--no-route", action="store_true", help="ignore banks and years in the question")
+
+    kpi_parser = commands.add_parser("kpi", help="the table of key figures per bank and year")
+    kpi_parser.add_argument(
+        "action",
+        choices=["extract", "build", "show"],
+        help="extract: read the figures with Claude (about USD 0.05); build: rebuild data/kpi.sqlite from "
+        "kpi/figures.yaml after editing it; show: print the table",
+    )
     return parser
 
 
@@ -74,8 +123,14 @@ def main(argv: list[str] | None = None) -> None:
         ingest(force=args.force)
     elif args.command == "search":
         search(args.question, k=args.k, retriever=args.retriever, route=not args.no_route)
-    else:
+    elif args.command == "ask":
         ask(args.question, k=args.k, retriever=args.retriever)
+    elif args.action == "extract":
+        kpi_extract()
+    elif args.action == "build":
+        build_db(load_figures())
+    else:
+        kpi_show()
 
 
 if __name__ == "__main__":
