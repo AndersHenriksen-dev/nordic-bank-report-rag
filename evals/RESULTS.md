@@ -16,3 +16,18 @@ Danish glossary: add English report wording for Danish finance terms.
 | BM25, structure chunks | 0.11 | 0.31 | 0.52 | 0.76 | 0.32 |
 | BM25, structure chunks, routed | 0.16 | 0.50 | 0.80 | 0.82 | 0.43 |
 | BM25, structure chunks, routed, Danish glossary | 0.16 | 0.59 | 0.89 | 0.91 | 0.45 |
+
+## Answers
+
+From the last answer run on 2026-10-25 with `claude-haiku-5-5`. Every question and
+answer, with the passages it cites, is in [ANSWERS.md](ANSWERS.md).
+
+| Metric | Value |
+|---|---|
+| Numeric answers exact | 94% of 17 |
+| Answerable questions answered with a citation | 100% |
+| Answers whose figures all appear in a cited passage | 95% of 19 |
+| Answerable questions wrongly refused | 0 |
+| Unanswerable questions refused | 5 of 5 |
+| Cost per question, mean / p95 (USD) | 0.00093 / 0.00128 |
+| Latency per question, mean / p95 (s) | 4.2 / 6.4 |

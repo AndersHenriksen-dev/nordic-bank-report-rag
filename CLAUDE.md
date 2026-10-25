@@ -51,4 +51,5 @@ The `make` targets wrap the same commands.
 - `src/bankrag/ingest/`: PDF parsing (`pdf.py`), chunking (`chunk.py`), pipeline with a per-report page cache (`pipeline.py`) that runs each report in a crash-safe child process (`worker.py`)
 - `src/bankrag/retrieve/`: BM25 (`bm25.py`), bank and year routing (`route.py`), Danish query glossary (`rewrite.py`)
 - `src/bankrag/answer/generate.py`: Claude call with `search_result` blocks, citations, prompt caching, refusals, cost, trace log
-- `src/bankrag/evaluate.py`: metrics; `evals/run_evals.py` runs them and writes `evals/RESULTS.md`
+- `src/bankrag/evaluate.py`: metrics; `evals/run_evals.py` runs them and writes `evals/RESULTS.md` and `evals/ANSWERS.md` (generated, do not edit by hand)
+- `docs/documents.md`: the six reports, their checksums and what to know about them
