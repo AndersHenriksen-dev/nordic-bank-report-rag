@@ -7,10 +7,8 @@ from pathlib import Path
 import yaml
 from pydantic import TypeAdapter
 
-from bankrag.figures import figure_tokens, numbers_in
+from bankrag.figures import close_to, figure_tokens, numbers_in
 from bankrag.models import Chunk, Question, Source
-
-NUMBER_TOLERANCE = 0.011  # allows rounding to one decimal, e.g. 45.46 matches 45.5
 
 _QUESTIONS_ADAPTER: TypeAdapter[list[Question]] = TypeAdapter(list[Question])
 
@@ -54,10 +52,7 @@ def numbers_match(question: Question, answer_text: str) -> bool | None:
     if not question.numbers:
         return None
     found = numbers_in(answer_text)
-    return all(
-        any(abs(number - alt) <= NUMBER_TOLERANCE * max(1.0, abs(alt) / 100) for number in found for alt in alts)
-        for alts in question.numbers
-    )
+    return all(any(close_to(number, alt) for number in found for alt in alts) for alts in question.numbers)
 
 
 def _rounds_to(value: float, decimals: int, pool: set[float]) -> bool:
