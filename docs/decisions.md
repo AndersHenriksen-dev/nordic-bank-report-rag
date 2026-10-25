@@ -88,3 +88,30 @@ The front-end (`make app`, Streamlit) shows, for each question, Claude's reasoni
 - **Only the rows the answer uses.** Claude cites a whole table block, but an answer usually uses one or two rows. The page highlights and quotes only the rows that share a figure with the answer, plus header rows for context.
 - **A close-up first.** Report pages are often wide spreads, so the page shows a crop around the highlighted area and keeps the whole page one click away.
 - **Local only.** The page images need the PDFs, which are not in the repository, and every question spends API credit, so the server listens on `localhost` only. A public demo will be a recording, as the hand-off asks.
+
+## 15. Hybrid search: BM25 and bge-m3 vectors fused by rank, then a cross-encoder reranker
+
+The default search is now four steps: route the question to the banks and years it names, search BM25 and dense vectors separately, fuse the two rankings with reciprocal rank fusion (RRF), and let a cross-encoder rerank the fused top 30 down to the 6 passages Claude sees.
+
+- **Embeddings: `BAAI/bge-m3`.** Multilingual (Danish questions, English reports), open (MIT), runs locally so the demo needs no second paid key, and handles inputs up to 8,192 tokens, so whole tables fit. Swappable with `BANKRAG_EMBED_MODEL`; the index rebuilds itself when the model or the chunks change.
+- **Qdrant embedded.** Qdrant runs in-process with its data in `data/index/qdrant`, so there is no server or Docker. Bank and year routing become payload filters. The price is a folder lock: one process at a time.
+- **Fusion in Python, not in Qdrant.** BM25 stays in `bm25s`, the same implementation the earlier evals measured, so the comparison changes one thing at a time. Qdrant's Query API could fuse sparse and dense vectors server-side with the same RRF; moving BM25 into Qdrant as sparse vectors is a possible next step, not a quality change.
+- **Reranker: `BAAI/bge-reranker-v2-m3`** (Apache 2.0, multilingual) on the top 30. It reads question and passage together, so it judges whether a passage answers the question rather than whether it shares words or a topic with it.
+- **GPU when there is one.** On my RTX 5070 building the index took about two minutes, including the 2.3 GB model download, and a reranked search takes about half a second (535 ms mean, 924 ms p95, against under 1 ms for BM25). On Windows PyTorch comes from the CUDA 13.0 index; on Linux, including CI, from the CPU index, which keeps CI small.
+
+What the evals showed (22 answerable questions, all routed with the Danish glossary):
+
+| Setup | Recall@1 | Recall@3 | Recall@6 | MRR |
+|---|---|---|---|---|
+| BM25 | 0.16 | 0.59 | 0.89 | 0.45 |
+| Dense | 0.17 | 0.52 | 0.70 | 0.43 |
+| Hybrid (RRF) | 0.36 | 0.64 | 0.85 | 0.57 |
+| Hybrid + reranker | 0.41 | 0.79 | 0.89 | 0.62 |
+
+- Dense search alone is weaker than BM25 here. Annual reports are full of exact terms ("CET1", "cost/income ratio") and figures in tables, which keyword search matches directly.
+- Fusion more than doubles recall@1, because a page both searches rank fairly high is usually the right one.
+- The reranker lifts recall@3 from 0.59 to 0.79 and fixes the two misses I had listed in milestone 1 (Jyske Bank's impairment drivers, and the three-bank CET1 comparison). Recall@6 stays at 0.89: the gain is in ordering, which matters because Claude reads the top passages most closely and the page shows them first.
+- It also loses two questions. For "What drove the increase in Danske Bank's net fee income?" it prefers business-unit pages ("Net fee income decreased 4%" in Personal Customers) over the group's financial review, and drops the gold page to rank 9. Group versus business-unit figures is a known weak spot.
+- The Danish glossary still helps dense search a little (recall@6 0.65 to 0.70), so it stays on.
+
+A mistake on the way: I first blamed the reranker's lost question on score ties, because the printed scores all read "1.00". The scores were only rounded in my printout; at full precision they differ and the order is the same in half and full precision. The reranker now reports raw scores, which are readable in the web page.

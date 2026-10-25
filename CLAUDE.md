@@ -8,8 +8,8 @@ Question answering over the 2024 and 2025 annual reports of Danske Bank, Nordea 
 uv sync                                  # install
 uv run pre-commit install                # once: ruff, mypy, line endings and gitleaks on every commit
 uv run python scripts/download.py        # fetch PDFs into data/raw/ (Jyske Bank: download by hand, see script output)
-uv run bankrag ingest                    # parse PDFs (about 30 min the first time), write data/processed/
-uv run bankrag search "question"         # show retrieved chunks, no API key needed
+uv run bankrag ingest                    # parse PDFs (about 30 min the first time), chunk, build the Qdrant index
+uv run bankrag search "question"         # show retrieved chunks, no API key needed; --retriever bm25|dense|hybrid|hybrid-rerank
 uv run bankrag ask "question"            # answer with citations, needs ANTHROPIC_API_KEY in .env
 uv run streamlit run src/bankrag/ui/app.py   # web page on localhost:8501, needs the key and the PDFs
 uv run python evals/run_evals.py         # retrieval evals, no API key needed
@@ -35,6 +35,8 @@ The `make` targets wrap the same commands.
 - Never commit data or keys: `data/`, PDFs and `.env` are git-ignored. Never read `.env`.
 - Page numbers are PDF page numbers (1-based), not the printed page labels.
 - Run `run_evals.py --answers` only when asked: it calls the paid API.
+- Qdrant runs embedded and locks `data/index/qdrant`: only one process (the web page, the evals or the CLI) can search at a time.
+- The first search downloads `BAAI/bge-m3` and `BAAI/bge-reranker-v2-m3` (2.3 GB each) from Hugging Face. They run on the GPU when PyTorch finds one.
 - Nothing from Anders's current or past employers goes in this repo. The banks appear only as the public subjects of their reports.
 - The system must refuse forecasts, recommendations and investment advice. Keep the disclaimer in the README and the UI.
 - Update `docs/BUILD_LOG.md` at the end of each session: date, hours, what was built, what Claude Code did, what Anders decided.
@@ -50,7 +52,7 @@ The `make` targets wrap the same commands.
 
 - `src/bankrag/models.py`: Pydantic models for everything that crosses a boundary (page cache, chunks, eval questions, answers)
 - `src/bankrag/ingest/`: PDF parsing (`pdf.py`), chunking (`chunk.py`), pipeline with a per-report page cache (`pipeline.py`) that runs each report in a crash-safe child process (`worker.py`)
-- `src/bankrag/retrieve/`: BM25 (`bm25.py`), bank and year routing (`route.py`), Danish query glossary (`rewrite.py`)
+- `src/bankrag/retrieve/`: BM25 (`bm25.py`), vectors in embedded Qdrant (`dense.py`), the local models (`neural.py`), rank fusion (`hybrid.py`), cross-encoder reranking (`rerank.py`), building a retriever by name (`factory.py`), bank and year routing (`route.py`), Danish query glossary (`rewrite.py`)
 - `src/bankrag/answer/generate.py`: Claude call with `search_result` blocks, citations, prompt caching, refusals, cost, trace log
 - `src/bankrag/ui/`: Streamlit page (`app.py`) and cited-passage highlighting on PDF pages (`highlight.py`)
 - `src/bankrag/figures.py`: number and figure parsing in English and Danish formats, used by the evals and the UI

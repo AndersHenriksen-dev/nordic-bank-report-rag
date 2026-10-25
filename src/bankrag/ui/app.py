@@ -1,7 +1,8 @@
 """Streamlit front-end: ask a question and see Claude's reasoning, the cited answer and the highlighted report pages.
 
 Run with `make app` or `uv run streamlit run src/bankrag/ui/app.py`. It needs the PDFs in data/raw/ for the page
-images, the chunk files from `bankrag ingest`, and ANTHROPIC_API_KEY in .env. Each question costs about USD 0.001.
+images, the chunks and vector index from `bankrag ingest`, and ANTHROPIC_API_KEY in .env. Each question costs about
+USD 0.001.
 """
 
 from __future__ import annotations
@@ -16,7 +17,7 @@ from bankrag.config import DISCLAIMER, RAW_DIR, Bank, bank_name
 from bankrag.figures import figures_in
 from bankrag.ingest import load_chunks
 from bankrag.models import Answer, Source
-from bankrag.retrieve import BM25Retriever, Hit, routed_search
+from bankrag.retrieve import DEFAULT_RETRIEVER, Hit, Retriever, build_retriever, routed_search
 from bankrag.ui.highlight import HighlightedPage, focus_passage, render_highlighted_page
 
 TOP_K = 6
@@ -40,8 +41,8 @@ class Result:
 
 
 @st.cache_resource(show_spinner="Loading the search index...")
-def _retriever() -> BM25Retriever:
-    return BM25Retriever(load_chunks("structure"))
+def _retriever() -> Retriever:
+    return build_retriever(DEFAULT_RETRIEVER, load_chunks("structure"))
 
 
 @st.cache_data(show_spinner=False)
@@ -129,7 +130,7 @@ def _show_retrieved(hits: list[Hit], sources: list[Source]) -> None:
                     "Report": f"{bank_name(hit.chunk.bank)} {hit.chunk.year}",
                     "Page": hit.chunk.page,
                     "Section": hit.chunk.heading or hit.chunk.section,
-                    "BM25 score": round(hit.score, 2),
+                    "Reranker score": round(hit.score, 2),
                     "Cited": "yes" if hit.chunk.id in cited else "",
                 }
                 for rank, hit in enumerate(hits, 1)
@@ -146,8 +147,9 @@ def _sidebar() -> None:
             st.session_state["ask_now"] = True
     st.sidebar.divider()
     st.sidebar.caption(
-        "Six annual reports: Danske Bank, Nordea and Jyske Bank, 2024 and 2025. Search is BM25 over 4,882 chunks; "
-        "answers come from Claude Haiku 5.5 with citations.",
+        "Six annual reports: Danske Bank, Nordea and Jyske Bank, 2024 and 2025. Search combines BM25 and bge-m3 "
+        "vectors over 4,882 chunks, then bge-reranker-v2-m3 picks the best 6; answers come from Claude Haiku 5.5 "
+        "with citations.",
     )
 
 
