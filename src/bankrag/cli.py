@@ -6,9 +6,9 @@ import argparse
 import sys
 
 from bankrag.answer import answer, log_trace, mark_quotes
-from bankrag.config import BANK_NAMES, DISCLAIMER, YEARS
+from bankrag.config import BANK_NAMES, DISCLAIMER
 from bankrag.ingest import load_chunks, run
-from bankrag.kpi import METRICS, build_db, compare_banks, extract_table, load_figures, save_figures
+from bankrag.kpi import KPI_YEARS, METRICS, build_db, compare_banks, extract_table, load_figures, save_figures
 from bankrag.models import KpiFigure
 from bankrag.retrieve import (
     DEFAULT_RETRIEVER,
@@ -78,7 +78,7 @@ def kpi_show() -> None:
     """Print the KPI table from the database, one row per metric and year, marking figures not yet checked by hand."""
     print(f"{'':30s}" + "".join(f"{name:>24s}" for name in BANK_NAMES.values()))
     for metric in METRICS:
-        for year in YEARS:
+        for year in KPI_YEARS:
             by_bank = {figure.bank: figure for figure in compare_banks(metric, year)}
             cells = []
             for bank in BANK_NAMES:

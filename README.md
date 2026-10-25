@@ -1,6 +1,6 @@
 # Nordic Bank Report RAG
 
-I built a question answering system over the 2024 and 2025 annual reports of Danske Bank, Nordea and Jyske Bank: 1,867 PDF pages. Ask a question in English or Danish and it answers from the reports, cites the report and page behind every claim, and refuses forecasts and investment advice. A test set of 44 questions with known answers measures every part of it.
+I built a question answering system over the 2022 to 2025 annual reports of Danske Bank, Nordea and Jyske Bank: twelve reports, 3,553 PDF pages. Ask a question in English or Danish and it answers from the reports, cites the report and page behind every claim, and refuses forecasts and investment advice. A test set of 44 questions with known answers measures every part of it.
 
 Not investment advice. Figures should be checked against the source page.
 
@@ -10,7 +10,7 @@ Not investment advice. Figures should be checked against the source page.
 
 Measured on 44 eval questions, 35 of them answerable from the reports ([evals/RESULTS.md](evals/RESULTS.md)):
 
-- **Recall@6 0.95** with hybrid search and a reranker, against 0.80 for keyword search alone: the 6 passages Claude reads hold the needed evidence 95% of the time, counting each bank or year a question needs.
+- **Recall@6 0.94** with hybrid search and a reranker, against 0.77 for keyword search alone: the 6 passages Claude reads hold the needed evidence 95% of the time, counting each bank or year a question needs.
 - **27 of 28 numeric answers exact.**
 - **9 of 9 unanswerable questions refused**, and no answerable question refused.
 - **USD 0.001 (DKK 0.007) and about 5 seconds per question**, with Claude Haiku 5.5 and local open models for search.
@@ -37,8 +37,8 @@ Once, with `bankrag ingest`:
 
 ```mermaid
 flowchart LR
-    P[6 PDFs] --> PA[Parse pages and tables]
-    PA --> CH[4,882 chunks]
+    P[12 PDFs] --> PA[Parse pages and tables]
+    PA --> CH[8,700 chunks]
     CH --> BM[BM25 index]
     CH --> QD[bge-m3 vectors in Qdrant]
 ```
@@ -57,8 +57,8 @@ flowchart LR
     RR --> CL[Claude answers with citations]
 ```
 
-1. **Parse.** PyMuPDF reads every page. Tables are rebuilt row by row from word positions, because the library's own cell output merged columns on many report tables. Each page keeps its bank, year, PDF page number and section. Each report is parsed in a child process that restarts after a crash, because PyMuPDF's layout model crashed the process on 2 of the 1,867 pages.
-2. **Chunk.** Paragraphs are packed into chunks of about 500 tokens that never cross a page, so every chunk cites one page. A table is never split unless it is very long. That gives 4,882 chunks.
+1. **Parse.** PyMuPDF reads every page. Tables are rebuilt row by row from word positions, because the library's own cell output merged columns on many report tables. Each page keeps its bank, year, PDF page number and section. Each report is parsed in a child process that restarts after a crash, because PyMuPDF's layout model crashed the process on 3 of the 3,553 pages.
+2. **Chunk.** Paragraphs are packed into chunks of about 500 tokens that never cross a page, so every chunk cites one page. A table is never split unless it is very long. That gives 8,700 chunks.
 3. **Route.** The question's bank and year names become filters. A question about three banks is searched once per bank and the results are interleaved, so one bank cannot take every slot.
 4. **Expand Danish.** A glossary of 25 Danish finance terms adds the English wording the reports use ("egenkapitalforrentning" adds "return on equity").
 5. **Search twice and fuse.** BM25 matches exact terms and figures. Dense vectors from `BAAI/bge-m3`, stored in embedded Qdrant, match meaning across languages. Reciprocal rank fusion merges the two rankings by rank, not score.
@@ -75,7 +75,7 @@ The reasons behind each choice are in [docs/decisions.md](docs/decisions.md). A 
 ### What you need
 
 - [uv](https://docs.astral.sh/uv/getting-started/installation/), which also installs Python 3.12, and git.
-- About 10 GB of free disk: the two local models are 2.3 GB each, and PyTorch with CUDA is several GB. The reports, parsed pages and index take about 170 MB.
+- About 10 GB of free disk: the two local models are 2.3 GB each, and PyTorch with CUDA is several GB. The reports, parsed pages and index take about 280 MB.
 - An NVIDIA GPU is optional. On Windows uv installs the CUDA 13.0 build of PyTorch; on Linux the CPU build. I built and measured everything on Windows 11 with an RTX 5070. On a CPU the search works but is slower, and I have not measured how much. macOS is untested.
 - An [Anthropic API key](https://console.anthropic.com/) for answers only. Search and the retrieval evals need no key.
 
@@ -85,13 +85,13 @@ The reasons behind each choice are in [docs/decisions.md](docs/decisions.md). A 
 git clone https://github.com/AndersHenriksen-dev/nordic-bank-report-rag.git
 cd nordic-bank-report-rag
 make setup          # uv sync, and the pre-commit hooks
-make download       # the six PDFs into data/raw/, checked against their SHA-256
+make download       # the twelve PDFs into data/raw/, checked against their SHA-256
 ```
 
-Jyske Bank's website blocks scripted downloads. The script then prints the URL: open it in a browser, save the PDF under the name the script gives in `data/raw/`, and run `make download` again to check it.
+Jyske Bank's website blocks scripted downloads. For its four reports the script prints the URL: open it in a browser, save the PDF under the name the script gives in `data/raw/`, and run `make download` again to check it.
 
 ```bash
-make ingest         # parse, chunk and index: about 30 minutes the first time
+make ingest         # parse, chunk and index: about 55 minutes the first time
 ```
 
 Parsing is the slow part, and its result is cached per report. The first run also downloads `bge-m3` from Hugging Face and builds the vector index (about 2 minutes on my GPU, including the download). Running `ingest` again parses only reports without a cache, and rebuilds the index only when the chunks or the embedding model changed.
@@ -161,19 +161,19 @@ The eval set ([evals/questions.yaml](evals/questions.yaml)) has 44 questions: 10
 
 ## What I tried
 
-Each step was measured on the 35 answerable questions. Claude reads the top 6 passages.
+Each step was measured on the 35 answerable questions, searching all twelve reports. Claude reads the top 6 passages.
 
 | Step | Recall@1 | Recall@3 | Recall@6 |
 |---|---|---|---|
-| BM25 over fixed 500-token windows | 0.12 | 0.19 | 0.48 |
-| + chunks that follow sections and keep tables whole | 0.17 | 0.33 | 0.50 |
-| + search only the banks and years the question names | 0.20 | 0.45 | 0.71 |
-| + English report wording for Danish finance terms | 0.20 | 0.54 | 0.80 |
+| BM25 over fixed 500-token windows | 0.14 | 0.25 | 0.39 |
+| + chunks that follow sections and keep tables whole | 0.19 | 0.28 | 0.47 |
+| + search only the banks and years the question names | 0.23 | 0.44 | 0.68 |
+| + English report wording for Danish finance terms | 0.23 | 0.53 | 0.77 |
 | Dense vectors (`bge-m3`) alone, for comparison | 0.24 | 0.57 | 0.74 |
-| BM25 and dense fused by reciprocal rank fusion | 0.38 | 0.64 | 0.82 |
-| + cross-encoder reranker (`bge-reranker-v2-m3`) on the top 30 | **0.50** | **0.84** | **0.95** |
+| BM25 and dense fused by reciprocal rank fusion | 0.39 | 0.68 | 0.82 |
+| + cross-encoder reranker (`bge-reranker-v2-m3`) on the top 30 | **0.50** | **0.84** | **0.94** |
 
-Answers on all 44 questions with the reranked search and Claude Haiku 5.5 (the latest of two runs):
+Answers on all 44 questions with the reranked search and Claude Haiku 5.5 (the latest of two runs, made before the 2022 and 2023 reports were added):
 
 - 27 of 28 numeric answers exact, and 26 of 32 answers with every figure in a cited passage (29 in the run before).
 - All 9 questions the reports cannot answer refused, and no answerable question refused.
@@ -182,8 +182,9 @@ Answers on all 44 questions with the reranked search and Claude Haiku 5.5 (the l
 
 What I take from it:
 
+- **More reports barely moved the search.** Doubling the corpus to twelve reports changed recall@6 from 0.95 to 0.94, because routing sends every question that names a year to that year's reports.
 - **Search quality came from the documents and the search, not the model.** Rebuilding tables row by row, routing by bank and year, and reranking moved the numbers; the answer model stayed the cheapest one.
-- **Dense vectors alone do not replace BM25 on annual reports**, which are full of exact terms and figures. They put the right page first a little more often (recall@1 0.24 against 0.20) but find less of the evidence in the top 6 (0.74 against 0.80). Fused with BM25 they nearly double how often the right page comes first, and the reranker lifts that to 2.5 times BM25.
+- **Dense vectors alone do not replace BM25 on annual reports**, which are full of exact terms and figures. They put the right page first about as often (recall@1 0.24 against 0.23) but find less of the evidence in the top 6 (0.74 against 0.77). Fused with BM25 they put the right page first 70% more often, and the reranker more than doubles BM25's rate (0.50 against 0.23).
 - **The eval had to be debugged too.** My first citation metric scored 50%, but it measured my gold page lists more than the answers. Its replacement checks that every figure in an answer appears in a passage the answer cites. Better searches also kept finding pages that hold the answer but were missing from my gold lists; each one is checked in the page text before it is added.
 - **A judge needs checking too.** The LLM judge caught comparisons that contradict themselves and business-unit figures offered as the group's, which no figure check could see. At low effort it also failed 3 good answers, and a sharper rubric alone only moved those errors around. Judging the same answers at medium effort cut the wrong verdicts to 1 of 34.
 - **Where it breaks:** group versus business-unit pages (the answer offers a business unit's figure next to the group's and will not choose), paragraphs the parser splits into pieces so a citation covers only part of a sentence, and sentences quoted without a citation marker. My first refusal rule also refused questions about a bank's own published outlook; a new eval question caught it, and the fix removed the last wrong refusal.

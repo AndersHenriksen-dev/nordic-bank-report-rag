@@ -13,7 +13,7 @@ from typing import NamedTuple
 from pydantic import ValidationError
 
 from bankrag.answer import api_client, cost_usd
-from bankrag.config import ANSWER_MODEL, BANK_NAMES, YEARS, Bank, bank_name
+from bankrag.config import ANSWER_MODEL, BANK_NAMES, Bank, bank_name
 from bankrag.figures import close_to, numbers_in
 from bankrag.models import Chunk, ExtractedKpi, KpiFigure, Metric
 from bankrag.retrieve import Hit, Retriever, routed_search
@@ -30,6 +30,7 @@ KEY_FIGURE_PAGES: dict[tuple[Bank, int], tuple[int, ...]] = {
     ("jyske", 2024): (7, 8),
     ("jyske", 2025): (7, 8),
 }
+KPI_YEARS = tuple(sorted({year for _, year in KEY_FIGURE_PAGES}))  # the older reports' key figure pages are not mapped
 
 SYSTEM_PROMPT = """\
 You read key figures from passages of a bank's annual report. Use only the passages.
@@ -199,7 +200,7 @@ def extract_table(
     """
     verified = {(figure.bank, figure.year, figure.metric): figure for figure in existing if figure.verified}
     for bank in BANK_NAMES:
-        for year in YEARS:
+        for year in KPI_YEARS:
             key_figures = key_figure_passages(chunks, bank, year)
             for metric in METRICS:
                 kept = verified.get((bank, year, metric))

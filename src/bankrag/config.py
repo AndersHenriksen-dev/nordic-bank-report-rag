@@ -24,7 +24,7 @@ BANK_NAMES: dict[Bank, str] = {
     "nordea": "Nordea",
     "jyske": "Jyske Bank",
 }
-YEARS = (2024, 2025)
+YEARS = (2022, 2023, 2024, 2025)
 
 DISCLAIMER = (
     "Built on public annual reports for demonstration. Not investment advice. "

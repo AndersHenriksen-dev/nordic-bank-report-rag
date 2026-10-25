@@ -183,8 +183,8 @@ def _sidebar() -> None:
             st.session_state["result"] = _replay(saved[choice])
     st.sidebar.divider()
     st.sidebar.caption(
-        "Six annual reports: Danske Bank, Nordea and Jyske Bank, 2024 and 2025. Search combines BM25 and bge-m3 "
-        "vectors over 4,882 chunks, then bge-reranker-v2-m3 picks the best 6; answers come from Claude Haiku 5.5 "
+        "Twelve annual reports: Danske Bank, Nordea and Jyske Bank, 2022 to 2025. Search combines BM25 and bge-m3 "
+        "vectors over 8,700 chunks, then bge-reranker-v2-m3 picks the best 6; answers come from Claude Haiku 5.5 "
         "with citations.",
     )
 

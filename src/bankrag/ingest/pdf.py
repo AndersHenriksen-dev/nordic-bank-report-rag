@@ -27,6 +27,7 @@ FOOTER_ZONE = 0.93  # lines below this share of the height count as footer
 BOILERPLATE_MIN_SHARE = 0.3  # a header or footer line on 30% of pages is boilerplate
 MIN_HEADING_SIZE = 12.0
 MIN_SECTION_SIZE = 18.0
+MIN_OUTLINE_ENTRIES = 5  # an outline with fewer entries names the report instead of dividing it into sections
 NAV_MIN_STYLE_DISTANCE = 100  # how different the active navigation tab must look
 BOLD_FLAG = 16
 FIGURE_RE = re.compile(r"^(DKK|EUR|SEK|NOK|USD)?\s*[-+]?[\d.,]+\s*(%|bn|m|million|billion)?\b", re.IGNORECASE)
@@ -90,7 +91,12 @@ def _find_boilerplate(doc: pymupdf.Document) -> set[str]:
 
 
 def _toc_sections(doc: pymupdf.Document) -> list[TocEntry]:
-    """Read section paths from the PDF outline, if the report has one."""
+    """Read section paths from the PDF outline, if it divides the report into sections.
+
+    Entries that point at no page (page -1, a broken link in Nordea's and Jyske Bank's 2023 outlines) are skipped:
+    one would otherwise start before every page and name them all. An outline with fewer than MIN_OUTLINE_ENTRIES
+    usable entries is ignored, so the navigation bar and headings name the sections instead.
+    """
     path: list[str] = []
     entries = []
     for level, raw_title, page in doc.get_toc():
@@ -98,9 +104,10 @@ def _toc_sections(doc: pymupdf.Document) -> list[TocEntry]:
         # entries. Strip that, and fall back to the parent.
         title = re.sub(r"^table of contents\s*", "", " ".join(raw_title.split()), flags=re.IGNORECASE)
         path = path[: level - 1] + ([title] if title else [])
-        # The top entry is usually the report title, which adds nothing.
-        entries.append((page, " > ".join(path[1:] if len(path) > 1 else path)))
-    return entries
+        if page >= 1:
+            # The top entry is usually the report title, which adds nothing.
+            entries.append((page, " > ".join(path[1:] if len(path) > 1 else path)))
+    return entries if len(entries) >= MIN_OUTLINE_ENTRIES else []
 
 
 def _body_font_size(page_dict: PageDict) -> float:
