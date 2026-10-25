@@ -156,3 +156,16 @@ The 2022 and 2023 annual reports of all three banks are in, which doubles the co
 - **Outlines are checked before use.** Two of the new PDFs have outline entries that point at no page, and two have outlines that only name the report. The parser now skips entries without a page and ignores an outline with fewer than 5 usable entries, falling back to the navigation bar and headings. Only the three affected reports changed; the 2024 and 2025 reports parse as before.
 - **Retrieval barely moved.** The reranked search scores recall@6 0.94 over twelve reports against 0.95 over six, because routing sends every question that names a year to that year's reports (see experiments.md). The answer results in the README were measured before the new reports were added and have not been rerun.
 - **Prompts name the new years.** The answer prompt and the judge rubric now say 2022 to 2025, and q17's gold answer (Nordea's 2012 net profit, unanswerable) was rechecked: the 2022 report's five-year table starts at 2018, and 2012 appears only in chart axes and board biographies.
+
+## 19. A read-only MCP server, and the rest of the `.claude` folder
+
+**The MCP server** (`src/bankrag/mcp_server.py`) lets Claude Desktop or Claude Code search the reports and read the KPI table directly, with the three tools the brief names.
+
+- **Read-only, and no API calls.** `search_reports` returns passages with bank, year, page and section; `get_kpi` and `compare_banks` read the KPI table. The client's own Claude writes the answer, so the server needs no key and costs nothing, and every tool is annotated read-only so clients can allow it without asking.
+- **Typed results.** Each tool returns Pydantic models, so the client gets structured output with a schema, not text to parse.
+- **The same search as everywhere else.** With no bank or year given, the query is routed as in the web page and the evals; with them, the search uses them as filters, after the Danish glossary.
+- **Errors that say why.** In the MCP Python SDK 2.x, an ordinary exception in a tool reaches the client only as "Error executing tool"; the reason stays on the server. A `ToolError` passes its message on, so "the KPI table has no lending for Jyske Bank in 2023" reaches Claude. A test found this before any client did.
+- **Not registered in the repository.** A `.mcp.json` would start the server in every Claude Code session here, and once it has searched it holds the vector index's lock, which would block the evals in the same session. The README shows how to add it by hand instead.
+- **Checked end to end** with the SDK's own stdio client: the server starts as Claude Desktop would start it, lists its tools, answers each, and returns errors with their reason. The first search takes about 12 seconds while the models load, later ones about 0.6 seconds.
+
+**The `.claude` folder** now has two project skills (`add-eval-case`, `run-evals-and-report`), one subagent (`eval-reviewer`), the style-guide hook and project permissions. The second skill and the subagent write down procedures that were done by hand many times in this build: explaining every changed eval number by its questions, and sorting failed cases by cause. The permissions allow the free read-only scripts and always ask before the commands that call the paid API, so the rule in CLAUDE.md is also enforced by the harness.

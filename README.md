@@ -119,6 +119,36 @@ The web page listens on localhost only, because every question spends the key's 
 
 Every answer is logged to `data/traces/answers.jsonl`, and the web page's "Saved answers" menu shows any of them again, with its reasoning, sources and highlighted pages, without calling the API or loading the search models. After `make eval` that includes all 44 eval questions, which is how the screenshots above were made.
 
+### Use it from Claude Desktop or Claude Code (MCP)
+
+`make mcp` starts a read-only MCP server over stdio with three tools:
+
+- `search_reports(query, bank?, year?, k?)`: the passages the reranked search finds, with bank, year, PDF page and section, so Claude can cite them.
+- `get_kpi(bank, metric, year)` and `compare_banks(metric, year)`: figures from the KPI table, with page and source row.
+
+The server makes no API calls: Claude writes the answer from what the tools return, so the tools cost nothing. It needs the ingested data, like the CLI, and the first search takes about 12 seconds while the models load.
+
+Claude Code:
+
+```bash
+claude mcp add bankrag -- uv --directory /path/to/nordic-bank-report-rag run bankrag-mcp
+```
+
+Claude Desktop, in `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "bankrag": {
+      "command": "uv",
+      "args": ["--directory", "/path/to/nordic-bank-report-rag", "run", "bankrag-mcp"]
+    }
+  }
+}
+```
+
+While the server has searched, it holds the vector index's lock, like the web page: close it before running the evals.
+
 ### Evals
 
 ```bash
@@ -206,24 +236,29 @@ src/bankrag/
     judge.py               the LLM judge
     evaluate.py            recall@k, MRR, number and grounding checks
     ui/                    the Streamlit page and the passage highlighter
+    mcp_server.py          the read-only MCP server: report search and the KPI table
 evals/                     questions, judge rubric, the eval runner and its generated results
 kpi/figures.yaml           the 42 key figures with page and source row, for review by hand
-scripts/                   download the reports; search the parsed pages to check a gold answer
+scripts/                   download the reports; search the parsed pages; retrieval per eval question
 tests/                     unit tests, no network or models needed
 docs/                      decisions, experiments, documents, concepts, build log
-.claude/                   Claude Code setup: style guide, hook, project skill, permissions
+.claude/                   Claude Code setup: style guide, hook, two project skills, a subagent, permissions
 ```
 
 ## How I built it
 
-I built this with Claude Code, and the setup is part of the repository:
+I built this with Claude Code in about 9 hours over two days, of which about 1.6 hours was parsing that ran in the background. [docs/BUILD_LOG.md](docs/BUILD_LOG.md) has one row per session: what was built, what Claude Code did, where it got something wrong, and what I decided.
 
-- [CLAUDE.md](CLAUDE.md) holds the project's rules: how to run things, never commit data or keys, every new feature gets an eval case, refuse investment advice.
-- A [Python style guide](.claude/reference/python-style.md) with a hook that blocks an agent from editing Python before it has read the guide. Ruff, mypy and pre-commit enforce the parts a tool can check.
-- A project skill, [add-eval-case](.claude/skills/add-eval-case/SKILL.md), which makes every new eval question's figures and pages checked in the parsed report text.
-- [docs/BUILD_LOG.md](docs/BUILD_LOG.md) records each session: what was built, what Claude Code did, and what I decided.
+The `.claude` folder is part of the repository, and each piece exists because it made the work faster or safer:
 
-Not done yet: an MCP server, retrieval evals in CI against a small index fixture, a demo GIF, and my own check of every gold answer and KPI figure against the PDFs (all are marked `verified: false` until then).
+- **[CLAUDE.md](CLAUDE.md)** gives every session the rules: how to run things, never commit data or keys, ask before any paid API run, refuse investment advice, every new feature gets an eval case. The build log lists what each paid run cost; all of them together came to about USD 0.31.
+- **A [Python style guide](.claude/reference/python-style.md) and a hook** that blocks an agent from editing Python before it has read the guide. Ruff, mypy and pre-commit then catch what a tool can check, before a commit.
+- **[add-eval-case](.claude/skills/add-eval-case/SKILL.md)**, a project skill, makes every eval question's figures and pages checked in the parsed report text. It was used for all 17 questions added in milestone 2, and those checks found a restatement, four different employee counts in one report, and pages missing from gold lists.
+- **[run-evals-and-report](.claude/skills/run-evals-and-report/SKILL.md)**, a project skill, is the loop that keeps the docs honest: run the free evals, find the questions behind every changed number, check unexpected pages in the text, update the docs. It was written down after doing that by hand for every change from the hybrid search to the twelve reports.
+- **[eval-reviewer](.claude/agents/eval-reviewer.md)**, a subagent, reads failed eval cases and sorts each by cause: retrieval, parsing, generation, gold answer or judge. That is the review I did by hand for the LLM judge's verdicts, written down so it can run on its own.
+- **[Permissions](.claude/settings.json)** deny reading `.env`, allow the free read-only scripts without asking, and always ask before the commands that spend money.
+
+Not done yet: retrieval evals in CI against a small index fixture, a screen recording of the MCP server in Claude Desktop, a test from a clean clone, and my own check of every gold answer and KPI figure against the PDFs (all are marked `verified: false` until then).
 
 ## Disclaimer
 

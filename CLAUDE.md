@@ -13,7 +13,9 @@ uv run bankrag search "question"         # show retrieved chunks, no API key nee
 uv run bankrag ask "question"            # answer with citations, needs ANTHROPIC_API_KEY in .env
 uv run bankrag kpi show                  # the KPI table; `kpi extract` reads it with Claude (about USD 0.05: ask first)
 uv run streamlit run src/bankrag/ui/app.py   # web page on localhost:8501, needs the key and the PDFs
+uv run bankrag-mcp                       # read-only MCP server over stdio (make mcp), no API key needed
 uv run python evals/run_evals.py         # retrieval evals, no API key needed
+uv run python scripts/retrieval_by_question.py --misses   # which questions the search misses, and what it ranked instead
 uv run python evals/run_evals.py --answers   # answers and LLM judge too, costs money: ask first
 uv run python scripts/find_pages.py "pattern" --report jyske_2025 --pages 20-25   # check a gold figure in the page text
 uv run ruff check . && uv run ruff format --check . && uv run mypy src && uv run pytest   # what CI runs
@@ -31,6 +33,8 @@ The `make` targets wrap the same commands.
 | [.pre-commit-config.yaml](.pre-commit-config.yaml) and [.github/workflows/ci.yml](.github/workflows/ci.yml) | Changing what runs on commit or in CI | The automatic half of the style guide, plus the gitleaks secret scan. |
 | [docs/decisions.md](docs/decisions.md) | Changing a design choice | Why things are built the way they are. |
 | [.claude/skills/add-eval-case/SKILL.md](.claude/skills/add-eval-case/SKILL.md) | Adding or correcting an eval question | How to find and check every gold figure and page in the parsed report text. |
+| [.claude/skills/run-evals-and-report/SKILL.md](.claude/skills/run-evals-and-report/SKILL.md) | After changing parsing, chunking, search, prompts or the eval set | Run the free evals, explain every changed number by its questions, update the docs that quote them. |
+| [.claude/agents/eval-reviewer.md](.claude/agents/eval-reviewer.md) | Failed eval cases need explaining | Subagent that sorts each failure into retrieval, parsing, generation, gold answer or judge, with evidence. |
 | [evals/judge_rubric.md](evals/judge_rubric.md) | Changing how answers are judged | The LLM judge's rubric, sent as its system prompt. |
 
 ## Rules
@@ -58,6 +62,7 @@ The `make` targets wrap the same commands.
 - `src/bankrag/ingest/`: PDF parsing (`pdf.py`), chunking (`chunk.py`), pipeline with a per-report page cache (`pipeline.py`) that runs each report in a crash-safe child process (`worker.py`)
 - `src/bankrag/retrieve/`: BM25 (`bm25.py`), vectors in embedded Qdrant (`dense.py`), the local models (`neural.py`), rank fusion (`hybrid.py`), cross-encoder reranking (`rerank.py`), building a retriever by name (`factory.py`), bank and year routing (`route.py`), Danish query glossary (`rewrite.py`)
 - `src/bankrag/answer/generate.py`: Claude call with `search_result` blocks, citations, prompt caching, refusals, cost, trace log
+- `src/bankrag/mcp_server.py`: read-only MCP server (`search_reports`, `get_kpi`, `compare_banks`); raise `ToolError` for deliberate tool errors, because MCP hides any other exception's message
 - `src/bankrag/ui/`: Streamlit page (`app.py`, which also replays saved answers from the trace log) and cited-passage highlighting on PDF pages (`highlight.py`)
 - `src/bankrag/figures.py`: number and figure parsing in English and Danish formats, used by the evals and the UI
 - `src/bankrag/evaluate.py`: metrics; `src/bankrag/judge.py`: the LLM judge; `evals/run_evals.py` runs them and writes `evals/RESULTS.md` with its chart and `evals/ANSWERS.md` (generated, do not edit by hand)

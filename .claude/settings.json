@@ -7,7 +7,16 @@
       "Bash(uv run bankrag search:*)",
       "Bash(uv run bankrag ingest:*)",
       "Bash(uv run python evals/run_evals.py)",
-      "Bash(uv run python scripts/download.py:*)"
+      "Bash(uv run python scripts/download.py:*)",
+      "Bash(uv run python scripts/find_pages.py:*)",
+      "Bash(uv run python scripts/retrieval_by_question.py:*)",
+      "Bash(uv run bankrag kpi show)"
+    ],
+    "ask": [
+      "Bash(uv run python evals/run_evals.py --answers:*)",
+      "Bash(make eval)",
+      "Bash(uv run bankrag ask:*)",
+      "Bash(uv run bankrag kpi extract:*)"
     ],
     "deny": [
       "Read(./.env)",

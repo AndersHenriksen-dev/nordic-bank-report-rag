@@ -9,6 +9,7 @@ requires-python = ">=3.11"
 dependencies = [
     "anthropic>=2.3",
     "bm25s>=0.2",
+    "mcp>=2.3.0",
     "pydantic>=2.5",
     "pymupdf>=2.0",
     "python-dotenv>=1.0",
@@ -21,6 +22,7 @@ dependencies = [
 
 [project.scripts]
 bankrag = "bankrag.cli:main"
+bankrag-mcp = "bankrag.mcp_server:main"
 
 [dependency-groups]
 dev = [

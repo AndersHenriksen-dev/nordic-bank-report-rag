@@ -231,7 +231,8 @@ In this project: `src/bankrag/judge.py`; decision 16 and the judge tables in [ex
 - **Pre-commit and CI.** Every commit runs ruff, mypy, line-ending fixes and gitleaks (a scanner that blocks API keys and other secrets). GitHub Actions runs lint, types, tests and the secret scan on every pull request.
 - **Crash isolation.** A library that crashes the interpreter (section 2) runs in a child process, so the parent can recover.
 - **Caching work.** Parsed pages are cached per report, embeddings are rebuilt only when the fingerprint changes, and query embeddings and reranker scores are cached during an eval run.
-- **Claude Code setup.** `CLAUDE.md` gives the agent the project's rules. A hook blocks Python edits until the style guide has been read. A project skill (`add-eval-case`) turns "check the gold answer in the PDF" into a repeatable procedure. Settings deny reading `.env`.
+- **An MCP server.** The Model Context Protocol lets an AI client such as Claude Desktop call tools a program offers. `bankrag-mcp` offers three read-only tools (search the reports, read a key figure, compare the banks), so Claude can use the reports and cite pages without this project's own answer step. Tools return typed results with a schema, and deliberate errors use `ToolError` so the client learns why.
+- **Claude Code setup.** `CLAUDE.md` gives the agent the project's rules. A hook blocks Python edits until the style guide has been read. Project skills turn repeated procedures into instructions an agent follows: `add-eval-case` checks a gold answer in the PDF text, `run-evals-and-report` explains every changed eval number by its questions. A subagent (`eval-reviewer`) sorts failed eval cases by cause. Settings deny reading `.env`, allow the free read-only scripts, and always ask before commands that call the paid API.
 
 ## 14. Banking terms in the reports
 
