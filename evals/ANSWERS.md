@@ -8,33 +8,50 @@ until checked by hand against the PDFs. The reports are listed in [docs/document
 
 | ID | Category | Question | Figures exact | Figures in cited passages | Refused | Judge |
 |---|---|---|---|---|---|---|
-| [q01](#q01) | compare_years | What was Danske Bank's cost/income ratio in 2025, and how did it change from 2024? | yes | yes | no | n/a |
-| [q02](#q02) | lookup | What was Danske Bank's net profit in 2025? | yes | yes | no | n/a |
-| [q03](#q03) | lookup | What was Danske Bank's CET1 capital ratio at the end of 2025? | yes | yes | no | n/a |
-| [q04](#q04) | lookup | What was Danske Bank's return on equity in 2024? | yes | yes | no | n/a |
-| [q05](#q05) | danish | Hvad var Nordeas egenkapitalforrentning i 2025? | yes | yes | no | n/a |
-| [q06](#q06) | lookup | What was Nordea's CET1 ratio at the end of 2025? | yes | yes | no | n/a |
-| [q07](#q07) | lookup | What was Nordea's net profit for 2024? | yes | yes | no | n/a |
-| [q08](#q08) | compare_years | How did Nordea's net interest income change from 2024 to 2025, and why? | yes | yes | no | n/a |
-| [q09](#q09) | compare_banks | Compare the CET1 ratio of Danske Bank and Nordea at the end of 2025. | yes | yes | no | n/a |
-| [q10](#q10) | why | What drove the increase in Danske Bank's net fee income in 2025? | n/a | yes | no | n/a |
-| [q11](#q11) | why | What did Danske Bank say about its loan impairment charges in 2025? | yes | yes | no | n/a |
-| [q12](#q12) | why | How does Nordea describe the role of AI in its strategy? | n/a | n/a | no | n/a |
-| [q13](#q13) | danish | Hvad var Danske Banks nettoresultat i 2025? | yes | yes | no | n/a |
-| [q14](#q14) | compare_years | How did Danske Bank's CET1 capital ratio change from the end of 2024 to the end of 2025, and why? | yes | yes | no | n/a |
+| [q01](#q01) | compare_years | What was Danske Bank's cost/income ratio in 2025, and how did it change from 2024? | yes | yes | no | pass |
+| [q02](#q02) | lookup | What was Danske Bank's net profit in 2025? | yes | yes | no | pass |
+| [q03](#q03) | lookup | What was Danske Bank's CET1 capital ratio at the end of 2025? | yes | yes | no | pass |
+| [q04](#q04) | lookup | What was Danske Bank's return on equity in 2024? | yes | yes | no | pass |
+| [q05](#q05) | danish | Hvad var Nordeas egenkapitalforrentning i 2025? | yes | yes | no | pass |
+| [q06](#q06) | lookup | What was Nordea's CET1 ratio at the end of 2025? | yes | yes | no | fail |
+| [q07](#q07) | lookup | What was Nordea's net profit for 2024? | yes | yes | no | pass |
+| [q08](#q08) | compare_years | How did Nordea's net interest income change from 2024 to 2025, and why? | yes | yes | no | pass |
+| [q09](#q09) | compare_banks | Compare the CET1 ratio of Danske Bank and Nordea at the end of 2025. | yes | yes | no | pass |
+| [q10](#q10) | why | What drove the increase in Danske Bank's net fee income in 2025? | n/a | yes | no | fail |
+| [q11](#q11) | why | What did Danske Bank say about its loan impairment charges in 2025? | yes | yes | no | fail |
+| [q12](#q12) | why | How does Nordea describe the role of AI in its strategy? | n/a | n/a | no | pass |
+| [q13](#q13) | danish | Hvad var Danske Banks nettoresultat i 2025? | yes | yes | no | pass |
+| [q14](#q14) | compare_years | How did Danske Bank's CET1 capital ratio change from the end of 2024 to the end of 2025, and why? | yes | yes | no | pass |
 | [q15](#q15) | unanswerable | What will Danske Bank's share price be next year? | n/a | n/a | yes | n/a |
 | [q16](#q16) | unanswerable | Should I buy Nordea shares now? | n/a | n/a | yes | n/a |
 | [q17](#q17) | unanswerable | What was Nordea's net profit in 2012? | n/a | n/a | yes | n/a |
 | [q18](#q18) | unanswerable | What mortgage interest rate will Nordea offer customers in 2027? | n/a | n/a | yes | n/a |
 | [q19](#q19) | unanswerable | Hvad bliver Jyske Banks udbytte for 2027? | n/a | n/a | yes | n/a |
-| [q20](#q20) | lookup | What was Jyske Bank's net profit in 2025? | yes | yes | no | n/a |
-| [q21](#q21) | why | What did Jyske Bank say were the main drivers of its loan impairment charges in 2025? | n/a | no | no | n/a |
-| [q22](#q22) | compare_banks | Compare the CET1 ratio of the three banks at the end of 2025. | yes | yes | no | n/a |
-| [q23](#q23) | danish | Hvad var Jyske Banks cost/income ratio i 2025? | yes | yes | no | n/a |
-| [q24](#q24) | why | How does Jyske Bank use AI, according to its 2025 annual report? | n/a | n/a | no | n/a |
-| [q25](#q25) | lookup | What was Jyske Bank's CET1 capital ratio at the end of 2024? | yes | yes | no | n/a |
-| [q26](#q26) | compare_banks | Which of the three banks mention AI in their 2025 annual reports, and how do they use it? | n/a | n/a | no | n/a |
-| [q27](#q27) | compare_years | What was Jyske Bank's net interest income in 2025 compared with 2024? | yes | yes | no | n/a |
+| [q20](#q20) | lookup | What was Jyske Bank's net profit in 2025? | yes | yes | no | pass |
+| [q21](#q21) | why | What did Jyske Bank say were the main drivers of its loan impairment charges in 2025? | n/a | no | no | pass |
+| [q22](#q22) | compare_banks | Compare the CET1 ratio of the three banks at the end of 2025. | yes | yes | no | pass |
+| [q23](#q23) | danish | Hvad var Jyske Banks cost/income ratio i 2025? | yes | yes | no | pass |
+| [q24](#q24) | why | How does Jyske Bank use AI, according to its 2025 annual report? | n/a | n/a | no | fail |
+| [q25](#q25) | lookup | What was Jyske Bank's CET1 capital ratio at the end of 2024? | yes | yes | no | pass |
+| [q26](#q26) | compare_banks | Which of the three banks mention AI in their 2025 annual reports, and how do they use it? | n/a | n/a | no | fail |
+| [q27](#q27) | compare_years | What was Jyske Bank's net interest income in 2025 compared with 2024? | yes | no | no | pass |
+| [q28](#q28) | lookup | What was Jyske Bank's net profit in 2024? | yes | yes | no | pass |
+| [q29](#q29) | lookup | What was Nordea's return on equity in 2024? | yes | yes | no | pass |
+| [q30](#q30) | lookup | What net profit does Danske Bank expect for 2026, according to its 2025 annual report? | yes | yes | yes | n/a |
+| [q31](#q31) | compare_years | How did Nordea's cost-to-income ratio change from 2024 to 2025? | yes | yes | no | pass |
+| [q32](#q32) | compare_years | How did Danske Bank's total income change from 2024 to 2025? | yes | yes | no | pass |
+| [q33](#q33) | compare_banks | Compare the return on equity of Danske Bank and Nordea in 2025. | yes | yes | no | pass |
+| [q34](#q34) | compare_banks | Compare the cost/income ratios of the three banks in 2025. | no | yes | no | fail |
+| [q35](#q35) | compare_banks | Compare the net profit of the three banks in 2025. | yes | yes | no | fail |
+| [q36](#q36) | danish | Sammenlign Danske Banks og Nordeas nettoresultat for 2024. | yes | yes | no | pass |
+| [q37](#q37) | why | What drove the increase in Danske Bank's net interest income in 2024? | n/a | yes | no | pass |
+| [q38](#q38) | why | Why did Jyske Bank's net interest income fall in 2024? | n/a | yes | no | pass |
+| [q39](#q39) | danish | Hvorfor faldt Jyske Banks egentlige kernekapitalprocent fra 2024 til 2025? | yes | yes | no | pass |
+| [q40](#q40) | danish | Hvor mange fuldtidsansatte havde Jyske Bank ved udgangen af 2025? | yes | no | no | fail |
+| [q41](#q41) | unanswerable | Should I move my savings from Danske Bank to Jyske Bank? | n/a | n/a | yes | n/a |
+| [q42](#q42) | unanswerable | Hvad bliver Nordeas aktiekurs ved udgangen af 2026? | n/a | n/a | yes | n/a |
+| [q43](#q43) | unanswerable | What was Nordea's net profit in the first quarter of 2026? | n/a | n/a | yes | n/a |
+| [q44](#q44) | unanswerable | Which of the three banks will pay the highest dividend for the financial year 2026? | n/a | n/a | yes | n/a |
 
 ## q01
 
@@ -46,25 +63,23 @@ Category: compare_years. Language: en. Gold answer checked by hand: no.
 
 **Gold pages:** Danske Bank 2025 p. 4 or Danske Bank 2025 p. 5; Danske Bank 2025 p. 4 or Danske Bank 2024 p. 5
 
-**Answer** (6.1 s, USD 0.00136):
+**Answer** (5.8 s, USD 0.00149):
 
-> For 2025, Danske Bank's cost/income ratio was 45.5%. The 2025 report's headline figures put this cost/income ratio at 45.5% [1].
+> Danske Bank's cost/income ratio was 45.5% in 2025, down from 45.6% in 2024, a decrease of 0.1 percentage points. The 2025 figure appears in the bank's "at a glance" summary, where Cost/income ratio of 45.5% [1]. The 2024 figure is in the 2024 report, which gives Cost/income ratio of 45.6% [2]. The 2025 report describes the ratio as a stable cost/income ratio [3].
 >
-> The 2024 report gave the comparable figure as 45.6%, so the ratio fell by 0.1 percentage point. The 2024 report shows a cost/income ratio of 45.6% [2].
->
-> The bank defines the ratio as operating expenses plus impairment charges on goodwill, divided by total income (Operating expenses and impairment charges on goodwill divided by total income. [3]).
->
-> The financial tables show a different measure, the income/cost ratio, which is the inverse and should not be confused with the cost/income ratio. For the parent company, it was 220.6% in 2025 and 233.0% in 2024 (Income/cost ratio (%) | 220.6 | 233.0 [4]). For the group, it was 217.4% in 2025 and 223.9% in 2024 (Income/cost ratio (%) | 217.4 | 223.9 [5]).
+> The highlights tables use a different measure, the income/cost ratio, which was 220.6% in 2025 and 233.0% in 2024 (Income/cost ratio (%) 220.6 | 233.0 [4]). That is not the same as the cost/income ratio and should not be compared with the 45.5% and 45.6% figures. The bank defines the cost/income ratio as Operating expenses and impairment charges on goodwill divided by total income. [5]
 
 **Sources:**
 
 1. Danske Bank, Annual Report 2025, p. 5, Danske Bank at a glance: "Cost/income ratio of45.5%"
 2. Danske Bank, Annual Report 2024, p. 5, Danske Bank at a glance: "Cost/income ratio of45.6%"
-3. Danske Bank, Annual Report 2025, p. 40, Definition of alternative performance: "| Ratios and key figures | Definition | | Dividend per share (DKK) | Total dividend per share, consisting of the interim dividend per share (if any) paid out | | during the year, and the dividend per share proposed in the Annual Report and paid to | | shareholders in the subsequent year. Any extraordinary or special dividend is also | | included in dividend per share. | | Return on average ..."
+3. Danske Bank, Annual Report 2025, p. 6, Executive summary: "The year 2025 was again a year of solid performance by Danske Bank as we continued to deliver on our Forward ’28 strategy to be a Nordic leader with strong profitability. The return on equity stood at 13.3% for 2025 based on a net profit of DKK 23.0 billion with a stable cost/income ratio and strong credit quality supported by stable and improving macroeconomic conditions. Customer activity ..."
 4. Danske Bank, Annual Report 2025, p. 268, P30. Highlights and ratios – Danske Bank A/S: "| 2025 | 2024* | 2023* | 2022 | 2021 | | Total capital ratio (%) | 24.5 | 25.7 | 26.8 | 25.2 | 26.5 | | Tier 1 capital ratio (%) | 21.4 | 22.0 | 23.9 | 22.4 | 23.6 | | Return on equity before tax (%) | 15.8 | 16.5 | 13.9 | -1.8 | 8.4 | | Return on equity after tax (%) | 12.9 | 13.5 | 12.4 | -2.7 | 7.5 | | Income/cost ratio (%) | 220.6 | 233.0 | 199.0 | 92.2 | 162.0 | | Interest rate risk (%) | ..."
-5. Danske Bank, Annual Report 2025, p. 247, G40. Highlights and ratios – Danske Bank Group: "| (DKK millions) | 2025 | 2024* | 2023* | 2022 | 2021 | Ratios | 2025 | 2024* | 2023* | 2022 | 2021 | | Highlights | Total capital ratio (%) | 20.9 | 22.4 | 23.1 | 22.1 | 22.4 | | Net interest and fee income | 52,421 | 52,019 | 48,245 | 39,180 | 39,266 | Tier 1 capital ratio (%) | 18.2 | 19.1 | 20.5 | 19.6 | 20.0 | | Value adjustments | 2,485 | 2,258 | 2,244 | 403 | 36,307 | Return on equity ..."
+5. Danske Bank, Annual Report 2025, p. 40, Definition of alternative performance: "| Ratios and key figures | Definition | | Dividend per share (DKK) | Total dividend per share, consisting of the interim dividend per share (if any) paid out | | during the year, and the dividend per share proposed in the Annual Report and paid to | | shareholders in the subsequent year. Any extraordinary or special dividend is also | | included in dividend per share. | | Return on average ..."
 
 **Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer gives the correct figures (45.5% in 2025, 45.6% in 2024, down 0.1 pp) and matches the gold answer. It adds an extra income/cost ratio discussion and a definition, which the gold answer does not cover but does not contradict, and the answer is internally consistent.
 
 ## q02
 
@@ -76,9 +91,11 @@ Category: lookup. Language: en. Gold answer checked by hand: no.
 
 **Gold pages:** Danske Bank 2025 p. 4 or Danske Bank 2025 p. 6 or Danske Bank 2025 p. 10 or Danske Bank 2025 p. 136
 
-**Answer** (4.5 s, USD 0.00084):
+**Answer** (3.2 s, USD 0.00088):
 
-> Danske Bank's net profit for 2025 was DKK 23,037 million. That was a 3% decrease from 2024, when it stood at DKK 23,629 million. [1] The executive summary gives the same 2025 result rounded, as a net profit of DKK 23.0 billion [2].
+> For the full year 2025, Danske Bank's bottom line came to DKK 23,037 million, compared with DKK 23,629 million in 2024 Net profit decreased 3% and amounted to DKK 23,037 million in 2025 (2024: DKK 23,629 million) [1].
+>
+> The executive summary gives the same figure rounded to the nearest tenth of a billion, as a net profit of DKK 23.0 billion [2].
 
 **Sources:**
 
@@ -86,6 +103,8 @@ Category: lookup. Language: en. Gold answer checked by hand: no.
 2. Danske Bank, Annual Report 2025, p. 6, Executive summary: "The year 2025 was again a year of solid performance by Danske Bank as we continued to deliver on our Forward ’28 strategy to be a Nordic leader with strong profitability. The return on equity stood at 13.3% for 2025 based on a net profit of DKK 23.0 billion with a stable cost/income ratio and strong credit quality supported by stable and improving macroeconomic conditions. Customer activity ..."
 
 **Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer gives DKK 23,037 million for 2025 and 23,629 million for 2024, matching the gold answer, and the 3% decrease is correct. The rounded DKK 23.0 billion figure is consistent with the exact value and nothing contradicts itself.
 
 ## q03
 
@@ -97,18 +116,17 @@ Category: lookup. Language: en. Gold answer checked by hand: no.
 
 **Gold pages:** Danske Bank 2025 p. 4 or Danske Bank 2025 p. 6 or Danske Bank 2025 p. 32
 
-**Answer** (3.5 s, USD 0.00097):
+**Answer** (2.9 s, USD 0.00093):
 
-> Danske Bank's CET1 capital ratio stood at 17.3% at the end of 2025, down from 17.8% at the end of 2024 The CET1 capital ratio was 17.3% (31 December 2024: 17.8%). [1]
->
-> The bank's calculation deducts the full 2025 net profit, in line with its proposed distribution. A deduction of only the usual 60% for ordinary dividend would result in a CET1 capital ratio of 18.4%. [2]
+> At the end of 2025, Danske Bank's CET1 capital ratio was 17.3%, down from 17.8% at the end of 2024 The CET1 capital ratio was 17.3% (31 December 2024: 17.8%). [1] The figure is in the Executive summary on page 6 of the Danske Bank Annual Report 2025.
 
 **Sources:**
 
 1. Danske Bank, Annual Report 2025, p. 6, Executive summary: "The CET1 capital ratio was 17.3% (31 December 2024: 17.8%)."
-2. Danske Bank, Annual Report 2025, p. 33, Management’s report > Capital and liquidity: "We have deducted 100% of 2025 net profit in the capital statement at December 2025, which is in alignment with the proposed distribution. This results in a CET1 capital ratio of 17.3%, while a deduction of only the usual 60% for ordinary dividend would result in a CET1 capital ratio of 18.4%."
 
 **Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer gives 17.3% at end-2025, matching the gold answer, and the 2024 comparison of 17.8% also matches. The sentence is slightly repetitive and lacks a period after 17.8%, but nothing contradicts the gold answer or itself.
 
 ## q04
 
@@ -120,22 +138,21 @@ Category: lookup. Language: en. Gold answer checked by hand: no.
 
 **Gold pages:** Danske Bank 2024 p. 5 or Danske Bank 2024 p. 6
 
-**Answer** (4.5 s, USD 0.00117):
+**Answer** (3.4 s, USD 0.00100):
 
-> Danske Bank's return on equity for 2024 was 13.4%. The report links this to a net profit of DKK 23.6 billion, which it attributes mainly to higher customer activity, an improved cost/income ratio and strong credit quality. We generated a return on equity for 2024 of 13.4% on the basis of a net profit of DKK 23.6 billion that was driven primarily by higher customer activity, an improved cost/income ratio and strong credit quality. [1]
+> Danske Bank's return on equity for 2024 was 13.4%. The executive summary says the bank generated a return on equity for 2024 of 13.4% on the basis of a net profit of DKK 23.6 billion [1]. The group's ratio table gives the same after-tax figure, with the average-equity basis labelled as Return on avg. shareholders' equity (% p.a.) 13.4 [2] for 2024.
 >
-> The group's financial highlights table gives the same 13.4% as return on average shareholders' equity, compared with 12.7% for 2023. Return on avg. shareholders' equity (% p.a.) | 13.4 | 12.7 | -2.8 | 7.6 | 2.6 [2]
->
-> The parent company, Danske Bank A/S, reports a separate set of ratios. Its after-tax return on equity is also 13.4% for 2024, but its before-tax figure is 16.4%, against 17.8% for the group. Return on equity before tax (%) | 17.8 | 15.9 | -1.0 | 9.6 | 3.7 | Return on equity after tax (%) | 13.4 | 12.7 [3] Return on equity before tax (%) | 16.4 | 14.3 | -1.8 | 8.4 | 2.6 [4]
+> The group's highlights table also shows a before-tax measure of Return on equity before tax (%) 17.8 [3] for 2024, which is a different measure from the 13.4% after-tax figure.
 
 **Sources:**
 
 1. Danske Bank, Annual Report 2024, p. 6, Executive summary: "Amid these complex operating conditions, Danske Bank had a very satisfactory year, delivering the best result in its recent history. We generated a return on equity for 2024 of 13.4% on the basis of a net profit of DKK 23.6 billion that was driven primarily by higher customer activity, an improved cost/income ratio and strong credit quality. In the fourth quarter of 2024, the strong ..."
 2. Danske Bank, Annual Report 2024, p. 4, Financial highlights - Danske Bank Group: "| Dividend per share (DKK)** | 28.7 | 14.5 | - | 2.0 | 2.0 | | Earnings per share (DKK) | 27.9 | 24.8 | -5.4 | 14.6 | 4.7 | | Return on avg. shareholders' equity (% p.a.) | 13.4 | 12.7 | -2.8 | 7.6 | 2.6 | | Net interest income as % p.a. of loans and deposits | 1.31 | 1.22 | 0.84 | 0.73 | 0.76 | | Cost/income ratio (C/I), (%) | 45.6 | 48.6 | 100.5 | 60.2 | 66.0 | | Total capital ratio (%) | ..."
 3. Danske Bank, Annual Report 2024, p. 241, G41. Highlights and ratios: "| Ratios | 2024 | 2023* | 2022* | 2021 | 2020 | | Total capital ratio (%) | 22.4 | 23.1 | 22.1 | 22.4 | 23.0 | | Tier 1 capital ratio (%) | 19.1 | 20.5 | 19.6 | 20.0 | 20.5 | | Return on equity before tax (%) | 17.8 | 15.9 | -1.0 | 9.6 | 3.7 | | Return on equity after tax (%) | 13.4 | 12.7 | -2.7 | 7.5 | 2.7 | | Income/cost ratio (%) | 223.9 | 203.7 | 96.1 | 153.5 | 115.8 | | Interest rate ..."
-4. Danske Bank, Annual Report 2024, p. 262, P30. Highlights and ratios – Danske Bank A/S: "| 2024 | 2023* | 2022* | 2021 | 2020 | | Total capital ratio (%) | 25.7 | 26.8 | 25.2 | 26.5 | 26.3 | | Tier 1 capital ratio (%) | 22.0 | 23.9 | 22.4 | 23.6 | 23.5 | | Return on equity before tax (%) | 16.4 | 14.3 | -1.8 | 8.4 | 2.6 | | Return on equity after tax (%) | 13.4 | 12.6 | -2.7 | 7.5 | 2.7 | | Income/cost ratio (%) | 233.0 | 201.8 | 92.2 | 162.0 | 113.9 | | Interest rate risk (%) | ..."
 
 **Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer gives 13.4% on net profit of DKK 23.6 billion, matching the gold answer. It omits the 2025 restatement to 13.5%, which is a secondary detail, and it adds a before-tax figure that is labelled as a different measure and does not contradict the gold.
 
 ## q05
 
@@ -147,16 +164,17 @@ Category: danish. Language: da. Gold answer checked by hand: no.
 
 **Gold pages:** Nordea 2025 p. 5 or Nordea 2025 p. 39 or Nordea 2025 p. 40
 
-**Answer** (3.4 s, USD 0.00070):
+**Answer** (3.2 s, USD 0.00078):
 
-> Nordeas egenkapitalforrentning (return on equity) var 15,5 % i 2025, mod 16,7 % i 2024, så den faldt med 1,2 procentpoint. Return on equity, % | 15.5 | 16.7 [1]. Rapporten nævner også, at 2025 er tredje år i træk, hvor banken har overskredet 15 % [2].
+> Nordeas egenkapitalforrentning var 15.5 % i 2025, mod 16.7 % i 2024 Net profit decreased by 4% to EUR 4,840m. Return on equity was 15.5% (16.7%). [1] Det svarer til et fald på 1,2 procentpoint.
 
 **Sources:**
 
-1. Nordea, Annual Report 2025, p. 40, Financial review 2025: "| Group results and key ratios 2025 | | EURm | 2025 | 2024 | Chg % | | Net interest income | 7,167 | 7,594 | -6 | | Net fee and commission income | 3,249 | 3,157 | 3 | | Net insurance result | 242 | 253 | -4 | | Net result from items at fair value | 1,045 | 1,023 | 2 | | Other income | 40 | 57 | -30 | | Total operating income | 11,743 | 12,084 | -3 | | Total operating expenses | | excluding ..."
-2. Nordea, Annual Report 2025, p. 5, Introduction > CEO Letter: "Total income for the year was EUR 11.7bn, holding up well in the lower rate environment. Profitability was high, with operating profit reaching EUR 6.3bn and return on equity 15.5%. This makes 2025 the third year in a row that we exceeded 15%, underlining our position as a strong and resilient financial services group."
+1. Nordea, Annual Report 2025, p. 40, Financial review 2025: "Net profit and return on equity Net profit decreased by 4% to EUR 4,840m. Return on equity was 15.5% (16.7%)."
 
 **Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer correctly gives Nordea's 2025 return on equity of 15.5% (vs 16.7% in 2024), matching the gold answer. The extra net profit figure and the 1.2 percentage point decline are consistent with the stated figures and do not contradict the gold answer.
 
 ## q06
 
@@ -168,18 +186,21 @@ Category: lookup. Language: en. Gold answer checked by hand: no.
 
 **Gold pages:** Nordea 2025 p. 5 or Nordea 2025 p. 39 or Nordea 2025 p. 40
 
-**Answer** (3.5 s, USD 0.00079):
+**Answer** (4.0 s, USD 0.00082):
 
-> At the end of 2025, Nordea's CET1 ratio stood at 15.7%, against 15.8% a year earlier (the report gives the 2024 figure as 15.8%) The CET1 capital ratio was 15.7% at the end of 2025 (15.8% last year), while CET1 capital was EUR 25.1bn (EUR 24.6bn last year). [1]
+> Nordea's CET1 capital ratio stood at 15.7% at the end of 2025, compared with 15.8% a year earlier The CET1 capital ratio was 15.7% at the end of 2025 (15.8% last year) [1].
 >
-> The "Key events of the year" page also shows a CET1 ratio of 15.5% next to a 15.7% figure, but the table does not label which year each value belongs to, so I cannot tell from that page what the 15.5% refers to. 15.7% [2] appears there as well.
+> The key events page also shows a "CET1 ratio" figure of 15.5% next to the 15.7% figure, but the layout does not make clear which is the year-end 2025 actual 15.7% [2]. The 15.5% appears in the financial targets section as an assumption, not an actual, since it is described as Assuming a CET1 ratio of ~15.5%. [3]
 
 **Sources:**
 
 1. Nordea, Annual Report 2025, p. 40, Financial review 2025: "Capital position The CET1 capital ratio was 15.7% at the end of 2025 (15.8% last year), while CET1 capital was EUR 25.1bn (EUR 24.6bn last year). The Group’s total capital ratio was 21.2% and total own funds were EUR 33.9bn at the end of 2025. A description of the capital position is available under “Capital management and new regulations” on pages 53–57 and in the Capital and Risk Management ..."
 2. Nordea, Annual Report 2025, p. 39, Key events of the year: "15.7%CET1 ratio 15.5%"
+3. Nordea, Annual Report 2025, p. 16, Our financial targets: "1) Assuming a CET1 ratio of ~15.5%."
 
 **Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** fail. Correct: yes. Complete: yes. Consistent: no. The answer gives the correct figure of 15.7% for end-2025 and the prior-year 15.8%, matching the gold answer. However, it adds a muddled discussion of a 15.5% figure and says the layout is unclear about which is the actual, which is confusing but does not contradict the core answer; the first sentence also duplicates the second awkwardly without a sentence break. Consistency is arguably affected by hedging about which figure is the actual when it has already stated 15.7% as the actual.
 
 ## q07
 
@@ -191,16 +212,17 @@ Category: lookup. Language: en. Gold answer checked by hand: no.
 
 **Gold pages:** Nordea 2024 p. 40 or Nordea 2024 p. 42
 
-**Answer** (3.2 s, USD 0.00102):
+**Answer** (3.2 s, USD 0.00101):
 
-> Nordea's net profit for the year was EUR 5,059 million in 2024, up from EUR 4,934 million in 2023, which is a rise of 3%. The Group results and key ratios table on page 40 of the 2024 Financial review [1] gives these figures in EUR million. The same 2024 figure of 5,059 also appears in the statement of comprehensive income on page 199 of the report, in the row for net profit for the year [2].
+> Nordea's profit after tax for 2024 was EUR 5,059 million, up from EUR 4,934 million in 2023, a rise of 3% according to the report's key figures table. Group results and key ratios 2024 table, Nordea Annual Report 2024, page 40 [1]
 
 **Sources:**
 
 1. Nordea, Annual Report 2024, p. 40, Financial review 2024: "| Group results and key ratios 2024 | | EURm | 2024 | 2023 | Chg % | | Net interest income | 7,594 | 7,451 | 2 | | Net fee and commission income | 3,157 | 3,021 | 5 | | Net insurance result | 253 | 217 | 17 | | Net result from items at fair value | 1,023 | 1,014 | 1 | | Other income | 57 | 40 | 43 | | Total operating income | 12,084 | 11,743 | 3 | | Total operating expenses | | excluding ..."
-2. Nordea, Annual Report 2024, p. 199, Income statement Statement of comprehensive income: "| EURm | Note | 2024 | 2023 | | Net profit for the year | 5,059 | 4,934 | | Other comprehensive income | | Items that may be reclassified subsequently to the income statement | | Currency translation: | | Currency translation differences | -483 | -436 | | Tax on currency translation differences | -1 | 0 | | Hedging of net investments in foreign operations: | G3.6 | | Valuation gains/losses | ..."
 
 **Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer gives EUR 5,059 million for 2024, matching the gold answer, and the 2023 figure of EUR 4,934 million also matches. The 3% rise is consistent with those figures (about 2.5%, rounded to 3%), and the answer does not contradict itself.
 
 ## q08
 
@@ -212,17 +234,19 @@ Category: compare_years. Language: en. Gold answer checked by hand: no.
 
 **Gold pages:** Nordea 2025 p. 40
 
-**Answer** (3.4 s, USD 0.00099):
+**Answer** (3.5 s, USD 0.00103):
 
-> Nordea's net interest income fell from EUR 7,594m in 2024 to EUR 7,167m in 2025, a decline of EUR 427m, or 6% Net interest income | 7,167 | 7,594 | -6 [1].
+> Nordea's net interest income fell from EUR 7,594m in 2024 to EUR 7,167m in 2025, a decline of EUR 427m, or 6%. Net interest income [1] is shown in the group results table for both years.
 >
-> The report attributes the drop mainly to lower margins on deposits, since interest rates fell after the central bank cut its policy rate. Higher lending and deposit volumes and a positive contribution from the deposit hedge partly offset this Net interest income decreased by 6%, mainly driven by lower deposit margins as interest rates were down following policy rate reductions. This was partly offset by the positive contribution from the deposit hedge as well as higher lending and deposit volumes. [1]
+> According to the report, the decline came mainly from thinner deposit margins, which followed central bank rate cuts. Net interest income decreased by 6%, mainly driven by lower deposit margins as interest rates were down following policy rate reductions. [1] Two factors partly offset this. The report cites the positive contribution from the deposit hedge as well as higher lending and deposit volumes. [1]
 
 **Sources:**
 
 1. Nordea, Annual Report 2025, p. 40, Financial review 2025: "| Group results and key ratios 2025 | | EURm | 2025 | 2024 | Chg % | | Net interest income | 7,167 | 7,594 | -6 | | Net fee and commission income | 3,249 | 3,157 | 3 | | Net insurance result | 242 | 253 | -4 | | Net result from items at fair value | 1,045 | 1,023 | 2 | | Other income | 40 | 57 | -30 | | Total operating income | 11,743 | 12,084 | -3 | | Total operating expenses | | excluding ..."
 
 **Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer gives the correct figures (EUR 7,594m to 7,167m, 6% fall), the main driver (lower deposit margins after rate cuts), and both offsetting factors (deposit hedge, higher volumes). It is consistent and complete.
 
 ## q09
 
@@ -234,21 +258,20 @@ Category: compare_banks. Language: en. Gold answer checked by hand: no.
 
 **Gold pages:** Danske Bank 2025 p. 4 or Danske Bank 2025 p. 6 or Danske Bank 2025 p. 32; Nordea 2025 p. 5 or Nordea 2025 p. 39 or Nordea 2025 p. 40
 
-**Answer** (5.7 s, USD 0.00111):
+**Answer** (4.4 s, USD 0.00101):
 
-> At the end of 2025, Danske Bank's CET1 capital ratio stood at 17.3%, down from 17.8% a year earlier. The Group's CET1 capital ratio was 17.3% (2024: 17.8%) [1], and the same figure appears in its financial highlights table Common equity tier 1 capital ratio (%) 17.3 | 17.8 [2].
+> At the end of 2025, Danske Bank's CET1 capital ratio was 17.3%, compared with 17.8% at the end of 2024 (the Group's CET1 capital ratio was 17.3% (2024: 17.8%) [1]). Nordea's CET1 capital ratio at the end of 2025 was 15.7%, slightly below its 15.8% a year earlier (The CET1 capital ratio was 15.7% at the end of 2025 (15.8% last year) [2]). Danske Bank's ratio was therefore 1.6 percentage points higher than Nordea's at the end of 2025.
 >
-> Nordea's CET1 ratio at the end of 2025 was 15.7%, compared with 15.8% for 2024, according to its financial review. Its report also gives CET1 capital of EUR 25.1bn for 2025 and EUR 24.6bn for 2024 CET1 capital was EUR 25.1bn (EUR 24.6bn last year) [3].
->
-> On these figures, Danske Bank's CET1 ratio was 1.6 percentage points higher than Nordea's at the end of 2025. Danske Bank also notes that a change to the conglomerate rules takes effect on 1 January 2026, and that it is expected to raise the CET1 ratio by around 35 basis points, which does not affect the year-end 2025 figure. On 4 December 2025, the Danish parliament adopted an amendment to the Danish implementation of the EU Conglomerate Directive. The new rules are applicable from 1 January 2026 and result in an, all else equal, increase in the CET 1 capital ratio of around 35 bps. [2]
+> The passages do not explain whether the two banks calculate the CET1 ratio in the same way, so the comparison is based only on the reported percentages.
 
 **Sources:**
 
 1. Danske Bank, Annual Report 2025, p. 218, G39. Risk management - continued Total capital: "The Group’s CET1 capital is based on the carrying amount of shareholders’ equity and adjusted with the following main deductions. • Adjustments to eligible capital instruments • Deferred tax assets that rely on future profitability • Defined benefit pension fund assets • Intangible assets of banking operations, including goodwill • Minimum loss coverage for non-performing exposures • ..."
-2. Danske Bank, Annual Report 2025, p. 4, Financial highlights - Danske Bank Group: "| Dividend per share (DKK)** | 22.72 | 28.70 | 14.50 | - | 2.00 | | Earnings per share (DKK) | 27.9 | 27.9 | 24.2 | -5.4 | 14.6 | | Return on avg. total equity (% p.a.) | 13.3 | 13.5 | 12.4 | -2.8 | 7.6 | | Net interest income as % p.a. of loans and deposits | 1.30 | 1.31 | 1.22 | 0.84 | 0.73 | | Cost/income ratio (C/I), (%) | 45.5 | 45.6 | 49.2 | 100.5 | 60.2 | | Total capital ratio (%) | ..."
-3. Nordea, Annual Report 2025, p. 40, Financial review 2025: "Capital position The CET1 capital ratio was 15.7% at the end of 2025 (15.8% last year), while CET1 capital was EUR 25.1bn (EUR 24.6bn last year). The Group’s total capital ratio was 21.2% and total own funds were EUR 33.9bn at the end of 2025. A description of the capital position is available under “Capital management and new regulations” on pages 53–57 and in the Capital and Risk Management ..."
+2. Nordea, Annual Report 2025, p. 40, Financial review 2025: "Capital position The CET1 capital ratio was 15.7% at the end of 2025 (15.8% last year), while CET1 capital was EUR 25.1bn (EUR 24.6bn last year). The Group’s total capital ratio was 21.2% and total own funds were EUR 33.9bn at the end of 2025. A description of the capital position is available under “Capital management and new regulations” on pages 53–57 and in the Capital and Risk Management ..."
 
 **Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer gives Danske Bank 17.3% and Nordea 15.7% and the 1.6 percentage point gap, matching the gold answer. The extra year-earlier figures and the methodology caveat are not covered by the gold answer and do not contradict it, and the answer is internally consistent.
 
 ## q10
 
@@ -260,18 +283,21 @@ Category: why. Language: en. Gold answer checked by hand: no.
 
 **Gold pages:** Danske Bank 2025 p. 10
 
-**Answer** (4.1 s, USD 0.00089):
+**Answer** (5.8 s, USD 0.00112):
 
-> Group net fee income rose 3% in 2025 compared with 2024. The report attributes this mainly to three things: high performance fee income from asset management, higher everyday banking fee income due to strong customer activity and higher investment fee income on the back of growth in assets under management due to higher net sales of packaged investment products. [1]
+> At group level, Danske Bank's net fee income rose 3% in 2025 compared with 2024, and the report gives no DKK amount for the group total in these passages. The bank attributed the increase mainly to high performance fee income from asset management, higher everyday banking fee income due to strong customer activity and higher investment fee income on the back of growth in assets under management due to higher net sales of packaged investment products. [1]
 >
-> A separate passage on page 18 gives a 7% rise to DKK 2,474 million (2024: DKK 2,303 million), which it links to everyday banking fees, driven by a rise in everyday banking fee income attributable to both increased customer activity and repricing actions. [2] That passage appears to cover the Business Customers segment, since its profit before tax figure matches the segment figure on page 17, so it is not the group total. The page 18 passage does not name the segment itself.
+> Segment figures show different movements. In the Business Customers segment, net fee income increased 7% to DKK 2,474 million (2024: DKK 2,303 million), primarily driven by a rise in everyday banking fee income attributable to both increased customer activity and repricing actions. [2] A separate segment on page 16 showed net fee income decreased 4% to DKK 4,592 million (2024: DKK 4,764 million) [3], and when adjusted for the effects of the divestment, there was an increase of 1% in net fee income. [3] That passage does not name the segment, so these segment figures should not be read as the group total.
 
 **Sources:**
 
-1. Danske Bank, Annual Report 2025, p. 6, Executive summary: "Net fee income increased 3% from the level in 2024, mainly due to high performance fee income from asset management, higher everyday banking fee income due to strong customer activity and higher investment fee income on the back of growth inassets under management due to higher net sales of packaged investment products."
+1. Danske Bank, Annual Report 2025, p. 6, Executive summary: "Net fee income increased 3% from the level in 2024, mainly due to high performance fee income from asset management, higher everyday banking fee income due to strong customer activity and higher investment fee income on the back of growth in"
 2. Danske Bank, Annual Report 2025, p. 18, Profit before tax: "Net fee income increased 7% to DKK 2,474 million (2024: DKK 2,303 million). The increase was primarily driven by a rise in everyday banking fee income attributable to both increased customer activity and repricing actions."
+3. Danske Bank, Annual Report 2025, p. 16, Profit before tax: "Net fee income decreased 4% to DKK 4,592 million (2024: DKK 4,764 million). When adjusting for the effect in 2024 of the net fee income generated by the personal customers business in Norway of DKK 78 million and positive one-offs of DKK 128 million, there was an increase of 1% in net fee income. Investment fee income picked up in the latter half of 2025 as a result of more stable financial ..."
 
 **Checks:** figures exact: n/a. Figures in cited passages: yes. Refused: no.
+
+**Judge:** fail. Correct: yes. Complete: no. Consistent: yes. The gold gives the group net fee income as DKK 15,423m (2024: 14,912m), which the answer omits, saying no DKK amount is in the passages. It also omits the Norway divestment offset, the main negative driver in the gold. The 3% rise is consistent with the gold figures (15,423/14,912 ≈ +3.4%), and the drivers match, so the answer is correct but incomplete. Its segment detail is not contradicted by the gold, but the claim that no group DKK figure exists is wrong.
 
 ## q11
 
@@ -283,25 +309,30 @@ Category: why. Language: en. Gold answer checked by hand: no.
 
 **Gold pages:** Danske Bank 2025 p. 11 or Danske Bank 2025 p. 10 or Danske Bank 2025 p. 5
 
-**Answer** (6.9 s, USD 0.00124):
+**Answer** (8.6 s, USD 0.00145):
 
-> Danske Bank's 2025 annual report gives two different figures for 2025 loan impairments, and the passages do not explain the gap.
+> Danske Bank's annual report gives two different full-year figures for 2025 loan impairment charges, and the passages I have do not explain the difference. One passage reports a net charge of DKK 1,260 million for 2025, compared with a net reversal of DKK 233 million for 2024. Loan impairments for 2025 amounted to a net charge of DKK 1,260 million, marking an increase relative to the net reversal of DKK 233 million recorded for 2024. [1] Another passage and the loan impairment table give a 2025 net charge of DKK 294 million, against a net reversal of DKK 543 million for 2024. Loan impairment charges for 2025 amounted to a net charge of DKK 294 million (2024: a net reversal of DKK 543 million). [2] The table shows the same total of 294 for 2025 and -543 for 2024. Total | 294 | -543 [3] I cannot tell from these excerpts which figure is the group's reported full-year total.
 >
-> - Page 21 reports a 2025 net charge of DKK 1,260 million, up from a net reversal of DKK 233 million in 2024. The charges were mainly driven by individual customer exposures as well as a higher proportion of post-model adjustments. [1]
-> - Page 143 and page 160 report a 2025 net charge of DKK 294 million, compared with a 2024 net reversal of DKK 543 million. On page 143 the bank says the impairment charge reflected sustained credit quality and a decrease in post-model adjustments. [2] The page 160 table splits the total into an ECL impairment of DKK 552 million and a fair value credit risk adjustment of DKK -258 million for 2025.
-> - In the fourth quarter alone, net loan impairment charges amounted to DKK 570 million (Q3 2025: net reversal of DKK 46 million). Impairment charges were mainly caused by single-name exposures and an increase in the post-model adjustments related to geopolitical tension. [3]
-> - By segment, Personal Customers had minimal impairment charges in 2025, while 2024 saw a reversal. [4] Business Customers recorded a net impairment reversal in 2025, in contrast to a net charge in 2024. [4] Large Corporates & Institutions posted a net impairment charge in 2025, largely influenced by single-name exposures [4].
+> For the fourth quarter, the bank reports a net loan impairment charge of DKK 570 million, compared with a net reversal of DKK 46 million in Q3 2025. Impairment charges were mainly caused by single-name exposures and an increase in the post-model adjustments related to geopolitical tension. [4]
 >
-> The DKK 1,260 million and DKK 294 million figures cannot be reconciled from these passages. The reports may define or scope the figures differently, but the passages do not say so, so I cannot tell which one is the group total.
+> By segment, the report describes the following:
+> - Personal Customers: Personal Customers had minimal impairment charges in 2025, while 2024 saw a reversal. [5]
+> - Business Customers: Business Customers recorded a net impairment reversal in 2025, in contrast to a net charge in 2024. The net reversal was primarily tied to single-name exposures, along with a reduction in post-model adjustments related to commercial property and construction. [5]
+> - Large Corporates & Institutions: posted a net impairment charge in 2025, largely influenced by single-name exposures and an increased allocation of post-model adjustments following the increase in the geopolitical tension post-model adjustment. [5]
+>
+> On post-model adjustments more generally, at the end of 2025, the post-model adjustments amounted to DKK 5.4 billion (2024: DKK 5.9 billion). [2]
 
 **Sources:**
 
 1. Danske Bank, Annual Report 2025, p. 21, Profit before tax: "Overall credit quality remained strong and has proven to be resilient to the geopolitical uncertainty. Loan impairments for 2025 amounted to a net charge of DKK 1,260 million, marking an increase relative to the net reversal of DKK 233 million recorded for 2024. The charges were mainly driven by individual customer exposures as well as a higher proportion of post-model adjustments."
-2. Danske Bank, Annual Report 2025, p. 143, G1. Material accounting policies and estimates - continued: "Loan impairment charges for 2025 amounted to a net charge of DKK 294 million (2024: a net reversal of DKK 543 million). The impairment charge reflected sustained credit quality and a decrease in post-model adjustments."
-3. Danske Bank, Annual Report 2025, p. 21, Profit before tax: "• Net loan impairment charges amounted to DKK 570 million (Q3 2025: net reversal of DKK 46 million). Impairment charges were mainly caused by single-name exposures and an increase in the post-model adjustments related to geopolitical tension."
-4. Danske Bank, Annual Report 2025, p. 11, Net profit: "Personal Customers had minimal impairment charges in 2025, while 2024 saw a reversal. The underlying credit quality for the segment remained stable throughout the year. Business Customers recorded a net impairment reversal in 2025, in contrast to a net charge in 2024. The net reversal was primarily tied to single-name exposures, along with a reduction Large Corporates & Institutions posted a ..."
+2. Danske Bank, Annual Report 2025, p. 143, G1. Material accounting policies and estimates - continued: "Loan impairment charges for 2025 amounted to a net charge of DKK 294 million (2024: a net reversal of DKK 543 million). The impairment charge reflected sustained credit quality and a decrease in post-model adjustments. Management applies judgement when determining the need for post-model adjustments. At the end of 2025, the post-model adjustments amounted to DKK 5.4 billion (2024: DKK 5.9 ..."
+3. Danske Bank, Annual Report 2025, p. 160, G11. Loan impairment charges G12. Trading portfolio assets and liabilities: "| (DKK millions) | 2025 | 2024 | | ECL impairment on Due from credit institutions and central banks | 13 | - | | ECL impairment on Loans at amortised cost | 580 | -589 | | ECL impairment on Loan commitments and guarantees etc. | -41 | -287 | | ECL impairment, total | 552 | -877 | | Fair value credit risk adjustment on Loans at fair value | -258 | 333 | | Total | 294 | -543 |"
+4. Danske Bank, Annual Report 2025, p. 21, Profit before tax: "• Net loan impairment charges amounted to DKK 570 million (Q3 2025: net reversal of DKK 46 million). Impairment charges were mainly caused by single-name exposures and an increase in the post-model adjustments related to geopolitical tension."
+5. Danske Bank, Annual Report 2025, p. 11, Net profit: "Personal Customers had minimal impairment charges in 2025, while 2024 saw a reversal. The underlying credit quality for the segment remained stable throughout the year. Business Customers recorded a net impairment reversal in 2025, in contrast to a net charge in 2024. The net reversal was primarily tied to single-name exposures, along with a reductionin post-model adjustments related to ..."
 
 **Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** fail. Correct: no. Complete: yes. Consistent: no. The answer does identify the correct 2025 figure of DKK 294 million and the 2024 reversal of DKK 543 million, but it presents a conflicting DKK 1,260 million figure as an equally plausible reported total and refuses to say which is correct, so it is internally inconsistent and does not commit to the gold figure. It also adds extra quarterly and segment detail, and the PMA balance it cites (5.4bn vs 5.9bn) is not in the gold answer, so it cannot be checked against it.
 
 ## q12
 
@@ -313,20 +344,27 @@ Category: why. Language: en. Gold answer checked by hand: no.
 
 **Gold pages:** Nordea 2025 p. 12 or Nordea 2025 p. 14 or Nordea 2025 p. 15
 
-**Answer** (5.6 s, USD 0.00094):
+**Answer** (4.9 s, USD 0.00096):
 
-> Nordea treats AI as one of the forces its strategy depends on. The 2025 report says technology, data and artificial intelligence (AI) will play a critical role across the three priorities, supporting better customer experiences, growth and efficiency. [1]
+> Nordea's 2025 annual report treats AI as a core enabler of its strategy. It says technology, data and AI will play a critical role across its three priorities, supporting better customer experiences, growth and efficiency. [1] Those priorities are growth, offering and scale (growing faster than the market while sustaining high profitability, leading with a compelling customer offering and the best digital experience, and delivering Nordic scale benefits [1]).
 >
-> AI already has practical uses at the bank. AI systems help predict customer churn, detect fraud and accelerate software development [2], and it also powers virtual assistants for customers and staff.
+> In practice, the report says AI is already used in several ways, such as virtual assistants that support customers and help colleagues in their daily work, and systems that help predict customer churn, detect fraud and accelerate software development. [2] The next step is to apply it to core product areas, such as mortgages, corporate lending, savings, and payments [2], with the aim of making processes smarter and more automated [2].
 >
-> The next step is to widen AI's use into the core business. Nordea plans to extend it into its main product areas, with the aim of making processes smarter and more automated [2]. The report gives the example of a mortgage application, which should move from submission to approval in fewer steps, with processing time reduced significantly.
+> Nordea also links AI to its technology group. The report says that through continuous improvement, innovation and acceleration of AI usage, Group Technology plays a key role in building resilient systems and advancing Nordea's digital services. [3]
+>
+> The 2024 report adds a note of caution. It says Nordea is taking generative AI capabilities into use, exercising both creativity and caution. [4] It also states that when used responsibly, AI can improve productivity, enhance service quality and support more personalised experiences. [5]
 
 **Sources:**
 
-1. Nordea, Annual Report 2025, p. 12, Strategic report > Strategic priorities: "Across our three priorities, technology, data and artifi­ cial intelligence (AI) will play a critical role – supporting better customer experiences, growth and efficiency."
+1. Nordea, Annual Report 2025, p. 12, Strategic report > Strategic priorities: "Across our three priorities, technology, data and artifi­ cial intelligence (AI) will play a critical role – supporting better customer experiences, growth and efficiency. • Growth: grow faster than the market while sustaining high profitability • Offering: lead with a compelling customer offering and the best digital experience • Scale: deliver Nordic scale benefits for superior com­ ..."
 2. Nordea, Annual Report 2025, p. 14, Strategic report > Strategic priorities: "Artificial intelligence (AI) will play an important role here. AI is used at Nordea in a variety of ways, for example to power virtual assistants that support customers and help colleagues in their daily work. AI systems also help predict customer churn, detect fraud and accelerate software development. In the next phase, we will apply AI across our core product areas, such as mortgages, ..."
+3. Nordea, Annual Report 2025, p. 70, Group functions Group organisation: "Kirsten Renner Chief Information Officer Group Technology Group Technology provides the data and technology infrastructure that support Nordea’s operations and strategic ambitions. It ensures the stability, scalability and security of the bank’s digital platforms, enabling business areas to deliver high-quality services to cus­ tomers. Through continuous improvement, innovation and ..."
+4. Nordea, Annual Report 2024, p. 10, Key trends shaping the financial industry: "accessible to a wide range of financial ­sector employees, including those without deep technical expertise. At Nordea, we are taking generative AI capabilities into use, exercising both creativity and caution."
+5. Nordea, Annual Report 2025, p. 9, Key trends shaping the financial industry: "Artificial intelligence (AI) is accelerating this shift. When used responsibly, AI can improve productivity, enhance service quality and support more personalised experiences. Trust remains central, and transparency in how these technologies are applied will be key to ensuring customers feel confident and well cared for."
 
 **Checks:** figures exact: n/a. Figures in cited passages: n/a. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer covers the gold answer's points (critical role across three priorities, virtual assistants, churn prediction, fraud detection) and adds further details; the gold answer does not contradict these, and the answer does not contradict itself. It mentions the 2024 report as well, which the gold does not cover, but nothing conflicts.
 
 ## q13
 
@@ -338,16 +376,17 @@ Category: danish. Language: da. Gold answer checked by hand: no.
 
 **Gold pages:** Danske Bank 2025 p. 4 or Danske Bank 2025 p. 6 or Danske Bank 2025 p. 10
 
-**Answer** (3.3 s, USD 0.00086):
+**Answer** (3.4 s, USD 0.00088):
 
-> Danske Bank havde et nettoresultat på DKK 23,037 million i 2025, mod DKK 23,629 million i 2024. Net profit decreased 3% and amounted to DKK 23,037 million in 2025 (2024: DKK 23,629 million) [1]. Banken angiver også en afrundet udgave i sit resumé: net profit of DKK 23.0 billion [2].
+> Danske Banks nettoresultat for 2025 var DKK 23.037 millioner, mod DKK 23.629 millioner i 2024. Det svarer til et fald på 592 millioner kroner, og rapporten angiver et fald på 3 %. Net profit decreased 3% and amounted to DKK 23,037 million in 2025 (2024: DKK 23,629 million), which was in line with the guidance published in the interim report for the first nine months of 2025. [1]
 
 **Sources:**
 
 1. Danske Bank, Annual Report 2025, p. 10, Financial review: "2025 vs 2024 Total income increased 1% from the level in 2024, driven by strong net fee income, which benefitted from high performance fee income, higher investment fee income driven by growth in asset management and strong customer activity. Net interest income remained stable as the sale in late 2024 of the personal customer business in Norway and a decrease in deposit margins due to lower ..."
-2. Danske Bank, Annual Report 2025, p. 6, Executive summary: "The year 2025 was again a year of solid performance by Danske Bank as we continued to deliver on our Forward ’28 strategy to be a Nordic leader with strong profitability. The return on equity stood at 13.3% for 2025 based on a net profit of DKK 23.0 billion with a stable cost/income ratio and strong credit quality supported by stable and improving macroeconomic conditions. Customer activity ..."
 
 **Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer gives DKK 23,037 million for 2025 and 23,629 million for 2024, a 3% decline, matching the gold answer. The 592 million difference is correct arithmetic (23,629 - 23,037), and the guidance claim is not covered by the gold answer and does not contradict it.
 
 ## q14
 
@@ -359,11 +398,11 @@ Category: compare_years. Language: en. Gold answer checked by hand: no.
 
 **Gold pages:** Danske Bank 2025 p. 32
 
-**Answer** (5.1 s, USD 0.00113):
+**Answer** (3.5 s, USD 0.00099):
 
-> Danske Bank's CET1 capital ratio fell from 17.8% at the end of 2024 to 17.3% at the end of 2025, a decline of 0.5 percentage points. At the end of 2025, the Group's CET1 capital amounted to DKK 142.1 billion (2024: DKK 145.2 billion), and its CET1 capital ratio was 17.3% (2024: 17.8%) [1]. The CET1 capital amount therefore dropped by DKK 3.1 billion.
+> At the end of 2025, Danske Bank's CET1 capital ratio was 17.3%, down from 17.8% at the end of 2024, a fall of 0.5 percentage points. The Group's CET1 capital amounted to DKK 142.1 billion, compared with DKK 145.2 billion for 2024. [1]
 >
-> The annual report attributes the movement mainly to a larger statutory deduction for Danica and to the full phase-in effect of IFRS 9. The movement in the capital ratios was driven primarily by an increase in the statutory deduction for Danica and the fully phased-in impact of IFRS 9. [2] The report also notes that net redemptions of additional tier 1 and tier 2 capital affected the total capital ratio, but it does not link those redemptions to the CET1 ratio.
+> The report attributes the decline mainly to two factors. A larger statutory deduction for Danica and the full phase-in effect of IFRS 9 pushed the ratio down. The capital ratios moved mainly because of a higher statutory deduction for Danica and the fully phased-in impact of IFRS 9, and the total capital ratio was also affected by net redemptions of additional tier 1 and tier 2 capital. [2] The redemptions affect the total capital ratio rather than the CET1 ratio, so they do not explain the CET1 movement.
 
 **Sources:**
 
@@ -371,6 +410,8 @@ Category: compare_years. Language: en. Gold answer checked by hand: no.
 2. Danske Bank, Annual Report 2025, p. 32, Capital and liquidity: "Capital ratios and requirements At the end of December 2025, the Group’s total capital ratio was 20.9% (31 December 2024: 22.4%), and its CET1 capital ratio was 17.3% (31 December 2024: 17.8%). The movement in the capital ratios was driven primarily by an increase in the statutorydeduction for Danica and the fully phased-in impact of IFRS 9. The total capital ratio was further affected by net ..."
 
 **Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer correctly gives 17.8% to 17.3% and both drivers (larger Danica deduction and full IFRS 9 phase-in), matching the gold answer. It is somewhat repetitive about the drivers but does not contradict the gold or itself, and the CET1 capital figures are not covered by the gold answer so they do not count against it.
 
 ## q15
 
@@ -380,15 +421,15 @@ Category: unanswerable. Language: en. Gold answer checked by hand: no.
 
 **Gold answer:** Refuse. A share price forecast is not in the reports and would be investment advice.
 
-**Answer** (3.5 s, USD 0.00088):
+**Answer** (3.5 s, USD 0.00095):
 
-> Not in the documents. This system only reports what the published annual reports say and does not give forecasts, price predictions or investment advice, so I cannot say where the share price will be next year.
+> Not in the documents. This system only reports what the published annual reports say. It cannot forecast share prices or give investment advice.
 >
-> The reports do describe the bank's own financial goals. Danske Bank's current targets run to 2026, and the bank says it will publish updated targets for 2028 with its first-quarter 2026 interim report. Given that our current financial targets run until 2026, we will provide updated financial targets for 2028 when we publish the interim report for the first quarter of 2026. [1]
+> The reports do describe the bank's own outlook. Danske Bank set financial targets for 2026 in its Forward '28 strategy, including a return on equity of 13% and a cost/income ratio around 45% (In June 2023, as part of our strategy, we announced a set of ambitious financial targets for 2026. [1]). The bank also plans to update its targets: we will provide updated financial targets for 2028 when we publish the interim report for the first quarter of 2026. [1]
 
 **Sources:**
 
-1. Danske Bank, Annual Report 2025, p. 35, Investor Relations: "Given that our current financial targets run until 2026, we will provide updated financial targets for 2028 when we publish the interim report for the first quarter of 2026."
+1. Danske Bank, Annual Report 2025, p. 35, Investor Relations: "Forward ’28 and the road ahead Continuing to deliver for our shareholders remains core to Danske Bank’s strategy. In June 2023, as part of our strategy, we announced a set of ambitious financial targets for 2026. These include an ROE of 13%, a cost/income ratio around 45% and a CET1 capital ratio above 16%. Given that our current financial targets run until 2026, we will provide updated ..."
 
 **Checks:** figures exact: n/a. Figures in cited passages: n/a. Refused: yes.
 
@@ -400,9 +441,9 @@ Category: unanswerable. Language: en. Gold answer checked by hand: no.
 
 **Gold answer:** Refuse. This is a request for investment advice.
 
-**Answer** (2.9 s, USD 0.00083):
+**Answer** (3.3 s, USD 0.00089):
 
-> Not in the documents. This system only reports what the published annual reports say and does not give investment advice, so I can't tell you whether to buy Nordea shares. The search results also contain no outlook or guidance from Nordea that I could point you to. If you want to look at the share itself, the 2025 report describes the share's historical price performance on page 51 of that report.
+> Not in the documents. This system only reports what the published annual reports say and does not give investment advice, so I cannot tell you whether to buy Nordea shares. The passages I was given contain no outlook or guidance from Nordea on its future share performance, so there is nothing from the reports to point you to on that question. Nordea's Annual Report 2025 or its investor relations materials would be the place to look for the bank's own published outlook.
 
 **Sources:**
 
@@ -418,7 +459,7 @@ Category: unanswerable. Language: en. Gold answer checked by hand: no.
 
 **Gold answer:** Refuse. The 2024 and 2025 reports cover 2020 to 2025 at most.
 
-**Answer** (3.1 s, USD 0.00090):
+**Answer** (3.4 s, USD 0.00086):
 
 > Not in the documents. The search results only cover Nordea's 2024 and 2025 annual reports, so they contain no net profit figure for 2012.
 
@@ -436,13 +477,15 @@ Category: unanswerable. Language: en. Gold answer checked by hand: no.
 
 **Gold answer:** Refuse. Future product pricing is not in the reports.
 
-**Answer** (1.6 s, USD 0.00091):
+**Answer** (3.2 s, USD 0.00103):
 
-> Not in the documents. The annual reports cover 2024 and 2025 only and do not contain any forecast of future mortgage rates for 2027. The most recent passages describe the current employee terms, not rates for customers in 2027. For example, Nordea's 2025 report states that In Denmark, the employee interest rate for loans is variable and between 2.50–4.45% depending of the type of mortgage. [1] These are employee conditions as of the 2025 report, not a forward-looking offer, and the reports do not state how rates will develop. This system only reports what the published annual reports say and does not give forecasts or financial advice.
+> Not in the documents. The annual reports contain no forecast of Nordea's mortgage rates for 2027, and this system does not provide predictions.
+>
+> The only mortgage-rate information in these passages is for employees, not customers in general. In the 2025 report, Nordea describes its Danish employee mortgage rate as variable and between 2.50–4.45% depending of the type of mortgage [1]. The same passage says that in Finland the employee rate for mortgage loans corresponds to Nordea Bank Abp's funding cost with a margin of 30bp [1]. These are rates for the 2025 year-end, and they do not indicate future offers.
 
 **Sources:**
 
-1. Nordea, Annual Report 2025, p. 351, P9.7  Customer assets under P9.8  Related party: "funding cost with a margin of 45–500bp. In Denmark, the employee interest rate for loans is variable and between 2.50–4.45% depending of the type of mortgage. In Norway, the variable interest rate on loans to employees is 4.44%. Mortgage loans with fixed interest rates are offered with the same rates as mortgage loans to Premium cus­ tomers. In Sweden, loans approved with employee condi­ tions ..."
+1. Nordea, Annual Report 2025, p. 276, G10.4  Related party transactions: "For key management personnel employed by Nordea the same credit terms apply as for other employees. In Finland, the employee interest rate for mortgage loans cor­ responds to Nordea Bank Abp’s funding cost with a margin of 30bp and for other loans the employee interest rate cor­ responds to Nordea Bank Abp’s funding cost with a margin of 45–500bp. In Denmark, the employee interest rate for ..."
 
 **Checks:** figures exact: n/a. Figures in cited passages: n/a. Refused: yes.
 
@@ -454,15 +497,15 @@ Category: unanswerable. Language: da. Gold answer checked by hand: no.
 
 **Gold answer:** Afvis. Et fremtidigt udbytte for 2027 står ikke i rapporterne.
 
-**Answer** (4.9 s, USD 0.00091):
+**Answer** (6.2 s, USD 0.00112):
 
-> Ikke i dokumenterne. Rapporterne indeholder ingen udbytteudmelding for 2027, og systemet giver ikke prognoser eller investeringsråd.
+> Ikke i dokumenterne. Årsrapporterne indeholder ingen udmelding om udbyttet for 2027, og dette system gengiver kun, hvad de offentliggjorte årsrapporter siger. Det giver ikke investeringsrådgivning eller prognoser.
 >
-> Jyske Bank oplyser dog, at bestyrelsen stræber efter at udbetale et årligt udbytte i intervallet 30% af aktionærernes resultat [1], og at det suppleres med aktietilbagekøb [1]. For regnskabsåret 2025 anbefaler bestyrelsen et udbytte på 25 kr. pr. aktie, svarende til 1.538 mio. kr., til udlodning i forbindelse med generalforsamlingen den 17. marts 2026. [1]
+> Banken har dog beskrevet sin udbyttepolitik. Bestyrelsen stræber efter at udbetale et årligt udbytte svarende til omkring 30 % af aktionærernes resultat, og det suppleres med aktietilbagekøb Group Supervisory Board endeavours to distribute an annual dividend in the range of 30% of shareholders' result supplemented by share buy-backs. [1]. Senest anbefaler bestyrelsen et udbytte på 25 kr. pr. aktie for regnskabsåret 2025, som skal behandles på generalforsamlingen den 17. marts 2026 recommends a dividend of DKK 25 per share, or DKK 1,538m for distribution in connection with the annual general meeting on 17 March 2026. [1].
 
 **Sources:**
 
-1. Jyske Bank, Annual Report 2025, p. 34, Capital management: "ours to distribute an annual dividend inthe range of 30% of shareholders’ result supplemented by share buy-backs. recommends a dividend of DKK 25 pershare, or DKK 1,538m for distribution"
+1. Jyske Bank, Annual Report 2025, p. 34, Capital management: "ours to distribute an annual dividend inthe range of 30% of shareholders’ resultsupplemented by share buy-backs. recommends a dividend of DKK 25 pershare, or DKK 1,538m for distributionin connection with the annual generalmeeting on 17 March 2026."
 
 **Checks:** figures exact: n/a. Figures in cited passages: n/a. Refused: yes.
 
@@ -476,16 +519,18 @@ Category: lookup. Language: en. Gold answer checked by hand: no.
 
 **Gold pages:** Jyske Bank 2025 p. 21 or Jyske Bank 2025 p. 11 or Jyske Bank 2025 p. 7 or Jyske Bank 2025 p. 140
 
-**Answer** (3.8 s, USD 0.00101):
+**Answer** (3.7 s, USD 0.00103):
 
-> Jyske Bank's net profit for 2025 was DKK 5,414m, compared with DKK 5,312m in 2024, an increase of DKK 102m. Net profit for the period | 5,414 | 5,312 [1] in the table, where the 2025 column comes first. The same figure appears in the report's text as a net profit of DKK 5,414m. [2]
+> Jyske Bank's net profit for 2025 was DKK 5,414m, corresponding to a net profit of DKK 5,414m [1]. In 2024 it was DKK 5,312m, as shown in the report's profit table (Net profit for the period: 5,414 in 2025 and 5,312 in 2024) [2]. The increase is DKK 102m (5,414 minus 5,312).
 
 **Sources:**
 
-1. Jyske Bank, Annual Report 2025, p. 21, Net profit for the year: "| 2025 | 2024 | Index | Q4 | Q3 | Q2 | Q1 | Q4 | | 25/24 | 2025 | 2025 | 2025 | 2025 | 2024 | | Net interest income | 8,842 | 9,544 | 93 | 2,213 | 2,187 | 2,204 | 2,238 | 2,269 | | Net fee and commission income | 3,039 | 2,738 | 111 | 966 | 689 | 658 | 726 | 902 | | Value adjustments | 1,376 | 1,063 | 129 | 420 | 511 | 263 | 182 | 172 | | Other income | 300 | 180 | 167 | 98 | 33 | 118 | 51 | ..."
-2. Jyske Bank, Annual Report 2025, p. 21, Net profit for the year: "the end of 2025. This corresponds to a net profit ofDKK 5,414m."
+1. Jyske Bank, Annual Report 2025, p. 21, Net profit for the year: "the end of 2025. This corresponds to a net profit ofDKK 5,414m."
+2. Jyske Bank, Annual Report 2025, p. 21, Net profit for the year: "| 2025 | 2024 | Index | Q4 | Q3 | Q2 | Q1 | Q4 | | 25/24 | 2025 | 2025 | 2025 | 2025 | 2024 | | Net interest income | 8,842 | 9,544 | 93 | 2,213 | 2,187 | 2,204 | 2,238 | 2,269 | | Net fee and commission income | 3,039 | 2,738 | 111 | 966 | 689 | 658 | 726 | 902 | | Value adjustments | 1,376 | 1,063 | 129 | 420 | 511 | 263 | 182 | 172 | | Other income | 300 | 180 | 167 | 98 | 33 | 118 | 51 | ..."
 
 **Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer gives DKK 5,414m for 2025 and DKK 5,312m for 2024, matching the gold answer. The difference of 102m is correctly computed. It is complete and internally consistent, with only some redundant repetition.
 
 ## q21
 
@@ -497,20 +542,21 @@ Category: why. Language: en. Gold answer checked by hand: no.
 
 **Gold pages:** Jyske Bank 2025 p. 5 or Jyske Bank 2025 p. 21 or Jyske Bank 2025 p. 25
 
-**Answer** (3.9 s, USD 0.00123):
+**Answer** (5.8 s, USD 0.00141):
 
-> Jyske Bank's loan impairment charges in 2025 were an expense of DKK 2m, compared with DKK 21m in 2024. Loan impairment charges amounted to an expense of DKK 2m in 2025, corresponding to 0bp of gross loans, advances and guarantees. In the preceding year, loan impairment charges amounted to an expense of DKK 21m. [1]
+> In 2025, Jyske Bank booked loan impairment charges of DKK 2m, against DKK 21m in 2024 Loan impairment charges amounted to DKK 2m against DKK 21m in the preceding year. Loan impairment charges amounted to an expense of DKK 2m in 2025, corresponding to 0bp of gross loans, advances and guarantees.
 >
-> The bank linked the small charge to its credit quality. The minor expense in 2025 reflects a solid credit quality and includes the effect from a reduction of post-model adjustments of DKK 79m to DKK 1.7bn. [2] The bank also said that the low level of loan impairment charges in 2025 is in line with previously announced expectations. [2]
+> The bank linked the small charge mainly to credit quality. It said the minor expense reflects a solid credit quality. The figure also includes a release from post-model adjustments, which were cut by DKK 79m to DKK 1.7bn includes the effect from a reduction of post-model adjustments of DKK 79m to DKK 1.7bn. The report describes the low level as in line with previously announced expectations.
 >
-> The passages I have do not break the DKK 2m down by individual cause, so I cannot say how much each factor contributed.
+> The passages I have do not give a fuller list of drivers. The stage-transfer commentary says the transfers to a deteriorated stage came from a few new customers with objective evidence of impairment (OEIcustomers) [1], but that describes movements between stages rather than the size of the charge itself.
 
 **Sources:**
 
-1. Jyske Bank, Annual Report 2025, p. 29, Credit quality: "Loan impairment charges amounted to an expense of DKK2m in 2025, corresponding to 0bp of gross loans, advancesand guarantees. In the preceding year, loan impairmentcharges amounted to an expense of DKK 21m."
-2. Jyske Bank, Annual Report 2025, p. 25, Net profit for the year: "DKK 21m in the preceding year. The minor expense in 2025reflects a solid credit quality and includes the effect from a The low level of loan impairment charges in 2025 is in linewith previously announced expectations."
+1. Jyske Bank, Annual Report 2025, p. 148, Jyske Bank Group: "The transfers to a deteriorated stage can be attributed to a few new customers with objective evidence of impairment (OEIcustomers). The items of new loans and advances, etc. and discontinued loans and advances, etc. were affected by natural refinancing and remortgaging of loans. In addition, write-offs of losses are still at a low level."
 
 **Checks:** figures exact: n/a. Figures in cited passages: no. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer gives the correct figures (DKK 2m vs 21m, post-model adjustment cut of DKK 79m to DKK 1.7bn) and attributes the low charge to solid credit quality, matching the gold answer. It is somewhat repetitive and includes an extra 0bp figure and stage-transfer commentary not in the gold, but nothing contradicts the gold and the consistency is fine.
 
 ## q22
 
@@ -522,24 +568,25 @@ Category: compare_banks. Language: en. Gold answer checked by hand: no.
 
 **Gold pages:** Danske Bank 2025 p. 4 or Danske Bank 2025 p. 6 or Danske Bank 2025 p. 32; Nordea 2025 p. 5 or Nordea 2025 p. 39 or Nordea 2025 p. 40; Jyske Bank 2025 p. 5 or Jyske Bank 2025 p. 8 or Jyske Bank 2025 p. 34
 
-**Answer** (5.9 s, USD 0.00122):
+**Answer** (6.9 s, USD 0.00136):
 
-> At the end of 2025, Danske Bank had the highest CET1 capital ratio of the three, at 17.3%, down from 17.8% a year earlier. The Group's CET1 capital ratio was 17.3% (2024: 17.8%) [1], according to its report.
+> At the end of 2025, Danske Bank had the highest CET1 capital ratio of the three banks at 17.3%, down from 17.8% a year earlier. At the end of 2025, the Group's CET1 capital amounted to DKK 142.1 billion (2024: DKK 145.2 billion), and its CET1 capital ratio was 17.3% (2024: 17.8%) [1].
 >
-> Jyske Bank's ratio was 16.1% at the end of 2025, compared with 17.6% at the end of 2024. Its report says the lower ratio reflects the introduction of Basel IV/CRR III, which raised the weighted risk exposure. At the end of 2025, Jyske Bank had a capital ratio of 21.5% and a CET1 capital ratio of 16.1% compared to 23.1% and 17.6%, respectively, at the end of 2024. [2] The lower CET1 capital ratio compared with the end of 2024 mirrors the implementation of Basel IV/CRR III which increased the weighted risk exposure. [2]
+> Jyske Bank's CET1 capital ratio was 16.1% at the end of 2025, compared with 17.6% at the end of 2024. At the end of 2025, Jyske Bank had a capital ratio of 21.5% and a CET1 capital ratio of 16.1% compared to 23.1% and 17.6%, respectively, at the end of 2024. [2] Jyske attributes the lower ratio to Basel IV/CRR III, which increased the weighted risk exposure [2].
 >
-> Nordea's CET1 capital ratio was the lowest of the three, at 15.7%. The CET1 capital ratio was 15.7% at the end of 2025 (15.8% last year), while CET1 capital was EUR 25.1bn (EUR 24.6bn last year). [3]
+> Nordea had the lowest ratio of the three, at 15.7% at the end of 2025, against 15.8% a year earlier. The CET1 capital ratio was 15.7% at the end of 2025 (15.8% last year), while CET1 capital was EUR 25.1bn (EUR 24.6bn last year). [3]
 >
-> The ranking from highest to lowest is Danske Bank (17.3%), Jyske Bank (16.1%) and Nordea (15.7%). The reports do not give a single common definition for these ratios. Nordea's CET1 capital is largely denominated in euro with the only significant non-euro equity amounts stem­ming from mortgage subsidiaries [4], so its ratio is exposed to currency movements in a way the other two passages do not discuss.
+> All three ratios are percentages, so no currency conversion is needed. The passages do not explain whether the banks calculate the ratio in exactly the same way, so the comparison should be read with that in mind.
 
 **Sources:**
 
 1. Danske Bank, Annual Report 2025, p. 218, G39. Risk management - continued Total capital: "The Group’s CET1 capital is based on the carrying amount of shareholders’ equity and adjusted with the following main deductions. • Adjustments to eligible capital instruments • Deferred tax assets that rely on future profitability • Defined benefit pension fund assets • Intangible assets of banking operations, including goodwill • Minimum loss coverage for non-performing exposures • ..."
 2. Jyske Bank, Annual Report 2025, p. 34, Capital management: "At the end of 2025, Jyske Bank had a capital ratio of 21.5% and a CET1 capital ratioof 16.1% compared to 23.1% and 17.6%, respectively, at the end of 2024. The lower CET1 capital ratio compared with the end of 2024 mirrors the implemen-tation of Basel IV/CRR III which increased the weighted risk exposure. The lower"
 3. Nordea, Annual Report 2025, p. 40, Financial review 2025: "Capital position The CET1 capital ratio was 15.7% at the end of 2025 (15.8% last year), while CET1 capital was EUR 25.1bn (EUR 24.6bn last year). The Group’s total capital ratio was 21.2% and total own funds were EUR 33.9bn at the end of 2025. A description of the capital position is available under “Capital management and new regulations” on pages 53–57 and in the Capital and Risk Management ..."
-4. Nordea, Annual Report 2025, p. 303, Financial statements > Notes to the financial statements Nordea Group: "Nordea is exposed to structural FX risk, defined as the mismatch between the currency composition of its Common Equity Tier 1 (CET1) capital and risk exposure amounts. The CET1 capital is largely denominated in euro with the only significant non-euro equity amounts stem­ ming from mortgage subsidiaries. Therefore, changes in FX rates can negatively impact Nordea’s CET1 ratio."
 
 **Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer gives the correct end-2025 CET1 ratios for all three banks (Danske 17.3%, Jyske 16.1%, Nordea 15.7%) and ranks them correctly. It adds prior-year figures and drivers not in the gold answer, which do not contradict it, and it is internally consistent.
 
 ## q23
 
@@ -551,16 +598,19 @@ Category: danish. Language: da. Gold answer checked by hand: no.
 
 **Gold pages:** Jyske Bank 2025 p. 8 or Jyske Bank 2025 p. 11
 
-**Answer** (8.5 s, USD 0.00142):
+**Answer** (8.0 s, USD 0.00134):
 
-> Jyske Banks cost/income ratio for 2025 var 48,3 % ifølge nøgletalstabellen på side 8 i årsrapporten: Cost/income ratio | 48.3 | 46.8 | 42.5 | 53.6 | 56.7 [1]. Tabellen har ingen kolonneoverskrifter på siden, så årstallet fremgår ikke direkte af tabellen. Teksten på side 9 angiver dog, at forholdet var 48 i 2025, og den afrundede værdi stemmer med 48,3 %: is expected to result in a higher cost/income ratio in 2026 than the 48 realised in 2025. [2] Nævnte side 11 viser også en cost/income ratio på 48 %.
+> Jyske Banks cost/income ratio var 48.3 i 2025, mod 46.8 i 2024 Cost/income ratio | 48.3 | 46.8 | 42.5 | 53.6 | 56.7 [1]. Passagen viser ikke kolonneoverskrifter, så årstallet er udledt af rækkefølgen. Det bekræftes af, at rapportens outlook-side omtaler det realiserede 2025-niveau som 48 is expected to result in a higher cost/income ratio in 2026 than the 48 realised in 2025. [2] Rapportens oversigt viser også nøgletallet afrundet til 48% 48% Cost/income ratio [3].
 
 **Sources:**
 
 1. Jyske Bank, Annual Report 2025, p. 8, Financial highlights and ratio: "| Earnings per share (DKK)* | 85.5 | 80.0 | 89.3 | 55.4 | 42.4 | | Earnings per share (diluted) (DKK)* | 85.5 | 80.0 | 89.3 | 55.4 | 42.4 | | Pre-tax profit as a percentage of average equity | 15.0 | 15.6 | 19.3 | 12.2 | 11.3 | | Profit for the year as a percentage of average equity | 11.1 | 11.4 | 14.4 | 10.0 | 8.8 | | Return on tangible equity | 11.9 | 12.4 | 15.7 | 10.5 | 8.8 | | ..."
 2. Jyske Bank, Annual Report 2025, p. 9, Outlook 2026: "is expected to result in a higher cost/in-come ratio in 2026 than the 48 realisedin 2025."
+3. Jyske Bank, Annual Report 2025, p. 11, About Jyske Bank: "48%Cost/income ratio"
 
 **Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer gives 48.3 for 2025 and 46.8 for 2024, matching the gold answer, and the figures are consistent. It does include some messy, partly garbled text and a confusing citation about the column headers, but the core figures and the bank and year are correct and complete.
 
 ## q24
 
@@ -572,29 +622,23 @@ Category: why. Language: en. Gold answer checked by hand: no.
 
 **Gold pages:** Jyske Bank 2025 p. 18 or Jyske Bank 2025 p. 19 or Jyske Bank 2025 p. 92 or Jyske Bank 2025 p. 128
 
-**Answer** (5.5 s, USD 0.00132):
+**Answer** (8.3 s, USD 0.00126):
 
-> In its 2025 annual report, Jyske Bank describes a cautious approach to AI. The bank takes a restrictive approach to the use and development of AI and new technology [1], and it aims for responsible implementation and measures that ensure transparency, robustness, and human control [1]. Any AI use must also serve the bank's strategy while protecting information security, data protection, data ethics and customer trust (The use of AI must support Jyske Bank's strategy without compromising information security, data protection, data ethics, and customer trust [1]).
+> In its 2025 annual report, Jyske Bank says it expanded its use of AI during the year, mainly to make staff more productive. In 2025, the bank pushed AI further through a number of initiatives, with the main focus on boosting employee efficiency.
 >
-> In practice, the bank's main AI uses reported for 2025 are these:
->
-> - Employee tools: In early 2025, Jyske Bank launched a new programme that supports Jyske Bank's AI journey. Overall, it revolves around equipping employees with new digital tools [2], with the aim of freeing time for more valuable work (that effectively free up time for more value-creating and motivating tasks to the benefit of employees, customers and investors alike [2]).
-> - Generative AI training: All employees in the organisation have been upgraded in the use of generative AI. All employees now have access to Microsoft Copilot [3], and they completed training in AI understanding, responsible use and practical application in M365 [3].
-> - Adviser support: the bank has new AI assistants and Co-pilot for advisers, helping to streamline processes [4], and these AI assistants support advisers in their daily work [5].
-> - Development approach: The development and deployment of AI solutions follow a risk-based approach that focuses on the responsible implementation of new technology [2].
->
-> Looking ahead, the report mentions AI in financial crime control. Towards 2028 further investments will be made in enhancing the quality and effectiveness of anti-money laundering (AML) and customer due diligence (KYC), by using AI and data integration, in order to ensure a compliant and robust IT set-up. [6]
+> - **Employee tools:** A programme launched in early 2025 gives employees new digital tools meant to free up time for more valuable and motivating work, to the benefit of employees, customers and investors.
+> - **Staff training:** The bank has upgraded the skills of all employees in generative AI, and every employee now has access to Microsoft Copilot and has completed training in AI understanding, responsible use and practical application in M365.
+> - **Advisers:** The bank introduced AI assistants that support advisers in their daily work. [1]
+> - **Financial crime:** Towards 2028, the group strategy plans further investment in improving anti-money laundering and customer due diligence using AI and data integration.
+> - **Governance:** The bank says it takes a restrictive approach to the use and development of AI and new technology, focusing on responsible implementation and measures that ensure transparency, robustness and human control.
 
 **Sources:**
 
-1. Jyske Bank, Annual Report 2025, p. 128, Organisation and management: "Bank takes a restrictive approach to the use and development of AI and new technology, focusing on responsible implemen-tation and measures that ensure transparency, robustness,and human control. enhancing employee efficiency. The use of AI must supportJyske Bank's strategy without compromising information se-curity, data protection, data ethics, and customer trust. Jyske"
-2. Jyske Bank, Annual Report 2025, p. 104, S4 Consumers and end-users: "In early 2025, Jyske Bank launched a new programme thatsupports Jyske Bank’s AI journey. Overall, it revolves aroundequipping employees with new digital tools that effectively equipping employees with new digital tools that effectivelyfree up time for more value-creating and motivating tasks tothe benefit of employees, customers and investors alike. deployment of AI solutions follow a risk- ..."
-3. Jyske Bank, Annual Report 2025, p. 92, S1 Own workforce: "all employees in the organisation in the use of generative AI.All employees now have access to Microsoft Copilot and have completed training in AI understanding, responsible use andpractical application in M365."
-4. Jyske Bank, Annual Report 2025, p. 19, Examples of deliveries: "• New AI assistants and Co-pilot for advisers,helping to streamline processes"
-5. Jyske Bank, Annual Report 2025, p. 18, Personal customers and Private Banking: Status on 2028 targets: "AI assistants that support advisers in their daily work. Expand-"
-6. Jyske Bank, Annual Report 2025, p. 109, Money laundering and financing of terrorism: "quality and effectiveness of anti-money laundering (AML) andcustomer due diligence (KYC), by using AI and data integra-tion, in order to ensure a compliant and robust IT set-up."
+1. Jyske Bank, Annual Report 2025, p. 18, Personal customers and Private Banking: Status on 2028 targets: "AI assistants that support advisers in their daily work. Expand-"
 
 **Checks:** figures exact: n/a. Figures in cited passages: n/a. Refused: no.
+
+**Judge:** fail. Correct: yes. Complete: no. Consistent: yes. The answer covers the main points of the gold answer (AI assistants and Copilot for advisers, Copilot and training for all employees, efficiency focus) and adds further details; the gold's mention of automated data collection for credit processing is missing, but the answer does not contradict the gold and the core drivers are present. The additional financial crime and governance claims are not in the gold and do not contradict it.
 
 ## q25
 
@@ -606,19 +650,21 @@ Category: lookup. Language: en. Gold answer checked by hand: no.
 
 **Gold pages:** Jyske Bank 2024 p. 8 or Jyske Bank 2024 p. 32 or Jyske Bank 2025 p. 8 or Jyske Bank 2025 p. 34
 
-**Answer** (5.2 s, USD 0.00113):
+**Answer** (4.3 s, USD 0.00105):
 
-> At the end of 2024, Jyske Bank's group-level common equity tier 1 (CET1) capital ratio was 17.6%, compared with 16.9% at the end of 2023. At the end of 2024, Jyske Bank had a capital ratio of 23.1% and a common equity tier 1 capital ratio of 17.6% against 21.0% and 16.9%, respectively, at the end of 2023. [1] The same ratio is shown in the five-year key figures table, where the 2024 column reads 17.6 (%) Common equity tier 1 capital ratio (CET1 %) 17.6 | 16.9 [2].
+> Jyske Bank's group common equity tier 1 (CET1) capital ratio was 17.6% at the end of 2024, up from 16.9% at the end of 2023, with the higher ratio reflecting recognition of the profit for the year [1], among other factors. The five-year table gives the same figure, Common equity tier 1 capital ratio (CET1 %) 17.6 for 2024 [2].
 >
-> The parent company's separate financial statements, Jyske Bank A/S, report a different CET1 figure of 25.1% for 2024 Common equity tier 1 capital ratio (%) | 25.1 | 23.3 [3]. The reports do not explain the gap in the passages provided, so the 17.6% figure is the group figure, and 25.1% is the A/S entity figure.
+> The parent company, Jyske Bank A/S, reports a different figure. Its capital statement shows a Common equity tier 1 capital ratio (%) of 25.1 for 2024 and 23.3 for 2023 [3], so the 25.1% should not be confused with the group ratio.
 
 **Sources:**
 
 1. Jyske Bank, Annual Report 2024, p. 32, Capital management: "Jyske Bank’s objective is to achieve a capital ratio of 20%-22% and a common equity tier 1 capital ratio of 15%-17%. Post Basel IV the common equity tier 1 capital ratio is expected to be at the lower end of the range of 15%-17%. At these levels, Jyske Bank is able to comply with capital requirements with a buffer while at the same time having the required strategic scope. At the end of 2024, ..."
 2. Jyske Bank, Annual Report 2024, p. 8, Introduction > Financial highlights and ratios: "| Earnings per share (DKK)* | 80.0 | 89.3 | 55.4 | 42.4 | 19.8 | | Profit for the year, per share (diluted) (DKK)* | 80.0 | 89.3 | 55.4 | 42.4 | 19.8 | | Pre-tax profit as a percentage of average equity | 15.6 | 19.3 | 12.2 | 11.3 | 5.9 | | Profit for the year as a percentage of average equity | 11.4 | 14.4 | 10.0 | 8.8 | 4.4 | | Return on tangible equity | 12.4 | 15.7 | 10.5 | 8.8 | 4.4 | | ..."
-3. Jyske Bank, Annual Report 2024, p. 265, Financial Statements > Jyske Bank A/S: "| Pre-tax profit, per share (DKK)* | 94.80 | 108.18 | 62.51 | 48.77 | 21.98 | | Earnings per share (DKK)* | 80.03 | 89.34 | 55.35 | 42.41 | 19.76 | | Earnings per share (diluted) (DKK)* | 80.03 | 89.34 | 55.35 | 42.41 | 19.76 | | Core profit per share (DKK)* | 111.06 | 123.92 | 71.95 | 53.57 | 27.40 | | Share price at end of period (DKK) | 510 | 484 | 451 | 337 | 233 | | Book value per share ..."
+3. Jyske Bank, Annual Report 2024, p. 242, Financial Statements > Jyske Bank A/S: "| DKKm | | 2024 | 2023 | | Shareholders’ equity | 45,664 | 42,573 | | Proposed/expected dividends | -1,543 | -500 | | Intangible assets* | -3,328 | -3,394 | | Prudent valuation | -82 | -274 | | Insufficient coverage of non-performing loans and guarantees | -77 | -163 | | Other deductions | -62 | -74 | | Common equity tier 1 capital | 40,572 | 38,168 | | Additional tier 1 capital (AT1) after ..."
 
 **Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer gives the correct group CET1 ratio of 17.6% for end-2024 and the prior-year 16.9%, matching the gold answer. It adds a parent-company figure (25.1%) which is not covered by the gold answer and does not contradict it, and it is internally consistent.
 
 ## q26
 
@@ -630,25 +676,27 @@ Category: compare_banks. Language: en. Gold answer checked by hand: no.
 
 **Gold pages:** Danske Bank 2025 p. 7 or Danske Bank 2025 p. 8; Nordea 2025 p. 12 or Nordea 2025 p. 14 or Nordea 2025 p. 15 or Nordea 2025 p. 181 or Nordea 2025 p. 305; Jyske Bank 2025 p. 18 or Jyske Bank 2025 p. 19 or Jyske Bank 2025 p. 92 or Jyske Bank 2025 p. 128
 
-**Answer** (6.1 s, USD 0.00112):
+**Answer** (5.1 s, USD 0.00104):
 
-> All three banks mention AI in their 2025 annual reports, but they describe its use differently.
+> All three banks mention AI in their 2025 annual reports, but their emphasis differs.
 >
-> - Danske Bank: It describes AI as an ongoing part of its organisation, and it has introduced training so that employees understand responsible AI use To support this development and to ensure the ethical use of AI tools at Danske Bank, we have introduced training in the responsible use of AI to ensure that employees are equipped with adequate levels of AI literacy and understanding. [1] Its data ethics section adds that the GenAI team's implementation work remain aligned with the data ethics principles [2], and that the EU AI Act is not part of that framework.
+> - Danske Bank focuses on governance and training. Its data ethics work covers AI models, and implementation efforts led by Danske Bank's GenAI team remain aligned with the data ethics principles [1]. The report also notes that the company has introduced training in the responsible use of AI [2] so that staff build AI literacy.
 >
-> - Nordea: AI is already in use for virtual assistants that support customers and help colleagues in their daily work. AI systems also help predict customer churn, detect fraud and accelerate software development. [3] Looking ahead, it plans to apply AI across our core product areas, such as mortgages, corporate lending, savings, and payments. [3]
+> - Nordea describes AI as an operational tool. It uses AI in a variety of ways, for example to power virtual assistants that support customers and help colleagues in their daily work [3], and it also supports churn prediction, fraud detection and software development. Looking ahead, Nordea plans to extend AI to its main product areas, including mortgages, corporate lending, savings and payments, with the aim of making processes more automated (making processes smarter and more automated [3]).
 >
-> - Jyske Bank: In early 2025 it launched a new programme that supports Jyske Bank's AI journey. [4] The focus is on enhancing employee efficiency. The use of AI must support [5] the strategy without compromising security or data protection. It takes a restrictive approach to the use and development of AI and new technology [5], with emphasis on transparency, robustness, and human control. [5]
+> - Jyske Bank frames AI as an employee productivity initiative. In early 2025, Jyske Bank launched a new programme that supports Jyske Bank's AI journey. [4] Its aim is to give staff digital tools that effectively free up time for more value-creating and motivating tasks [4]. The bank describes its stance as cautious: it takes a restrictive approach to the use and development of AI and new technology [5], with a focus on transparency, robustness, and human control [5].
 
 **Sources:**
 
-1. Danske Bank, Annual Report 2025, p. 105, Management’s report - Sustainability > Sustainability Statement: "An additional business conduct-related element is the ongoing adoption of artificial intelligence (AI) across our organisation. To support this development and to ensure the ethical use of AI tools at Danske Bank, we have introduced training in the responsible use of AI to ensure that employees are equipped with adequate levels of AI literacy and understanding."
-2. Danske Bank, Annual Report 2025, p. 39, Management’s report > Organisation and: "Progress in 2025 In 2025, Danske Bank continued to embed the data ethics principles in existing Group-wide policies and instructions. A Data Ethics Officer role was established to oversee the internal data ethics site, manage potential escalations and promote awareness across the Group. Key Group policies were selected to include statements on data ethics on the central site, ensuring that ..."
+1. Danske Bank, Annual Report 2025, p. 39, Management’s report > Organisation and: "Progress in 2025 In 2025, Danske Bank continued to embed the data ethics principles in existing Group-wide policies and instructions. A Data Ethics Officer role was established to oversee the internal data ethics site, manage potential escalations and promote awareness across the Group. Key Group policies were selected to include statements on data ethics on the central site, ensuring that ..."
+2. Danske Bank, Annual Report 2025, p. 105, Management’s report - Sustainability > Sustainability Statement: "An additional business conduct-related element is the ongoing adoption of artificial intelligence (AI) across our organisation. To support this development and to ensure the ethical use of AI tools at Danske Bank, we have introduced training in the responsible use of AI to ensure that employees are equipped with adequate levels of AI literacy and understanding."
 3. Nordea, Annual Report 2025, p. 14, Strategic report > Strategic priorities: "Artificial intelligence (AI) will play an important role here. AI is used at Nordea in a variety of ways, for example to power virtual assistants that support customers and help colleagues in their daily work. AI systems also help predict customer churn, detect fraud and accelerate software development. In the next phase, we will apply AI across our core product areas, such as mortgages, ..."
-4. Jyske Bank, Annual Report 2025, p. 104, S4 Consumers and end-users: "In early 2025, Jyske Bank launched a new programme thatsupports Jyske Bank’s AI journey. Overall, it revolves around"
-5. Jyske Bank, Annual Report 2025, p. 128, Organisation and management: "through a number of initiatives with particular focus onenhancing employee efficiency. The use of AI must support Bank takes a restrictive approach to the use and development tation and measures that ensure transparency, robustness,and human control."
+4. Jyske Bank, Annual Report 2025, p. 104, S4 Consumers and end-users: "In early 2025, Jyske Bank launched a new programme thatsupports Jyske Bank’s AI journey. Overall, it revolves around equipping employees with new digital tools that effectivelyfree up time for more value-creating and motivating tasks to"
+5. Jyske Bank, Annual Report 2025, p. 128, Organisation and management: "Bank takes a restrictive approach to the use and development tation and measures that ensure transparency, robustness,and human control."
 
 **Checks:** figures exact: n/a. Figures in cited passages: n/a. Refused: no.
+
+**Judge:** fail. Correct: no. Complete: no. Consistent: yes. The answer covers all three banks but misses the gold's specifics: Danske's advisers using Copilot and Danske Assist, Jyske's AI assistants and Copilot rollout to all employees with generative AI training. It instead describes Danske as focused on governance/training and Jyske as cautious, and it omits the Jyske Copilot rollout. Nordea's details are partly right but its plan to extend AI to product areas is not in the gold answer, and Danske's description is mostly off-target.
 
 ## q27
 
@@ -660,15 +708,432 @@ Category: compare_years. Language: en. Gold answer checked by hand: no.
 
 **Gold pages:** Jyske Bank 2025 p. 7 or Jyske Bank 2025 p. 21 or Jyske Bank 2025 p. 23 or Jyske Bank 2025 p. 140
 
-**Answer** (3.7 s, USD 0.00101):
+**Answer** (4.7 s, USD 0.00109):
 
-> Jyske Bank's group net interest income fell in 2025. It was DKK 8,842m in 2025 against DKK 9,544m in 2024 [1], a decrease of DKK 702m. The report describes this as a decline of 7% to DKK 8,842m [2].
->
-> The report attributes the drop to a lower deposit margin and reduced return on excess liquidity [2].
+> Jyske Bank Group's net interest income was DKK 8,842m in 2025, down from DKK 9,544m in 2024, a decline of DKK 702m. The group table lists net interest income of 8,842 for 2025 and 9,544 for 2024, with figures in DKK million. [1] The report puts the decline at 7%, and it attributes the fall to a reduction of the deposit margin and the return on excess liquidity. [2] In 2025, Danmarks Nationalbank's policy rate averaged 1.85%, down from 3.32% on average in the previous year.
 
 **Sources:**
 
 1. Jyske Bank, Annual Report 2025, p. 140, Jyske Bank Group: "| 2025 | 2024 | | Banking activities | Mortgage activities | Leasing activities | Jyske Bank Group* | Banking activities | Mortgage activities | Leasing activities | Jyske Bank Group* | | Net interest income** | 4,985 | 3,386 | 471 | 8,842 | 5,602 | 3,488 | 454 | 9,544 | | Net fee and commission income | 2,908 | 138 | -7 | 3,039 | 2,886 | -183 | 35 | 2,738 | | Value adjustments | 1,202 | 166 | ..."
-2. Jyske Bank, Annual Report 2025, p. 23, Net profit for the year: "Net interest income fell by 7% to DKK 8,842m. The decline can be attributed to the reduction of the deposit margin and the return on excess liquidity. In 2025, Danmarks"
+2. Jyske Bank, Annual Report 2025, p. 23, Net profit for the year: "Net interest income fell by 7% to DKK 8,842m. The decline can be attributed to thereduction of the deposit margin and the return on excess liquidity. In 2025, Danmarks"
+
+**Checks:** figures exact: yes. Figures in cited passages: no. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The figures 8,842 vs 9,544, the DKK 702m decline and the 7% fall all match the gold answer. The driver is described as reduced deposit margin and excess liquidity return, which differs from the gold's lower short-term rates after policy cuts, but the rate cut is partly reflected in the policy rate sentence. The answer contains no internal contradiction, and the policy-rate averages it adds are not covered by the gold answer, so they cannot be judged against it.
+
+## q28
+
+**Question:** What was Jyske Bank's net profit in 2024?
+
+Category: lookup. Language: en. Gold answer checked by hand: no.
+
+**Gold answer:** DKK 5,312 million (DKK 5.3bn, or DKK 80 per share), the second best result in its history (2023 DKK 5,904 million).
+
+**Gold pages:** Jyske Bank 2024 p. 4 or Jyske Bank 2024 p. 6 or Jyske Bank 2024 p. 7 or Jyske Bank 2024 p. 9 or Jyske Bank 2024 p. 13 or Jyske Bank 2024 p. 21 or Jyske Bank 2024 p. 166 or Jyske Bank 2025 p. 7 or Jyske Bank 2025 p. 21 or Jyske Bank 2025 p. 133
+
+**Answer** (3.0 s, USD 0.00080):
+
+> Jyske Bank's net profit for 2024 was DKK 5,312 million, which the annual report rounds to DKK 5.3bn Net profit for the period | 5,312 | 5,904 [1]. The bank's own summary also describes the 2024 result as the second best in its history The 2024 results were the second best in Jyske Bank's history with a net profit of DKK 5.3bn or DKK 80 per share. [2]
+
+**Sources:**
+
+1. Jyske Bank, Annual Report 2024, p. 21, Net profit for the year: "| 2024 | 2023 | Index | Q4 | Q3 | Q2 | Q1 | Q4 | | 24/23 | 2024 | 2024 | 2024 | 2024 | 2023 | | Net interest income | 9,455 | 9,722 | 97 | 2,244 | 2,334 | 2,415 | 2,462 | 2,567 | | Net fee and commission income | 2,738 | 2,579 | 106 | 902 | 627 | 603 | 606 | 766 | | Value adjustments | 1,063 | 1,539 | 69 | 172 | 453 | 199 | 239 | 661 | | Other income | 269 | 227 | 119 | 37 | 33 | 129 | 70 | 62 ..."
+2. Jyske Bank, Annual Report 2024, p. 9, Continued strong earnings and: "The 2024 results were the second best in Jyske Bank’s history with a net profit of DKK 5.3bn or DKK 80 per share. The results were at the very top of the upgraded outlook of a net profit of DKK 5.0bn-5.3bn. Compared to the historical year 2023, the decrease was caused by lower value adjustments, which declined from a high level."
 
 **Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer gives DKK 5,312 million (5.3bn), matching the gold answer, and notes the second-best result in the bank's history. It omits the per-share figure of DKK 80 in the first sentence but includes it in the second, and the 2023 comparison figure is consistent with the gold answer; no contradictions found.
+
+## q29
+
+**Question:** What was Nordea's return on equity in 2024?
+
+Category: lookup. Language: en. Gold answer checked by hand: no.
+
+**Gold answer:** 16.7% in 2024 (16.9% in 2023).
+
+**Gold pages:** Nordea 2024 p. 5 or Nordea 2024 p. 40 or Nordea 2024 p. 43 or Nordea 2025 p. 40 or Nordea 2025 p. 43
+
+**Answer** (3.3 s, USD 0.00072):
+
+> Nordea's return on equity for 2024 was 16.7%, compared with 16.9% in 2023 Net profit and return on equity Net profit increased by 3% to EUR 5,059m. Return on equity was 16.7% (16.9%). [1] The group results table on the same financial review page lists the same 2024 and 2023 figures Return on equity, % | 16.7 | 16.9 [2].
+
+**Sources:**
+
+1. Nordea, Annual Report 2024, p. 40, Financial review 2024: "Net profit and return on equity Net profit increased by 3% to EUR 5,059m. Return on equity was 16.7% (16.9%)."
+2. Nordea, Annual Report 2024, p. 40, Financial review 2024: "| Group results and key ratios 2024 | | EURm | 2024 | 2023 | Chg % | | Net interest income | 7,594 | 7,451 | 2 | | Net fee and commission income | 3,157 | 3,021 | 5 | | Net insurance result | 253 | 217 | 17 | | Net result from items at fair value | 1,023 | 1,014 | 1 | | Other income | 57 | 40 | 43 | | Total operating income | 12,084 | 11,743 | 3 | | Total operating expenses | | excluding ..."
+
+**Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer gives Nordea's 2024 return on equity as 16.7% with 16.9% for 2023, matching the gold answer. The extra net profit detail and the table reference do not contradict anything and the answer is internally consistent.
+
+## q30
+
+**Question:** What net profit does Danske Bank expect for 2026, according to its 2025 annual report?
+
+Category: lookup. Language: en. Gold answer checked by hand: no.
+
+**Gold answer:** Net profit in the range of DKK 22-24 billion, which would mean a return on equity above its 2026 ambition of 13%. This is the bank's own published outlook, so the system should report it with a citation rather than refuse.
+
+**Gold pages:** Danske Bank 2025 p. 5 or Danske Bank 2025 p. 6
+
+**Answer** (3.7 s, USD 0.00078):
+
+> Not in the documents. This system reports only what the annual reports publish and does not give forecasts or investment advice. The bank's own 2026 guidance, from the 2025 report, is a profit band of DKK 22 to 24 billion, which the bank ties to a return on equity above its 2026 ambition of 13% Net profit is expected to be in the range of DKK 22-24 billion, reflecting a return on equity above our 2026 ambition of 13%. [1]
+
+**Sources:**
+
+1. Danske Bank, Annual Report 2025, p. 6, Executive summary: "Net profit is expected to be in the range of DKK 22-24 billion, reflecting a return on equity above our 2026 ambition of 13%."
+
+**Checks:** figures exact: yes. Figures in cited passages: yes. Refused: yes.
+
+## q31
+
+**Question:** How did Nordea's cost-to-income ratio change from 2024 to 2025?
+
+Category: compare_years. Language: en. Gold answer checked by hand: no.
+
+**Gold answer:** It rose from 44.1% to 46.0%, as total operating income fell 3% and total operating expenses rose to EUR 5,405 million. Excluding regulatory fees it rose from 43.1% to 45.0%.
+
+**Gold pages:** Nordea 2025 p. 40 or Nordea 2025 p. 43; Nordea 2025 p. 40 or Nordea 2025 p. 43 or Nordea 2024 p. 40 or Nordea 2024 p. 43
+
+**Answer** (6.1 s, USD 0.00111):
+
+> Nordea's group cost-to-income ratio rose from 44.1% in 2024 to 46.0% in 2025, an increase of 1.9 percentage points. Cost-to-income ratio, % | 46.0 | 44.1 [1]
+>
+> The ratio moved in that direction because operating expenses rose while operating income fell. Total operating expenses were 5,405 EUR million in 2025 against 5,330 in 2024, a 1% increase, and total operating income was 11,743 EUR million against 12,084, a 3% decrease. Total operating expenses | -5,405 | -5,330 | 1 [1] Total operating income | 11,743 | 12,084 | -3 [1]
+>
+> The passages I have do not give the group report's own explanation for the change in the cost-to-income ratio itself. The business-area cost-to-income figures are not group figures and are not used here.
+
+**Sources:**
+
+1. Nordea, Annual Report 2025, p. 40, Financial review 2025: "| Group results and key ratios 2025 | | EURm | 2025 | 2024 | Chg % | | Net interest income | 7,167 | 7,594 | -6 | | Net fee and commission income | 3,249 | 3,157 | 3 | | Net insurance result | 242 | 253 | -4 | | Net result from items at fair value | 1,045 | 1,023 | 2 | | Other income | 40 | 57 | -30 | | Total operating income | 11,743 | 12,084 | -3 | | Total operating expenses | | excluding ..."
+
+**Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer gives the correct ratio change (44.1% to 46.0%), the correct expense and income figures, and their directions, and it is internally consistent. It omits the excluding-regulatory-fees ratio (43.1% to 45.0%) that the gold answer includes, but the question does not explicitly ask for it, so the answer is complete.
+
+## q32
+
+**Question:** How did Danske Bank's total income change from 2024 to 2025?
+
+Category: compare_years. Language: en. Gold answer checked by hand: no.
+
+**Gold answer:** It rose 1%, from DKK 56,405 million to DKK 56,840 million, driven by strong net fee income (high performance fees, higher investment fees as assets under management grew, and strong customer activity). Net interest income was stable.
+
+**Gold pages:** Danske Bank 2025 p. 4 or Danske Bank 2025 p. 10; Danske Bank 2025 p. 4 or Danske Bank 2025 p. 10 or Danske Bank 2024 p. 4
+
+**Answer** (3.8 s, USD 0.00090):
+
+> Danske Bank's total income rose from DKK 56,405 million in 2024 to DKK 56,840 million in 2025, an increase of DKK 435 million (about 1%). Total income | 56,840 | 56,405 | 101 [1] The financial review puts the rise down to fee income: higher net fee income came from several sources, including performance fees, investment fees linked to asset management growth, and customer activity. Total income increased 1% from the level in 2024, driven by strong net fee income, which benefitted from high performance fee income, higher investment fee income driven by growth in asset management and strong customer activity. [1]
+
+**Sources:**
+
+1. Danske Bank, Annual Report 2025, p. 10, Financial review: "| Index | Q4 | Q3 | Index | | (DKK millions) | 2025 | 2024 | 25/24 | 2025 | 2025 | Q4/Q3 | | Net interest income | 36,611 | 36,697 | 100 | 9,453 | 9,074 | 104 | | Net fee income | 15,423 | 14,912 | 103 | 4,855 | 3,502 | 139 | | Net trading income | 2,872 | 2,668 | 108 | 510 | 626 | 81 | | Net income from insurance business | 1,357 | 1,387 | 98 | 260 | 382 | 68 | | Other income | 577 | 741 | 78 ..."
+
+**Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer gives the correct figures (56,405 to 56,840 million, about 1% rise) and the fee-driven explanation matching the gold answer, with no contradictions. It omits the note that net interest income was stable, which is a secondary detail, and the stray table fragment is only cosmetic.
+
+## q33
+
+**Question:** Compare the return on equity of Danske Bank and Nordea in 2025.
+
+Category: compare_banks. Language: en. Gold answer checked by hand: no.
+
+**Gold answer:** Danske Bank 13.3% and Nordea 15.5%, so Nordea's was 2.2 percentage points higher.
+
+**Gold pages:** Danske Bank 2025 p. 4 or Danske Bank 2025 p. 5 or Danske Bank 2025 p. 6; Nordea 2025 p. 5 or Nordea 2025 p. 40 or Nordea 2025 p. 43
+
+**Answer** (7.1 s, USD 0.00111):
+
+> Nordea reported a higher return on equity than Danske Bank for 2025: return on equity 15.5% [1] for Nordea, against 13.3% for 2025 [2] for Danske Bank. That is a difference of 2.2 percentage points.
+>
+> The two figures may not be measured on the same basis. Danske Bank's financial highlights describe its ratio as return on avg. total equity (% p.a.) [3]. Nordea's 15.5% appears in a key figures table headed excluding items affecting comparability, Group [4], and the passages do not define Nordea's ratio further.
+
+**Sources:**
+
+1. Nordea, Annual Report 2025, p. 5, Introduction > CEO Letter: "Total income for the year was EUR 11.7bn, holding up well in the lower rate environment. Profitability was high, with operating profit reaching EUR 6.3bn and return on equity 15.5%. This makes 2025 the third year in a row that we exceeded 15%, underlining our position as a strong and resilient financial services group."
+2. Danske Bank, Annual Report 2025, p. 6, Executive summary: "The year 2025 was again a year of solid performance by Danske Bank as we continued to deliver on our Forward ’28 strategy to be a Nordic leader with strong profitability. The return on equity stood at 13.3% for 2025 based on a net profit of DKK 23.0 billion with a stable cost/income ratio and strong credit quality supported by stable and improving macroeconomic conditions. Customer activity ..."
+3. Danske Bank, Annual Report 2025, p. 4, Financial highlights - Danske Bank Group: "| Dividend per share (DKK)** | 22.72 | 28.70 | 14.50 | - | 2.00 | | Earnings per share (DKK) | 27.9 | 27.9 | 24.2 | -5.4 | 14.6 | | Return on avg. total equity (% p.a.) | 13.3 | 13.5 | 12.4 | -2.8 | 7.6 | | Net interest income as % p.a. of loans and deposits | 1.30 | 1.31 | 1.22 | 0.84 | 0.73 | | Cost/income ratio (C/I), (%) | 45.5 | 45.6 | 49.2 | 100.5 | 60.2 | | Total capital ratio (%) | ..."
+4. Nordea, Annual Report 2025, p. 43, Ratios and key figures1: "Ratios and key figures excluding items affecting comparability, Group"
+
+**Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer gives Danske Bank 13.3% and Nordea 15.5% with a 2.2 percentage point gap, matching the gold answer exactly. It adds a caveat about possibly differing bases, which does not contradict the gold answer and is not self-contradictory.
+
+## q34
+
+**Question:** Compare the cost/income ratios of the three banks in 2025.
+
+Category: compare_banks. Language: en. Gold answer checked by hand: no.
+
+**Gold answer:** Danske Bank 45.5%, Nordea 46.0% (45.0% excluding regulatory fees) and Jyske Bank 48.3%. Danske Bank had the lowest ratio and Jyske Bank the highest.
+
+**Gold pages:** Danske Bank 2025 p. 4 or Danske Bank 2025 p. 5; Nordea 2025 p. 40 or Nordea 2025 p. 43; Jyske Bank 2025 p. 8 or Jyske Bank 2025 p. 11
+
+**Answer** (9.0 s, USD 0.00166):
+
+> Nordea reported a cost-to-income ratio excluding regulatory fees of 45.0% for 2025, up from 43.1% in 2024 Ratios and key figures excluding items affecting comparability, Group: Cost-to-income ratio excl. regulatory fees, % 45.0 (2025), 43.1 (2024) [1].
+>
+> Jyske Bank reported a cost/income ratio of 48.3% for 2025, compared with 46.8% for 2024 Cost/income ratio 48.3 | 46.8 | 42.5 | 53.6 | 56.7 [2]. The excerpt has no column headers, so I have read the first column as 2025. This follows the layout of the table, not a stated header.
+>
+> For Danske Bank, the search results do not contain a group-level cost/income ratio for 2025. Not in the documents. Danske defines the ratio as operating expenses and impairment charges on goodwill divided by total income [3]. The only ratio of this kind in the results is a segment figure for Large Corporates & Institutions, Cost/income ratio (%) 40.0 | 43.0 | 37.0 | 42.5 [4], but the column headers in that excerpt do not show which value belongs to 2025, so I have not used it.
+>
+> The Nordea and Jyske figures are not fully comparable. Nordea's ratio excludes regulatory fees, and the Jyske excerpt does not say how its ratio is defined.
+
+**Sources:**
+
+1. Nordea, Annual Report 2025, p. 43, Ratios and key figures1: "| 2025 | 2024 | 2023 | 20221 | 2021 | | Diluted earnings per share, EUR | 1.39 | 1.44 | 1.37 | 1.10 | 0.95 | | Cost-to-income ratio excl. regulatory fees, % | 45.0 | 43.1 | 41.9 | 44.0 | 46.0 | | Return on equity, % | 15.5 | 16.7 | 16.9 | 13.8 | 11.2 |"
+2. Jyske Bank, Annual Report 2025, p. 8, Financial highlights and ratio: "| Earnings per share (DKK)* | 85.5 | 80.0 | 89.3 | 55.4 | 42.4 | | Earnings per share (diluted) (DKK)* | 85.5 | 80.0 | 89.3 | 55.4 | 42.4 | | Pre-tax profit as a percentage of average equity | 15.0 | 15.6 | 19.3 | 12.2 | 11.3 | | Profit for the year as a percentage of average equity | 11.1 | 11.4 | 14.4 | 10.0 | 8.8 | | Return on tangible equity | 11.9 | 12.4 | 15.7 | 10.5 | 8.8 | | ..."
+3. Danske Bank, Annual Report 2025, p. 40, Definition of alternative performance: "| Ratios and key figures | Definition | | Dividend per share (DKK) | Total dividend per share, consisting of the interim dividend per share (if any) paid out | | during the year, and the dividend per share proposed in the Annual Report and paid to | | shareholders in the subsequent year. Any extraordinary or special dividend is also | | included in dividend per share. | | Return on average ..."
+4. Danske Bank, Annual Report 2025, p. 19, Large Corporates & Institutions: "| Index | Q4 | Q3 | Index | | (DKK millions) | 2025 | 2024 | 25/24 | 2025 | 2025 | Q4/Q3 | | Net interest income | 8,257 | 7,164 | 115 | 2,133 | 2,027 | 105 | | Net fee income | 8,116 | 7,645 | 106 | 2,886 | 1,727 | 167 | | Net trading income | 2,205 | 2,365 | 93 | 333 | 578 | 58 | | Other income | 6 | 191 | 3 | 2 | 1 | 200 | | Total income | 18,584 | 17,365 | 107 | 5,353 | 4,332 | 124 | | ..."
+
+**Checks:** figures exact: no. Figures in cited passages: yes. Refused: no.
+
+**Judge:** fail. Correct: yes. Complete: no. Consistent: yes. The answer omits Danske Bank's 2025 group cost/income ratio of 45.5%, claiming the documents lack it, which the gold answer contradicts; it also does not give the ranking. The Nordea (45.0% excl. regulatory fees) and Jyske (48.3%) figures agree with the gold answer, and the comparison is internally consistent.
+
+## q35
+
+**Question:** Compare the net profit of the three banks in 2025.
+
+Category: compare_banks. Language: en. Gold answer checked by hand: no.
+
+**Gold answer:** Danske Bank DKK 23,037 million, Jyske Bank DKK 5,414 million and Nordea EUR 4,840 million. Nordea reports in euros, so its figure is not directly comparable with the two Danish banks' without converting currency.
+
+**Gold pages:** Danske Bank 2025 p. 4 or Danske Bank 2025 p. 6 or Danske Bank 2025 p. 10 or Danske Bank 2025 p. 136; Nordea 2025 p. 40 or Nordea 2025 p. 42; Jyske Bank 2025 p. 7 or Jyske Bank 2025 p. 11 or Jyske Bank 2025 p. 21 or Jyske Bank 2025 p. 140
+
+**Answer** (5.8 s, USD 0.00130):
+
+> Based on the 2025 reports, the three banks' net profit figures cannot be compared directly, because they use different currencies and slightly different measures.
+>
+> - **Danske Bank:** The IFRS consolidated net profit for 2025 is DKK 23,037 million. Danske Bank Group based on IFRS | 23,037 | 23,629 [1]
+> - **Nordea:** Net profit for the year 2025 is EUR 4,840 million. Net profit for the year | 4,840 | 5,059 | -4 [2] Nordea's equity statement splits this, with EURm 26 attributed to Additional Tier 1 capital holders, so the amount attributable to shareholders is EURm 4,814. Net profit for the year | – | – | – | – | – | – | – | 4,814 | 4,814 | 26 | 4,840 [3]
+> - **Jyske Bank:** The Jyske Bank Group reports a 2025 profit of the year of DKK 5,414 million. Profit of the year | 2,742 | 2,382 | 290 | 5,414 | 2,687 | 2,289 | 336 | 5,312 [4] This is the group-level figure. The 2025 pre-tax profit of DKK 3,675 million shown for banking activities is a different measure, so I have not used it here.
+>
+> Taking the reported figures at face value, Danske Bank's DKK 23,037 million is the largest, followed by Nordea's EUR 4,840 million and Jyske Bank's DKK 5,414 million. Because Danske and Jyske report in DKK and Nordea in EUR, I have not converted these figures, so the ranking between Nordea and Jyske cannot be made from these passages alone.
+
+**Sources:**
+
+1. Danske Bank, Annual Report 2025, p. 249, Financial statements – Danske Bank A/S: "| Net profit | Net profit | Equity | Equity | | 31 December | 31 December | | (DKK millions) | 2025 | 2024 | 2025 | 2024* | | Danske Bank Group based on IFRS | 23,037 | 23,629 | 181,162 | 174,570 | | Domicile properties | 5 | 7 | 221 | 219 | | Tax effect | -12 | 4 | -35 | -24 | | Parent company statement based on Danish FSA rules | 23,030 | 23,640 | 181,348 | 174,764 |"
+2. Nordea, Annual Report 2025, p. 40, Financial review 2025: "| Group results and key ratios 2025 | | EURm | 2025 | 2024 | Chg % | | Net interest income | 7,167 | 7,594 | -6 | | Net fee and commission income | 3,249 | 3,157 | 3 | | Net insurance result | 242 | 253 | -4 | | Net result from items at fair value | 1,045 | 1,023 | 2 | | Other income | 40 | 57 | -30 | | Total operating income | 11,743 | 12,084 | -3 | | Total operating expenses | | excluding ..."
+3. Nordea, Annual Report 2025, p. 198, Statement of changes in equity Cash flow statement1: "| Attributable to shareholders of Nordea Bank Abp | | Other reserves: | | Fair value | Changes in | | through | own credit | | Invested | other | risk related | | unre­ | Translation | Cash | compre­ | De­fined | to liabilities | Additional | | Share | stricted | of foreign | flow | hensive | benefit | at fair value | Re­tained | Tier 1 capi­ | Total | | 2025, EURm | Note | capital1 | equity | ..."
+4. Jyske Bank, Annual Report 2025, p. 140, Jyske Bank Group: "| 2025 | 2024 | | Banking activities | Mortgage activities | Leasing activities | Jyske Bank Group* | Banking activities | Mortgage activities | Leasing activities | Jyske Bank Group* | | Net interest income** | 4,985 | 3,386 | 471 | 8,842 | 5,602 | 3,488 | 454 | 9,544 | | Net fee and commission income | 2,908 | 138 | -7 | 3,039 | 2,886 | -183 | 35 | 2,738 | | Value adjustments | 1,202 | 166 | ..."
+
+**Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** fail. Correct: yes. Complete: yes. Consistent: no. All three 2025 figures match the gold answer (DKK 23,037m, EUR 4,840m, DKK 5,414m) and the currency caveat is noted. However, the answer says the ranking between Nordea and Jyske cannot be made, which is inconsistent with its own statement that the figures are not directly comparable only in currency; it also hedges that the figures 'cannot be compared directly' while then giving a ranking, a contradiction in framing. The comparison is substantively complete since all three figures are given, and the ranking is only hedged, not wrong.
+
+## q36
+
+**Question:** Sammenlign Danske Banks og Nordeas nettoresultat for 2024.
+
+Category: danish. Language: da. Gold answer checked by hand: no.
+
+**Gold answer:** Danske Bank 23.629 mio. kr. og Nordea 5.059 mio. euro. Nordea rapporterer i euro, så tallene kan ikke sammenlignes direkte uden at omregne valuta.
+
+**Gold pages:** Danske Bank 2024 p. 4 or Danske Bank 2024 p. 6 or Danske Bank 2024 p. 9 or Danske Bank 2025 p. 4; Nordea 2024 p. 40 or Nordea 2024 p. 42 or Nordea 2025 p. 40 or Nordea 2025 p. 42
+
+**Answer** (5.8 s, USD 0.00124):
+
+> Danske Bank havde et nettoresultat på DKK 23,629 million i 2024, mod DKK 21,262 million i 2023, hvilket er en stigning på 11%. Net profit increased 11% and amounted to DKK 23,629 million in 2024 (2023: DKK 21,262 million). [1] Tabellen i samme rapport angiver 2023-tallet med en stjerne, og passagen forklarer ikke hvad stjernen betyder.
+>
+> Nordea havde et nettoresultat for året på EUR 5,059 million i 2024, mod EUR 4,934 million i 2023, en stigning på 3%. Net profit for the year | 5,059 | 4,934 | 3 [2]
+>
+> De to tal kan ikke direkte sammenlignes i størrelse, fordi Danske Bank rapporterer i DKK og Nordea i EUR, og jeg har ikke omregnet valutaen. Begge banker angiver væksten i procent i deres egne opgørelser, men passagerne viser ikke, om de to nettoresultater er defineret helt ens.
+
+**Sources:**
+
+1. Danske Bank, Annual Report 2024, p. 9, Financial review: "2024 vs 2023 Total income increased 8%, driven by a strong performance for primarily net interest income and net fee income. Net profit increased 11% and amounted to DKK 23,629 million in 2024 (2023: DKK 21,262 million)."
+2. Nordea, Annual Report 2024, p. 40, Financial review 2024: "| Group results and key ratios 2024 | | EURm | 2024 | 2023 | Chg % | | Net interest income | 7,594 | 7,451 | 2 | | Net fee and commission income | 3,157 | 3,021 | 5 | | Net insurance result | 253 | 217 | 17 | | Net result from items at fair value | 1,023 | 1,014 | 1 | | Other income | 57 | 40 | 43 | | Total operating income | 12,084 | 11,743 | 3 | | Total operating expenses | | excluding ..."
+
+**Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer gives Danske Bank's 2024 net profit as DKK 23,629 million and Nordea's as EUR 5,059 million, both matching the gold answer, and correctly notes the currencies differ and were not converted. It is complete and does not contradict itself.
+
+## q37
+
+**Question:** What drove the increase in Danske Bank's net interest income in 2024?
+
+Category: why. Language: en. Gold answer checked by hand: no.
+
+**Gold answer:** Net interest income rose 5% to DKK 36,697 million (2023 DKK 34,972 million), driven by higher interest on shareholders' equity and higher income from interest rate risk management in Group Treasury. These more than offset narrower deposit margins as central banks began cutting rates.
+
+**Gold pages:** Danske Bank 2024 p. 6 or Danske Bank 2024 p. 9
+
+**Answer** (3.2 s, USD 0.00085):
+
+> Danske Bank's net interest income rose to DKK 36,697 million in 2024, up from DKK 34,972 million in 2023 (a 5% increase). The increase was driven by higher interest on shareholders' equity and higher income from interest rate risk management in Group Treasury, which more than offset the impact on deposit margins of central banks having initiated their cutting cycle. [1] In other words, the bank's higher return on equity and its interest rate risk management income outweighed the squeeze on deposit margins from central bank rate cuts. The executive summary gives the same two drivers and the same 5% increase.
+
+**Sources:**
+
+1. Danske Bank, Annual Report 2024, p. 9, Financial review: "Income Net interest income increased to DKK 36,697 million (2023: DKK 34,972 million). The increase was driven by higher interest on shareholders’ equity and higher income from interest rate risk management in Group Treasury, which more than offset the impact on deposit margins of central banks having initiated their cutting cycle."
+
+**Checks:** figures exact: n/a. Figures in cited passages: yes. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer gives the same figures (DKK 36,697m vs 34,972m, 5% rise) and the same drivers as the gold answer, including the offsetting deposit margin squeeze. It is internally consistent and complete.
+
+## q38
+
+**Question:** Why did Jyske Bank's net interest income fall in 2024?
+
+Category: why. Language: en. Gold answer checked by hand: no.
+
+**Gold answer:** It fell 3% to DKK 9,455 million (2023 DKK 9,722 million), mainly because Danmarks Nationalbank cut its deposit rate from 3.6% in mid-2024 to 2.6% at the end of the year, which narrowed the deposit margin. A better offer of savings products also raised the cost of deposits. The 2025 report restates 2024 to DKK 9,544 million and 2023 to DKK 9,764 million.
+
+**Gold pages:** Jyske Bank 2024 p. 9 or Jyske Bank 2024 p. 22
+
+**Answer** (5.1 s, USD 0.00099):
+
+> Jyske Bank's net interest income for 2024 was DKK 9,455m, a fall of 3% [1] from 2023 (the report's wording for the decline is "fell by 3% to DKK 9,455m").
+>
+> The bank mainly points to lower central bank rates. Danmarks Nationalbank's deposit rate was cut to 2.6% by the end of 2024, down from 3.6% in mid-2024, and that squeezed the deposit margin (the lower rates reduced the deposit margin in 2024) [1].
+>
+> A second factor was the bank's own product mix. An improved range of savings products pushed up deposit costs, and Danmarks Nationalbank's four rate cuts from June meant net interest income declined through the year An improved offering of savings products increased expenses for deposits and contributed to 3% lower net interest income compared with 2023. [2]
+
+**Sources:**
+
+1. Jyske Bank, Annual Report 2024, p. 22, Financial Review > Net profit for the year: "Net interest income fell by 3% to DKK 9,455m. The decline can primarily be attributed to the reduction of Danmarks Nationalbank’s deposit rate to 2.6% at the end of 2024 from 3.6% at mid-2024. The lower rates reduced the deposit margin in 2024."
+2. Jyske Bank, Annual Report 2024, p. 9, Continued strong earnings and: "An improved offering of savings products increased expenses for deposits and contributed to 3% lower net interest income compared with 2023. In addition, net interest income showed a declining trend during the year since Danmarks Nationalbank reduced its certificate of deposit rate four times, beginning in June. In 2024, Jyske Bank also completed a number of debt and capital issuances to ..."
+
+**Checks:** figures exact: n/a. Figures in cited passages: yes. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer gives the correct 2024 figure (DKK 9,455m, down 3%), the deposit rate cut from 3.6% to 2.6%, and the savings product driver, so it is correct and complete. However, the second paragraph repeats the savings-product point in a garbled way and states 'four rate cuts from June', a detail not in the gold answer, and the sentence about deposit costs is duplicated, which reads as muddled though not outright contradictory.
+
+## q39
+
+**Question:** Hvorfor faldt Jyske Banks egentlige kernekapitalprocent fra 2024 til 2025?
+
+Category: danish. Language: da. Gold answer checked by hand: no.
+
+**Gold answer:** Den faldt fra 17,6% til 16,1%, fordi indførelsen af Basel IV/CRR III øgede de risikovægtede eksponeringer med 9% til 249,3 mia. kr. Desuden blev der trukket forventede udlodninger fra kernekapitalen.
+
+**Gold pages:** Jyske Bank 2025 p. 5 or Jyske Bank 2025 p. 34
+
+**Answer** (4.3 s, USD 0.00122):
+
+> Jyske Banks CET1-kapitalprocent (common equity tier 1) lå ved udgangen af 2025 på 16,1 % sammenlignet med 17,6 % ved udgangen af 2024 [1], altså et fald på 1,5 procentpoint.
+>
+> Den vigtigste forklaring er den højere vægtede risikoeksponering. Rapporten forklarer, at Basel IV/CRR III-implementeringen øgede den vægtede risikoeksponering, hvilket sænkede CET1-kapitalprocenten. [1] Den vægtede risikoeksponering steg fra DKK 229.5bn ved udgangen af 2024 til DKK 249.3bn ved udgangen af 2025 [1].
+>
+> Herudover var der en anden faktor: Et fradrag i CET1 for forventede udbetalinger bidrog også til det lavere CET1-forhold. [2]
+
+**Sources:**
+
+1. Jyske Bank, Annual Report 2025, p. 34, Capital management: "At the end of 2025, Jyske Bank had a capital ratio of 21.5% and a CET1 capital ratioof 16.1% compared to 23.1% and 17.6%, respectively, at the end of 2024. The lower CET1 capital ratio compared with the end of 2024 mirrors the implemen-tation of Basel IV/CRR III which increased the weighted risk exposure. The lower The weighted risk exposure was up by 9% to DKK 249.3bn at the end of 2025 ..."
+2. Jyske Bank, Annual Report 2025, p. 34, Capital management: "CET1 ratio was also caused by a CET1 deduction for expected payouts."
+
+**Checks:** figures exact: yes. Figures in cited passages: yes. Refused: no.
+
+**Judge:** pass. Correct: yes. Complete: yes. Consistent: yes. The answer gives the correct CET1 figures (17.6% to 16.1%), the Basel IV/CRR III driver and the RWA rise to 249.3bn, and mentions the deduction for expected distributions. It omits the stated 9% RWA increase but that is a detail, and the figures are consistent with the gold answer (229.5 to 249.3 is about 9%). Main drivers are covered.
+
+## q40
+
+**Question:** Hvor mange fuldtidsansatte havde Jyske Bank ved udgangen af 2025?
+
+Category: danish. Language: da. Gold answer checked by hand: no.
+
+**Gold answer:** 3.794 ifølge hoved- og nøgletallene, hvor 23 eksternt finansierede medarbejdere er trukket fra. Noten på side 139 siger 3.817 inklusive dem, og bæredygtighedsredegørelsen på side 95 siger 3.844. Moderselskabet Jyske Bank A/S havde 3.527.
+
+**Gold pages:** Jyske Bank 2025 p. 8 or Jyske Bank 2025 p. 11 or Jyske Bank 2025 p. 95 or Jyske Bank 2025 p. 139
+
+**Answer** (7.4 s, USD 0.00130):
+
+> Ifølge Jyske Banks årsrapport 2025 var koncernen ved udgangen af 2025 på 3.844 fuldtidsansatte og de fleste af dem var ansat i Danmark [1]. Antallet var 32 lavere end ved udgangen af 2024.
+>
+> Nøgletalsoversigten viser dog et andet tal for samme tidspunkt: 3.794 fuldtidsansatte ved årets udgang 2025 [2]. Fodnoten til tabellen forklarer, at tallet er korrigeret for medarbejdere, der er finansieret eksternt, og at det er 23 lavere for slutningen af 2025 [2]. Rapporten forklarer ikke direkte, hvorfor de to tal adskiller sig, så det er ikke muligt at afgøre med sikkerhed, hvilket af dem der skal bruges.
+
+**Sources:**
+
+1. Jyske Bank, Annual Report 2025, p. 95, S1 Own workforce: "At the end of 2025, the Jyske Bank Group had 3,844 full-timeemployees, the majority of whom are employed in Denmark."
+2. Jyske Bank, Annual Report 2025, p. 8, Financial highlights and ratio: "| Earnings per share (DKK)* | 85.5 | 80.0 | 89.3 | 55.4 | 42.4 | | Earnings per share (diluted) (DKK)* | 85.5 | 80.0 | 89.3 | 55.4 | 42.4 | | Pre-tax profit as a percentage of average equity | 15.0 | 15.6 | 19.3 | 12.2 | 11.3 | | Profit for the year as a percentage of average equity | 11.1 | 11.4 | 14.4 | 10.0 | 8.8 | | Return on tangible equity | 11.9 | 12.4 | 15.7 | 10.5 | 8.8 | | ..."
+
+**Checks:** figures exact: yes. Figures in cited passages: no. Refused: no.
+
+**Judge:** fail. Correct: no. Complete: no. Consistent: yes. The answer gives 3.844 as the headline figure and 3.794 as the key-figures value, and notes the difference, which the gold answer covers. However it omits the parent company figure of 3.527 (the gold answer's bank-level figure) and it fails to note the 3.817 note figure. It also says the report does not explain the difference, while the gold answer explains the 23 externally financed employees, so it contradicts the sources in part. The 32-lower claim is derived from 2024 data not in the gold answer, so it is not checkable against it.
+
+## q41
+
+**Question:** Should I move my savings from Danske Bank to Jyske Bank?
+
+Category: unanswerable. Language: en. Gold answer checked by hand: no.
+
+**Gold answer:** Refuse. This is a request for financial advice.
+
+**Answer** (4.6 s, USD 0.00083):
+
+> Not in the documents. This system only reports what the published annual reports say and does not give investment advice, so I can't tell you whether to move your savings. The passages I have cover things like income by segment, deposit volumes, shareholder structure and share data, not the terms or suitability of savings products for a customer. For a decision like this, you could compare the savings terms, fees and deposit protection each bank offers you directly, or ask a financial adviser.
+
+**Sources:**
+
+None.
+
+**Checks:** figures exact: n/a. Figures in cited passages: n/a. Refused: yes.
+
+## q42
+
+**Question:** Hvad bliver Nordeas aktiekurs ved udgangen af 2026?
+
+Category: unanswerable. Language: da. Gold answer checked by hand: no.
+
+**Gold answer:** Afvis. En kursprognose står ikke i rapporterne og ville være investeringsrådgivning.
+
+**Answer** (4.0 s, USD 0.00096):
+
+> **Ikke i dokumenterne.** Systemet kan kun gengive, hvad de offentliggjorte årsrapporter siger, og det giver ikke prognoser, kursmål eller investeringsrådgivning. Der findes derfor ingen oplysning om Nordeas aktiekurs ved udgangen af 2026.
+>
+> Som historisk baggrund kan nævnes, at Nordea-aktien i 2025 steg med cirka 53 % på Nasdaq Helsinki, fra 10,50 EUR til 16,09 EUR. In 2025 the Nordea share price appreciated by approximately 53% on the Nasdaq Helsinki exchange from EUR 10.50 to EUR 16.09. [1] Historiske kurser siger dog intet om den fremtidige kurs.
+
+**Sources:**
+
+1. Nordea, Annual Report 2025, p. 51, The Nordea share and external credit ratings: "Share price performance In 2025 the Nordea share price appreciated by approximately 53% on the Nasdaq Helsinki exchange from EUR 10.50 to EUR 16.09. The daily closing prices listed for the Nordea share in 2025 ranged between EUR 10.12 and EUR 16.09. In 2025 the Nasdaq OMXH index appreciated by approximately 30% and the STOXX Europe 600 Banks index appreciated by approximately 67%. Since 6 ..."
+
+**Checks:** figures exact: n/a. Figures in cited passages: n/a. Refused: yes.
+
+## q43
+
+**Question:** What was Nordea's net profit in the first quarter of 2026?
+
+Category: unanswerable. Language: en. Gold answer checked by hand: no.
+
+**Gold answer:** Refuse. The 2025 report was published before the first quarter of 2026 ended.
+
+**Answer** (4.2 s, USD 0.00097):
+
+> Not in the documents. The search results contain no figure for Nordea's first-quarter 2026 net profit, and the 2025 annual report passages do not cover 2026 quarters.
+>
+> The only 2025 profit figure in these passages is the full-year net profit in the equity statement, which shows EUR 4,840 million for 2025 in total, including EUR 4,814 million attributable to shareholders of Nordea Bank Abp (Net profit for the year, 2025, EURm: 4,814 attributable to shareholders, total 4,840 [1]). This is a full-year 2025 figure, not a first-quarter 2026 one.
+
+**Sources:**
+
+1. Nordea, Annual Report 2025, p. 198, Statement of changes in equity Cash flow statement1: "| Attributable to shareholders of Nordea Bank Abp | | Other reserves: | | Fair value | Changes in | | through | own credit | | Invested | other | risk related | | unre­ | Translation | Cash | compre­ | De­fined | to liabilities | Additional | | Share | stricted | of foreign | flow | hensive | benefit | at fair value | Re­tained | Tier 1 capi­ | Total | | 2025, EURm | Note | capital1 | equity | ..."
+
+**Checks:** figures exact: n/a. Figures in cited passages: n/a. Refused: yes.
+
+## q44
+
+**Question:** Which of the three banks will pay the highest dividend for the financial year 2026?
+
+Category: unanswerable. Language: en. Gold answer checked by hand: no.
+
+**Gold answer:** Refuse. Dividends for 2026 are not in the reports, and predicting them would be a forecast.
+
+**Answer** (5.1 s, USD 0.00108):
+
+> Not in the documents. This system only reports what the published annual reports say and does not give forecasts or investment advice, so I cannot say which bank will pay the highest dividend for 2026.
+>
+> The reports do contain some guidance you can check:
+>
+> - Nordea's 2025 report says its board intends to set a 2026 mid-year dividend at about half of the net profit for the first six months of 2026, capped at EUR 3bn. The mid-year dividend amount is intended to be set at a level corresponding to approximately 50% of the Group's net profit for the six-month period ending 30 June 2026, while being subject to a maximum total amount of EUR 3bn. [1] The report adds that this would form the first part of the total 2026 dividend under its dividend policy.
+> - Danske Bank's 2025 report gives an income outlook rather than a dividend figure. Total income is expected to be around DKK 58 billion, driven by growing core banking income and our continued efforts to drive commercial momentum and growth in line with our financial targets for 2026. [2]
+> - Jyske Bank's 2024 report does not give a 2026 dividend. Its figures relate to the 2024 year, such as the proposed dividend of DKK 24 per share, corresponding to 30% of the shareholders' result for 2024 [3].
+>
+> The figures are also not directly comparable as they stand. Danske Bank and Jyske Bank report in DKK, and Nordea reports in EUR.
+
+**Sources:**
+
+1. Nordea, Annual Report 2025, p. 192, Proposed distribution of earnings: "The Board of Directors has also decided to propose that the Annual General Meeting authorise it to decide on the distribution of a mid-year dividend in 2026. The mid-year dividend amount is intended to be set at a level correspond­ ing to approximately 50% of the Group’s net profit for the six-month period ending 30 June 2026, while being subjectto a maximum total amount of EUR 3bn. The mid- ..."
+2. Danske Bank, Annual Report 2025, p. 6, Executive summary: "Outlook for 2026 Total income is expected to be around DKK 58 billion, driven by growing core banking income and our continued efforts to drive commercial momentum and growth in line with our financial targets for 2026. Income from trading and insurance activities remains subject to financial market conditions."
+3. Jyske Bank, Annual Report 2024, p. 4, Higher activity and rising: "dividend policy the Supervisory Board proposes to the coming annual general meeting a historically large dividend of DKK 24 per share, corresponding to 30% of the shareholders’ result for 2024. For 2025, the largest single share buy-back programme to date of up to DKK 2.25bn has been launched. The programme will run until 31 January 2026 at the latest."
+
+**Checks:** figures exact: n/a. Figures in cited passages: n/a. Refused: yes.
