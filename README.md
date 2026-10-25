@@ -26,14 +26,20 @@ Each step was measured on the 35 answerable questions of a 44-question eval set 
 | BM25 and dense fused by reciprocal rank fusion | 0.38 | 0.64 | 0.82 |
 | + cross-encoder reranker (`bge-reranker-v2-m3`) on the top 30 | **0.50** | **0.84** | **0.95** |
 
-On the first 27 questions with the reranked search, 17 of 17 numeric answers were exact (16 of 17 with BM25), and all 5 questions the reports cannot answer were refused. Answers to the full set, graded by an LLM judge as well, are next.
+Answers on all 44 questions with the reranked search and Claude Haiku 5.5:
+
+- 27 of 28 numeric answers exact, and 29 of 32 answers with every figure in a cited passage.
+- All 9 questions the reports cannot answer refused, and 1 answerable question wrongly refused.
+- An LLM judge with a [written rubric](evals/judge_rubric.md) passed 26 of 34 answers as correct, complete and consistent. Reading the 8 fails, 4 are real faults and 4 are the judge marking secondary details as missing, although its rubric says they may be.
+- USD 0.001 and 4.8 s per question, plus USD 0.00013 per verdict.
 
 What I take from it:
 
 - **Search quality came from the documents and the search, not the model.** Rebuilding tables row by row, routing by bank and year, and reranking moved the numbers; the answer model stayed the cheapest one (Claude Haiku 5.5, about USD 0.001 per question).
 - **Dense vectors alone do not replace BM25 on annual reports**, which are full of exact terms and figures. They put the right page first a little more often (recall@1 0.24 against 0.20) but find less of the evidence in the top 6 (0.74 against 0.80). Fused with BM25 they nearly double how often the right page comes first, and the reranker lifts that to 2.5 times BM25.
 - **The eval had to be debugged too.** My first citation metric scored 50%, but it measured my gold page lists more than the answers. Its replacement checks that every figure in an answer appears in a passage the answer cites: 18 or 19 of 19 answers pass, depending on the run. Better searches also kept finding pages that hold the answer but were missing from my gold lists; each one is checked in the PDF text before it is added.
-- **Where it breaks:** group versus business-unit pages, paragraphs the parser splits into pieces so a citation covers only part of a sentence, and a comparison that contradicted itself with correct figures. Details, and every other strategy with its result, are in [docs/experiments.md](docs/experiments.md).
+- **A judge needs checking too.** The LLM judge caught a comparison that ranked Nordea's EUR figure above Jyske Bank's DKK figure and then said the two could not be ranked, which no figure check could see. It was also stricter than its own rubric on 4 answers, so its pass rate is a floor, not the truth.
+- **Where it breaks:** group versus business-unit pages (a business unit's figure offered next to the group's), paragraphs the parser splits into pieces so a citation covers only part of a sentence, and a refusal rule that also refuses questions about a bank's own published outlook. Details, and every other strategy with its result, are in [docs/experiments.md](docs/experiments.md).
 
 ## Disclaimer
 
