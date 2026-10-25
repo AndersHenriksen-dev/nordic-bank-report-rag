@@ -1,7 +1,8 @@
-.PHONY: setup download ingest ask eval-retrieval eval test lint
+.PHONY: setup download ingest ask eval-retrieval eval test lint check
 
 setup:
 	uv sync
+	uv run pre-commit install
 
 download:
 	uv run python scripts/download.py
@@ -25,3 +26,7 @@ test:
 lint:
 	uv run ruff check .
 	uv run ruff format --check .
+	uv run mypy src
+
+# Everything CI runs.
+check: lint test

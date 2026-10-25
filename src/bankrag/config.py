@@ -1,41 +1,54 @@
-"""Paths, bank names and settings shared by the whole package."""
+"""Settings shared by the whole package: paths, the three banks, the answer model and its prices."""
 
 from __future__ import annotations
 
 import os
 from pathlib import Path
+from typing import Literal
 
 from dotenv import load_dotenv
+from pydantic import TypeAdapter
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = ROOT / "data"
 RAW_DIR = DATA_DIR / "raw"
 PROCESSED_DIR = DATA_DIR / "processed"
-INDEX_DIR = DATA_DIR / "index"
 TRACE_DIR = DATA_DIR / "traces"
 
 load_dotenv(ROOT / ".env")
 
-BANK_NAMES = {
+Bank = Literal["danske", "nordea", "jyske"]
+BANK_NAMES: dict[Bank, str] = {
     "danske": "Danske Bank",
     "nordea": "Nordea",
     "jyske": "Jyske Bank",
 }
 YEARS = (2024, 2025)
 
-# The cheapest current Claude model by default. Override with BANKRAG_MODEL.
 ANSWER_MODEL = os.getenv("BANKRAG_MODEL", "claude-haiku-5-5")
 
 # USD per million tokens: (input, output). Cache writes cost 1.25x input, cache reads 0.1x.
 # Source: Anthropic pricing, checked October 2026.
-PRICES_USD_PER_MTOK = {
+PRICES_USD_PER_MTOK: dict[str, tuple[float, float]] = {
     "claude-haiku-5-5": (0.10, 0.50),
     "claude-sonnet-5-5": (2.00, 10.00),
     "claude-opus-5-5": (4.00, 20.00),
 }
-# Fixed rate so cost figures are comparable between runs. Update when it drifts.
+# A fixed rate keeps cost figures comparable between eval runs.
 USD_TO_DKK = float(os.getenv("BANKRAG_USD_TO_DKK", "6.8"))
 
+_BANK_ADAPTER: TypeAdapter[Bank] = TypeAdapter(Bank)
 
-def bank_name(bank: str) -> str:
-    return BANK_NAMES.get(bank, bank)
+
+def parse_bank(value: str) -> Bank:
+    """Validate a bank key read from a file name or the command line.
+
+    Raises:
+        pydantic.ValidationError: If `value` is not one of the three banks.
+    """
+    return _BANK_ADAPTER.validate_python(value)
+
+
+def bank_name(bank: Bank) -> str:
+    """Return the display name of a bank, for example "Danske Bank" for "danske"."""
+    return BANK_NAMES[bank]

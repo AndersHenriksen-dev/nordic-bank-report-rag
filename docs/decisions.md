@@ -56,3 +56,16 @@ Large text is only treated as a heading if it reads like one: at least four lett
 ## 11. A Danish glossary for keyword search
 
 The reports are in English, so keyword search cannot match a Danish question such as "Hvad var Nordeas egenkapitalforrentning i 2025?". When a question looks Danish (æ, ø, å or Danish question words), about 25 Danish finance terms are expanded with the English wording the reports use ("egenkapitalforrentning" adds "return on equity"). The original words stay in the query. It is a fixed list, cheap and easy to inspect. Multilingual embeddings in milestone 2 should make it matter less, and the evals show how much it adds.
+
+## 12. Python follows my standard style guide
+
+All Python follows [.claude/reference/python-style.md](../.claude/reference/python-style.md), my standard guide from another project, adapted with this project's examples. In short: ruff with a 120-character line, typed signatures checked by mypy in a strict profile, Google-style docstrings, Pydantic models for every piece of data that crosses a boundary, high-level functions at the bottom of each module, and comments that explain why. Ruff, mypy, line-ending fixes and gitleaks run in pre-commit and CI, and a Claude Code hook makes an agent read the guide before it edits Python.
+
+Choices made while adopting it:
+
+- **Google docstrings, not NumPy.** An older guide of mine uses NumPy-style docstrings for API documentation. The newer guide, which comes with the enforcement setup, uses Google style, so that is the one followed here.
+- **Pydantic at the boundaries.** Page caches, chunk files, eval questions and answers are Pydantic models (`src/bankrag/models.py`). A page cache line cut off by a crash now fails validation and is parsed again, instead of relying on a JSON error.
+- **Local ruff and mypy hooks.** Pre-commit runs ruff and mypy through `uv run`, so they use the versions in `uv.lock` rather than a second pinned copy.
+- **Rules not adopted.** The source project also bans any credit to the agent in commits and pull requests. That conflicts with this repo's purpose, which is to show openly what Claude Code built, so it is not adopted here.
+
+The rewrite changed no behaviour: re-chunking the cached pages gives byte-identical chunks, and the retrieval evals give the same numbers.
