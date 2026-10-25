@@ -29,27 +29,28 @@ The web page shows the same answer with Claude's reasoning summary, the cost and
 
 ## How it works
 
+Once, with `bankrag ingest`:
+
 ```mermaid
-flowchart TB
-    subgraph once["Once: bankrag ingest"]
-        direction LR
-        P[6 PDFs] --> PA[Parse pages, tables and sections]
-        PA --> CH[4,882 chunks of about 500 tokens]
-        CH --> BM[BM25 keyword index]
-        CH --> QD[bge-m3 vectors in Qdrant]
-    end
-    subgraph each["Each question"]
-        direction LR
-        Q[Question] --> RT[Route to the banks and years it names]
-        RT --> GL[Add English terms for Danish words]
-        GL --> S1[BM25 top 30]
-        GL --> S2[Vector search top 30]
-        S1 --> RRF[Reciprocal rank fusion]
-        S2 --> RRF
-        RRF --> RR[Cross-encoder keeps the best 6]
-        RR --> CL[Claude Haiku 5.5 answers with citations]
-    end
-    once -- the indexes --> each
+flowchart LR
+    P[6 PDFs] --> PA[Parse pages and tables]
+    PA --> CH[4,882 chunks]
+    CH --> BM[BM25 index]
+    CH --> QD[bge-m3 vectors in Qdrant]
+```
+
+For each question:
+
+```mermaid
+flowchart LR
+    Q[Question] --> RT[Route by bank and year]
+    RT --> GL[Danish terms in English]
+    GL --> S1[BM25 top 30]
+    GL --> S2[Vectors top 30]
+    S1 --> RRF[Rank fusion]
+    S2 --> RRF
+    RRF --> RR[Rerank to 6]
+    RR --> CL[Claude answers with citations]
 ```
 
 1. **Parse.** PyMuPDF reads every page. Tables are rebuilt row by row from word positions, because the library's own cell output merged columns on many report tables. Each page keeps its bank, year, PDF page number and section. Each report is parsed in a child process that restarts after a crash, because PyMuPDF's layout model crashed the process on 2 of the 1,867 pages.
