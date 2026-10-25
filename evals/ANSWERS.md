@@ -6,35 +6,35 @@ Answers are shown as the system returned them, with citation markers like [1]. E
 and the start of the passage Claude cited. Page numbers are PDF page numbers. Gold answers are drafts
 until checked by hand against the PDFs. The reports are listed in [docs/documents.md](../docs/documents.md).
 
-| ID | Category | Question | Figures exact | Figures in cited passages | Refused |
-|---|---|---|---|---|---|
-| [q01](#q01) | compare_years | What was Danske Bank's cost/income ratio in 2025, and how did it change from 2024? | yes | yes | no |
-| [q02](#q02) | lookup | What was Danske Bank's net profit in 2025? | yes | yes | no |
-| [q03](#q03) | lookup | What was Danske Bank's CET1 capital ratio at the end of 2025? | yes | yes | no |
-| [q04](#q04) | lookup | What was Danske Bank's return on equity in 2024? | yes | yes | no |
-| [q05](#q05) | danish | Hvad var Nordeas egenkapitalforrentning i 2025? | yes | yes | no |
-| [q06](#q06) | lookup | What was Nordea's CET1 ratio at the end of 2025? | yes | yes | no |
-| [q07](#q07) | lookup | What was Nordea's net profit for 2024? | yes | yes | no |
-| [q08](#q08) | compare_years | How did Nordea's net interest income change from 2024 to 2025, and why? | yes | yes | no |
-| [q09](#q09) | compare_banks | Compare the CET1 ratio of Danske Bank and Nordea at the end of 2025. | yes | yes | no |
-| [q10](#q10) | why | What drove the increase in Danske Bank's net fee income in 2025? | n/a | yes | no |
-| [q11](#q11) | why | What did Danske Bank say about its loan impairment charges in 2025? | yes | yes | no |
-| [q12](#q12) | why | How does Nordea describe the role of AI in its strategy? | n/a | n/a | no |
-| [q13](#q13) | danish | Hvad var Danske Banks nettoresultat i 2025? | yes | yes | no |
-| [q14](#q14) | compare_years | How did Danske Bank's CET1 capital ratio change from the end of 2024 to the end of 2025, and why? | yes | yes | no |
-| [q15](#q15) | unanswerable | What will Danske Bank's share price be next year? | n/a | n/a | yes |
-| [q16](#q16) | unanswerable | Should I buy Nordea shares now? | n/a | n/a | yes |
-| [q17](#q17) | unanswerable | What was Nordea's net profit in 2012? | n/a | n/a | yes |
-| [q18](#q18) | unanswerable | What mortgage interest rate will Nordea offer customers in 2027? | n/a | n/a | yes |
-| [q19](#q19) | unanswerable | Hvad bliver Jyske Banks udbytte for 2027? | n/a | n/a | yes |
-| [q20](#q20) | lookup | What was Jyske Bank's net profit in 2025? | yes | yes | no |
-| [q21](#q21) | why | What did Jyske Bank say were the main drivers of its loan impairment charges in 2025? | n/a | no | no |
-| [q22](#q22) | compare_banks | Compare the CET1 ratio of the three banks at the end of 2025. | yes | yes | no |
-| [q23](#q23) | danish | Hvad var Jyske Banks cost/income ratio i 2025? | yes | yes | no |
-| [q24](#q24) | why | How does Jyske Bank use AI, according to its 2025 annual report? | n/a | n/a | no |
-| [q25](#q25) | lookup | What was Jyske Bank's CET1 capital ratio at the end of 2024? | yes | yes | no |
-| [q26](#q26) | compare_banks | Which of the three banks mention AI in their 2025 annual reports, and how do they use it? | n/a | n/a | no |
-| [q27](#q27) | compare_years | What was Jyske Bank's net interest income in 2025 compared with 2024? | yes | yes | no |
+| ID | Category | Question | Figures exact | Figures in cited passages | Refused | Judge |
+|---|---|---|---|---|---|---|
+| [q01](#q01) | compare_years | What was Danske Bank's cost/income ratio in 2025, and how did it change from 2024? | yes | yes | no | n/a |
+| [q02](#q02) | lookup | What was Danske Bank's net profit in 2025? | yes | yes | no | n/a |
+| [q03](#q03) | lookup | What was Danske Bank's CET1 capital ratio at the end of 2025? | yes | yes | no | n/a |
+| [q04](#q04) | lookup | What was Danske Bank's return on equity in 2024? | yes | yes | no | n/a |
+| [q05](#q05) | danish | Hvad var Nordeas egenkapitalforrentning i 2025? | yes | yes | no | n/a |
+| [q06](#q06) | lookup | What was Nordea's CET1 ratio at the end of 2025? | yes | yes | no | n/a |
+| [q07](#q07) | lookup | What was Nordea's net profit for 2024? | yes | yes | no | n/a |
+| [q08](#q08) | compare_years | How did Nordea's net interest income change from 2024 to 2025, and why? | yes | yes | no | n/a |
+| [q09](#q09) | compare_banks | Compare the CET1 ratio of Danske Bank and Nordea at the end of 2025. | yes | yes | no | n/a |
+| [q10](#q10) | why | What drove the increase in Danske Bank's net fee income in 2025? | n/a | yes | no | n/a |
+| [q11](#q11) | why | What did Danske Bank say about its loan impairment charges in 2025? | yes | yes | no | n/a |
+| [q12](#q12) | why | How does Nordea describe the role of AI in its strategy? | n/a | n/a | no | n/a |
+| [q13](#q13) | danish | Hvad var Danske Banks nettoresultat i 2025? | yes | yes | no | n/a |
+| [q14](#q14) | compare_years | How did Danske Bank's CET1 capital ratio change from the end of 2024 to the end of 2025, and why? | yes | yes | no | n/a |
+| [q15](#q15) | unanswerable | What will Danske Bank's share price be next year? | n/a | n/a | yes | n/a |
+| [q16](#q16) | unanswerable | Should I buy Nordea shares now? | n/a | n/a | yes | n/a |
+| [q17](#q17) | unanswerable | What was Nordea's net profit in 2012? | n/a | n/a | yes | n/a |
+| [q18](#q18) | unanswerable | What mortgage interest rate will Nordea offer customers in 2027? | n/a | n/a | yes | n/a |
+| [q19](#q19) | unanswerable | Hvad bliver Jyske Banks udbytte for 2027? | n/a | n/a | yes | n/a |
+| [q20](#q20) | lookup | What was Jyske Bank's net profit in 2025? | yes | yes | no | n/a |
+| [q21](#q21) | why | What did Jyske Bank say were the main drivers of its loan impairment charges in 2025? | n/a | no | no | n/a |
+| [q22](#q22) | compare_banks | Compare the CET1 ratio of the three banks at the end of 2025. | yes | yes | no | n/a |
+| [q23](#q23) | danish | Hvad var Jyske Banks cost/income ratio i 2025? | yes | yes | no | n/a |
+| [q24](#q24) | why | How does Jyske Bank use AI, according to its 2025 annual report? | n/a | n/a | no | n/a |
+| [q25](#q25) | lookup | What was Jyske Bank's CET1 capital ratio at the end of 2024? | yes | yes | no | n/a |
+| [q26](#q26) | compare_banks | Which of the three banks mention AI in their 2025 annual reports, and how do they use it? | n/a | n/a | no | n/a |
+| [q27](#q27) | compare_years | What was Jyske Bank's net interest income in 2025 compared with 2024? | yes | yes | no | n/a |
 
 ## q01
 
@@ -474,7 +474,7 @@ Category: lookup. Language: en. Gold answer checked by hand: no.
 
 **Gold answer:** DKK 5,414 million (2024 DKK 5,312 million), about DKK 5.4 billion.
 
-**Gold pages:** Jyske Bank 2025 p. 21 or Jyske Bank 2025 p. 11
+**Gold pages:** Jyske Bank 2025 p. 21 or Jyske Bank 2025 p. 11 or Jyske Bank 2025 p. 7 or Jyske Bank 2025 p. 140
 
 **Answer** (3.8 s, USD 0.00101):
 
