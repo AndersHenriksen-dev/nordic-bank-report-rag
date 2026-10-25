@@ -21,17 +21,20 @@ No if any figure, year, bank, unit, currency, direction of change (a rise or a f
 
 ## Complete
 
-Yes if the answer gives what the question asks for:
+Yes if the answer gives every main point of the gold answer. The main points are what the question asks for:
 
 - For a figure: the figure, for the bank and year asked about.
 - For a comparison: a figure for every bank or year the question names.
-- For a "why" question: the main drivers in the gold answer. The wording may differ. Secondary details, such as an offsetting factor or an extra figure, may be missing.
+- For a "why" question: each cause the gold answer names as a driver. The wording may differ.
+- For a question about how a bank does something: the main uses or actions in the gold answer. One example missing out of several is fine.
 
-No if a bank, a year or a main driver is missing, or if the answer says the information is not in the documents while the gold answer shows that it is.
+Everything else in the gold answer is secondary and may be missing: the previous year's figure when the question asks about one year, the total behind a "why" question, factors that partly offset the drivers, restated figures, figures under another definition or for another entity (such as the parent company), and page references. Mention a missing secondary point in the reason, but do not mark the answer incomplete for it.
+
+No if a main point is missing, or if the answer says the information is not in the documents while the gold answer shows that it is.
 
 ## Consistent
 
-Yes if the answer does not contradict itself.
+Yes if the answer does not contradict itself. A side remark that the answer explains is not a contradiction, such as a target next to the actual figure, or a second figure under another definition with the difference explained.
 
 No if, for example, it calls one figure the lowest and later ranks it highest, says a ratio rose while its own figures show a fall, or gives two values for the same figure without saying why they differ.
 

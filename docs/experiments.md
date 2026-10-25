@@ -37,31 +37,46 @@ The question the reranked search fixed is Jyske Bank's net interest income: it f
 
 ## Answers on all 44 questions, with the LLM judge
 
-| Metric | Result |
-|---|---|
-| Numeric answers exact | 27 of 28 |
-| Answers with every figure in a cited passage | 29 of 32 |
-| Unanswerable questions refused | 9 of 9 |
-| Answerable questions wrongly refused | 1 of 35 |
-| Answers the judge passed (correct, complete, consistent) | 26 of 34 |
-| "Why" answers the judge passed | 4 of 7 |
-| Cost per question, mean (USD) | 0.00106, plus 0.00013 per judge verdict |
-| Time per question, mean | 4.8 s for Claude, plus about 0.5 s of search |
+Two runs with Claude Haiku 5.5 and the reranked search. Between them the refusal rule changed (a bank's own published outlook is now answered) and the judge got a sharper rubric and medium effort instead of low (see below).
 
-What the 8 failed verdicts were, after reading each answer:
-
-| Question | Judge's reason | Real fault? |
+| Metric | Run 1 | Run 2 |
 |---|---|---|
-| q11 Danske Bank's impairment charges | Offers a business unit's DKK 1,260 million next to the group's DKK 294 million and does not choose | Yes: group versus business unit |
-| q26 How the three banks use AI | Misses the advisers' tools at Danske Bank and Jyske Bank | Yes: a thinner answer than the gold one |
-| q34 Three banks' cost/income ratios | No figure for Danske Bank | Yes: the search found a business unit's ratio, not the group's |
-| q35 Three banks' net profit | Ranks Nordea's EUR figure above Jyske Bank's DKK figure, then says they cannot be ranked | Yes: a self-contradiction no figure check sees |
-| q06 Nordea's CET1 ratio | A side remark on a 15.5% target makes it "inconsistent" | No: the answer explains the 15.5% |
-| q10 Danske Bank's fee income drivers | Missing the group DKK figure and the Norway offset | No: all three drivers are there, and the rubric lets secondary details be missing |
-| q24 How Jyske Bank uses AI | Missing "automated data collection for credit processing" | No: the judge's own reason says the core points are present |
-| q40 Jyske Bank's employees (Danish) | Missing the parent company's 3,527 | No: the answer gives the group figures and why they differ |
+| Numeric answers exact | 27 of 28 | 27 of 28 |
+| Answers with every figure in a cited passage | 29 of 32 | 26 of 32 |
+| Unanswerable questions refused | 9 of 9 | 9 of 9 |
+| Answerable questions wrongly refused | 1 of 35 | **0 of 35** |
+| Answers the judge passed (correct, complete, consistent) | 26 of 34 | 27 of 35 |
+| "Why" answers the judge passed | 4 of 7 | 4 of 7 |
+| Judge verdicts that a reading of the answer agrees with | 31 of 34 | 34 of 35 |
+| Cost per question, mean (USD) | 0.00106, plus 0.00013 per verdict | 0.00105, plus 0.0002 per verdict |
+| Time per question, mean | 4.8 s | 5.1 s, plus about 0.5 s of search |
 
-So the judge agrees with a reading of each answer on 30 of 34. A spot check of 9 passed comparison and "why" answers found no false passes, but the judge is stricter than its rubric on completeness. Its pass rate is a floor. These readings were made by Claude Code and are still to be checked by hand.
+The grounding drop in run 2 comes from answers that quote a source sentence without a citation marker, or add an uncited side remark (one answer has no citations at all). The prompt change touched only the refusal rule, so this looks like the run-to-run variation seen in milestone 1 (16 to 19 of 19), but two runs cannot prove it.
+
+### The judge, measured on identical answers
+
+To separate the judge from the answers, the 34 answers of run 1 were judged three times:
+
+| Judge | Passed | Wrong verdicts, by reading |
+|---|---|---|
+| First rubric, low effort (run 1) | 26 | 3: q06, q24 and q40 failed for missing secondary details or an explained side remark |
+| Rubric with main and secondary points defined, low effort | 26 | 3: q06 and q24 fixed, but q23 and q38 newly failed as "inconsistent" for clumsy wording, and q40 still failed |
+| Same rubric, medium effort | 28 | 1: q40 |
+
+q10 failed under all three, which is defensible: the answer says the group figure is not in its passages, and the rubric fails an answer that says the documents lack what the gold answer shows. (The first review of run 1 counted q10 as a wrong verdict; on a second reading it is not.) The four clear faults (q11, q26, q34, q35) failed under all three. A rubric change alone moved errors around instead of removing them, and the low-effort judge disagreed with itself on unchanged answers. Medium effort costs USD 0.0002 instead of 0.00013 per verdict, so it became the default. These readings were made by Claude Code and are still to be checked by hand.
+
+### What the judge failed in run 2
+
+| Question | What is wrong with the answer | Real fault? |
+|---|---|---|
+| q09 CET1 of Danske Bank and Nordea | States Nordea's 15.7%, then says it cannot tell whether 15.5% on another page is the year-end ratio | Yes: hedges its own figure |
+| q10 Danske Bank's fee income drivers | Right drivers, then a second growth rate for a segment it cannot place | Yes: group versus business unit |
+| q11 Danske Bank's impairment charges | A business unit's DKK 1,260 million next to the group's DKK 294 million, with no choice between them | Yes: group versus business unit |
+| q12 How Nordea uses AI | Gives virtual assistants but not churn prediction or fraud detection | Yes: a thinner answer |
+| q26 How the three banks use AI | Misses the advisers' AI tools at Danske Bank and Jyske Bank | Yes: a thinner answer |
+| q34 Three banks' cost/income ratios | No Danske Bank figure, and calls Nordea the lowest | Yes: the search found a business unit's ratio |
+| q35 Three banks' net profit | Calls Danske Bank's figure the highest, then says the three cannot be ranked | Yes: a mild self-contradiction |
+| q40 Jyske Bank's employees (Danish) | Says the report does not explain the gap of 50 between two counts | No: that is true; the footnote explains a gap of 23 |
 
 ## Everything else, by stage
 
@@ -82,8 +97,10 @@ So the judge agrees with a reading of each answer on 30 of 34. A spot check of 9
 | Evaluation | Gold evidence lists drafted from my own reading of the PDFs | Better searches kept finding other pages that also hold the answer (a chart, a note table) | Widened for 4 questions, each page checked in the PDF text first |
 | Evaluation | Recall@k from one deep search cut to k | Not what the answer model sees, because routing splits k between banks | No: the eval searches at each k |
 | Evaluation | 17 more questions, written with a project skill that makes every figure and page checked in the parsed text (`add-eval-case`) | 44 questions: 10 lookups, 6 year comparisons, 6 bank comparisons, 7 "why", 6 Danish and 9 unanswerable. The new ones found a restatement (Jyske Bank's 2024 net interest income), four different employee counts in one report, and two more pages missing from gold lists | Yes (D16) |
-| Evaluation | An LLM judge with a written rubric: correct, complete and consistent against the gold answer | Caught a self-contradicting ranking and a business unit's figure offered as the group's, which the figure checks passed. Also failed 4 good answers for missing secondary details. USD 0.00013 per verdict | Yes, read with its fails checked (D16) |
-| Answers | A refusal rule for forecasts that lets the answer point to the bank's own outlook | The question "What net profit does Danske Bank expect for 2026?" is answered correctly but opens with "Not in the documents.", so it counts as a refusal | Rule to change: a bank's own published outlook is a fact in the report |
+| Evaluation | An LLM judge with a written rubric: correct, complete and consistent against the gold answer | Caught a self-contradicting ranking and a business unit's figure offered as the group's, which the figure checks passed. At low effort it also failed 3 good answers | Yes (D16) |
+| Evaluation | Defining main and secondary points in the judge's rubric | On the same answers, fixed 2 wrong verdicts and caused 2 new ones | Kept, with medium effort |
+| Evaluation | The judge at medium effort instead of low | On the same answers, wrong verdicts fell from 3 to 1, at USD 0.0002 instead of 0.00013 per verdict | Yes (D16) |
+| Answers | A refusal rule for forecasts that lets the answer point to the bank's own outlook | The question "What net profit does Danske Bank expect for 2026?" was answered correctly but opened with "Not in the documents.", so it counted as a refusal | No: a bank's own outlook is now answered as a fact in its report, while forecasts by the system are still refused. 0 wrong refusals, 9 of 9 refusals kept (D16) |
 | Web page | Highlighting cited passages on the page image | Repeated phrases, whole tables and header rows lit up at first | Kept with four rules: neighbouring windows must agree, table rows found by label with figures on the same line, only rows the answer uses, no rows without figures (D14) |
 
 ## Where it still breaks
@@ -91,8 +108,8 @@ So the judge agrees with a reading of each answer on 30 of 34. A spot check of 9
 - **Paragraphs split into pieces.** On some pages the parser breaks a paragraph into line-sized pieces. Claude then cites some pieces of a sentence but not the one with the figure, so a correct figure on the right page fails the strict check that it must be in the cited passage (Jyske Bank's post-model adjustments, "DKK 79m to DKK 1.7bn"). Merging such pieces back into paragraphs is the fix to try.
 - **Group versus business unit.** Asked about Danske Bank's net fee income, the reranker prefers business-unit pages over the group's financial review. Asked for the three banks' cost/income ratios, it finds Large Corporates & Institutions' 40.0% and the page that defines the ratio, but not Danske Bank's group figure of 45.5%.
 - **A comparison can contradict itself.** One three-bank answer called Danske Bank's 17.3% "the lowest" and then ranked it highest. Another ranked Nordea's EUR 4,840 million above Jyske Bank's DKK 5,414 million and then said the two could not be ranked. Every figure was right, so only the LLM judge catches these.
-- **A bank's own outlook is refused.** The system prompt tells Claude to open forecast questions with "Not in the documents." and then point to the bank's guidance. For "What net profit does Danske Bank expect for 2026?" that produces a correct, cited answer (DKK 22-24 billion) that still counts as a refusal.
-- **Uncited side remarks.** Two answers add a figure in a sentence without a citation (Danmarks Nationalbank's average policy rate, the change in Jyske Bank's headcount), which the figure-grounding check flags.
+- **Hedging between figures it cannot place.** When the passages hold a business unit's figure or a figure from a highlights page next to the group's, the answer often reports both and says it cannot tell which is right, instead of preferring the group's financial review. Four of the eight answers the judge failed in run 2 do this.
+- **Uncited quotes and side remarks.** Some answers copy a source sentence into the text without a citation marker, or add a figure in a sentence without a citation (Danmarks Nationalbank's average policy rate, the change in Jyske Bank's headcount). The figure-grounding check flags them: 3 to 6 of 32 answers per run.
 - **Danish answers quote English.** Claude often adds a verbatim quote of the English source after its own Danish sentence.
 
 ## Mistakes along the way, and how they were caught
