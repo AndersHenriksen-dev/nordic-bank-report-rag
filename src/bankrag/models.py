@@ -16,6 +16,16 @@ from bankrag.config import USD_TO_DKK, Bank, bank_name
 BlockKind = Literal["text", "table"]
 Language = Literal["en", "da"]
 Category = Literal["lookup", "compare_years", "compare_banks", "why", "danish", "unanswerable"]
+Metric = Literal[
+    "net_profit",
+    "total_income",
+    "cost_income_ratio",
+    "return_on_equity",
+    "cet1_ratio",
+    "loan_impairment_charges",
+    "lending",
+]
+Unit = Literal["DKK million", "DKK billion", "EUR million", "EUR billion", "%"]
 
 
 class Block(BaseModel):
@@ -53,6 +63,37 @@ class Chunk(BaseModel):
     text: str = Field(description="The body with a context line in front, as indexed for search.")
     body: str = Field(description="The page text alone, as passed to the answer model.")
     has_table: bool
+
+
+class ExtractedKpi(BaseModel):
+    """One key figure as the extraction model reads it from the passages; the field descriptions are its schema."""
+
+    found: bool = Field(description="True if a passage states this figure for the whole group and the year asked.")
+    value: float | None = Field(
+        description="The figure as a plain number in the unit given, without thousands separators. Loan impairment "
+        "charges: positive for a net charge, negative for a net reversal, whatever sign the report prints.",
+    )
+    unit: Unit | None
+    page: int | None = Field(description="The page number of the passage the figure comes from.")
+    quote: str | None = Field(description="The table row or sentence that states the figure, copied exactly.")
+    label: str | None = Field(description="The report's own name for the figure, such as 'Total operating income'.")
+    note: str | None = Field(description="How this bank's figure differs from the one asked for, if it does.")
+
+
+class KpiFigure(BaseModel):
+    """A key figure in the KPI table, with where it comes from and whether it has been checked."""
+
+    bank: Bank
+    year: int
+    metric: Metric
+    value: float | None
+    unit: Unit | None
+    page: int | None
+    quote: str = ""
+    label: str = ""
+    note: str = ""
+    failed_checks: list[str] = Field(default_factory=list, description="Automatic checks the extraction failed.")
+    verified: bool = Field(default=False, description="Checked by hand against the PDF.")
 
 
 class Question(BaseModel):
