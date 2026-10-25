@@ -14,7 +14,7 @@ from textwrap import shorten
 
 import streamlit as st
 
-from bankrag.answer import answer, load_traces, log_trace
+from bankrag.answer import answer, load_traces, log_trace, mark_quotes
 from bankrag.config import DISCLAIMER, RAW_DIR, Bank, bank_name
 from bankrag.figures import figures_in
 from bankrag.ingest import load_chunks
@@ -94,9 +94,10 @@ def _markdown(text: str) -> str:
     return text.replace("$", r"\$")
 
 
-def _show_answer(result: Answer) -> None:
+def _show_answer(result: Answer, hits: list[Hit]) -> None:
     st.subheader("Answer")
-    st.markdown(_markdown(result.text))
+    bodies = {hit.chunk.id: hit.chunk.body for hit in hits}
+    st.markdown(_markdown(mark_quotes(result.text, result.sources, bodies)))
     latency, cost, tokens, cached = st.columns(4)
     latency.metric("Latency", f"{result.latency_s:.1f} s")
     cost.metric("Cost", f"DKK {result.cost_dkk:.3f}", help=f"USD {result.cost_usd:.5f}")
@@ -214,7 +215,7 @@ def main() -> None:
             "Cost and latency are from when it was made.",
         )
     _show_thinking(result.answer)
-    _show_answer(result.answer)
+    _show_answer(result.answer, result.hits)
     _show_sources(result.answer)
     _show_retrieved(result.hits, result.answer.sources)
 

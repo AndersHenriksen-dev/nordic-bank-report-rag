@@ -11,8 +11,14 @@ import pytest
 from anthropic.types import Message
 
 from bankrag.answer import generate
-from bankrag.answer.generate import is_refusal, render_with_citations, search_result_block, thinking_summary
-from bankrag.models import Answer, Chunk
+from bankrag.answer.generate import (
+    is_refusal,
+    mark_quotes,
+    render_with_citations,
+    search_result_block,
+    thinking_summary,
+)
+from bankrag.models import Answer, Chunk, Source
 from bankrag.retrieve import Hit
 
 
@@ -174,3 +180,60 @@ class TestTraceLog:
 
     def test_no_log_means_no_answers(self) -> None:
         assert generate.load_traces() == []
+
+
+OPEN, CLOSE = chr(0x201C), chr(0x201D)  # the quotation marks mark_quotes adds
+SOFT_HYPHEN = chr(0xAD)
+NORDEA_P40 = (
+    "Capital position The CET1 capital ratio was 15.7% at the end of 2025 (15.8% last year), while CET1 capital was "
+    "EUR 25.1bn (EUR 24.6bn last year).\n\nNet interest income decreased by 6%, mainly driven by lower deposit "
+    f"margins as interest rates were down follow{SOFT_HYPHEN} ing policy rate reductions."
+)
+
+
+def cited(text: str, *cited_text: str) -> str:
+    source = Source(n=1, chunk_id="nordea-2025-p040-c03", bank="nordea", year=2025, page=40, section="Financial review")
+    source.cited_text.extend(cited_text)
+    return mark_quotes(text, [source], {"nordea-2025-p040-c03": NORDEA_P40})
+
+
+class TestMarkQuotes:
+    def test_quote_run_on_from_own_words_gets_a_colon(self) -> None:
+        text = "It was 15.7%, down from 15.8% a year earlier The CET1 capital ratio was 15.7% at the end of 2025. [1]"
+        assert cited(text, "The CET1 capital ratio was 15.7%") == (
+            f"It was 15.7%, down from 15.8% a year earlier: {OPEN}The CET1 capital ratio was 15.7% at the end of "
+            f"2025.{CLOSE} [1]"
+        )
+
+    def test_quote_after_a_full_stop_needs_no_colon(self) -> None:
+        text = "The ratio fell. The CET1 capital ratio was 15.7% at the end of 2025. [1]"
+        assert cited(text) == f"The ratio fell. {OPEN}The CET1 capital ratio was 15.7% at the end of 2025.{CLOSE} [1]"
+
+    def test_quote_that_continues_a_sentence_keeps_it(self) -> None:
+        text = "Its ratio stood at 15.7% at the end of 2025 (15.8% last year). [1]"
+        assert cited(text) == f"Its ratio stood at {OPEN}15.7% at the end of 2025 (15.8% last year).{CLOSE} [1]"
+
+    def test_quote_matches_despite_soft_hyphens(self) -> None:
+        text = (
+            "Margins fell Net interest income decreased by 6%, mainly driven by lower deposit margins as interest "
+            "rates were down following policy rate reductions. [1]"
+        )
+        assert cited(text).startswith(f"Margins fell: {OPEN}Net interest income decreased")
+
+    def test_table_row_quote_loses_its_outer_bars(self) -> None:
+        source = Source(n=1, chunk_id="c", bank="nordea", year=2025, page=40, section="Financial review")
+        bodies = {"c": "| EURm | 2025 | 2024 | Chg % |\n| Net interest income | 7,167 | 7,594 | -6 |"}
+        text = "It fell 6% | Net interest income | 7,167 | 7,594 | -6 | [1]."
+        assert (
+            mark_quotes(text, [source], bodies)
+            == f"It fell 6%: {OPEN}Net interest income | 7,167 | 7,594 | -6{CLOSE} [1]."
+        )
+
+    def test_own_words_and_short_overlaps_stay_as_they_are(self) -> None:
+        assert (
+            cited("Nordea's CET1 ratio fell slightly to 15.7%. [1]")
+            == "Nordea's CET1 ratio fell slightly to 15.7%. [1]"
+        )
+
+    def test_text_without_citations_is_unchanged(self) -> None:
+        assert cited("Not in the documents.") == "Not in the documents."

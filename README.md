@@ -17,11 +17,11 @@ Measured on 44 eval questions, 35 of them answerable from the reports ([evals/RE
 
 ## What an answer looks like
 
-From the last eval run ([evals/ANSWERS.md](evals/ANSWERS.md#q30)), shown as the system returned it. The text after Claude's own sentences is the passage it cites, and `[1]` points to the source:
+From the last eval run ([evals/ANSWERS.md](evals/ANSWERS.md#q30)), as the web page shows it. Text in quotation marks is copied word for word from the cited page, and `[1]` points to the source:
 
 > **What net profit does Danske Bank expect for 2026, according to its 2025 annual report?**
 >
-> For 2026, Danske Bank's own projection is a net profit of DKK 22-24 billion. The report links this to a return on equity above the bank's 2026 ambition of 13%. This is the bank's expectation as stated in its report, not a forecast from me. Net profit is expected to be in the range of DKK 22-24 billion, reflecting a return on equity above our 2026 ambition of 13%. [1]
+> For 2026, Danske Bank's own projection is a net profit of DKK 22-24 billion. The report links this to a return on equity above the bank's 2026 ambition of 13%. This is the bank's expectation as stated in its report, not a forecast from me. “Net profit is expected to be in the range of DKK 22-24 billion, reflecting a return on equity above our 2026 ambition of 13%.” [1]
 >
 > [1] Danske Bank, Annual Report 2025, p. 6, Executive summary
 

@@ -8,7 +8,9 @@ system prompt is the same on every call and marked for prompt caching.
 from __future__ import annotations
 
 import os
+import re
 import time
+from collections.abc import Mapping
 from datetime import UTC, datetime
 
 import anthropic
@@ -22,6 +24,14 @@ from bankrag.retrieve import Hit
 REFUSAL_PREFIXES = ("not in the documents", "ikke i dokumenterne")
 MAX_OUTPUT_TOKENS = 2048
 TRACE_FILE = TRACE_DIR / "answers.jsonl"
+MIN_QUOTE_WORDS = 5  # shorter overlaps with a source, like "15.7% at the end of 2025", are Claude's own words
+MARKERS_RE = re.compile(r"(?: \[\d+\])+")
+MARKER_NUMBER_RE = re.compile(r"\d+")
+WORD_START_RE = re.compile(r"(?<!\S)\S")
+SOFT_HYPHEN_RE = re.compile(r"\u00ad\s*")
+LINE_BREAK_HYPHEN_RE = re.compile(r"(?<=[a-z])- (?=[a-z])")  # "considera-" and "bly" on two lines make one word
+TYPOGRAPHY = str.maketrans({"\u2019": "'", "\u201c": '"', "\u201d": '"'})
+SENTENCE_ENDS = (".", "!", "?", ":", ";", ")")
 
 SYSTEM_PROMPT = """\
 You answer questions about the annual reports of three Nordic banks: Danske Bank, Nordea and Jyske Bank, \
@@ -174,6 +184,71 @@ def render_with_citations(response: Message, hits: list[Hit]) -> tuple[str, list
             text += " "
         text += block.text + "".join(f" [{n}]" for n in _register_citations(block, hits, sources))
     return text.strip(), sorted(sources.values(), key=lambda source: source.n)
+
+
+def _comparable(text: str) -> str:
+    """Normalize text so a quote matches its source despite case, line breaks, hyphenation and typographic marks."""
+    squashed = " ".join(SOFT_HYPHEN_RE.sub("", text).translate(TYPOGRAPHY).split())
+    return LINE_BREAK_HYPHEN_RE.sub("", squashed).casefold()
+
+
+def _quote_start(before: str, passages: list[str]) -> int | None:
+    """Find where the longest verbatim quote of a passage starts at the end of `before`, if there is one.
+
+    The quote's final punctuation is ignored: Claude often ends a quote with a full stop where the source sentence
+    goes on.
+    """
+    for match in WORD_START_RE.finditer(before):
+        candidate = _comparable(before[match.start() :]).rstrip(".,;:!? ")
+        if len(candidate.split()) < MIN_QUOTE_WORDS:
+            return None
+        if any(candidate in passage for passage in passages):
+            return match.start()
+    return None
+
+
+def _join_quote(own_words: str, quote: str) -> str:
+    """Put a quote in quotation marks after Claude's own words, with a colon where the words ran straight into it."""
+    quote = quote.strip().strip("|").strip()
+    own = own_words.rstrip()
+    if not own:
+        return f"{own_words}\u201c{quote}\u201d"
+    runs_on = not own.endswith(SENTENCE_ENDS) and quote[:1].isupper()  # "stood at 15.7%..." continues a sentence
+    return f"{own}{': ' if runs_on else ' '}\u201c{quote}\u201d"
+
+
+def mark_quotes(text: str, sources: list[Source], bodies: Mapping[str, str]) -> str:
+    """Put quotation marks around cited text that Claude copied word for word from its source, for display.
+
+    Claude often follows its own sentence with a verbatim quote of the cited passage, with no full stop between them,
+    which reads as one run-on sentence. A stretch of at least MIN_QUOTE_WORDS words just before a citation marker that
+    appears word for word in that source is shown as a quote, after a colon when Claude's own words did not end a
+    sentence. Table rows lose their outer "|". The stored answer text is unchanged; this only formats it.
+
+    Args:
+        text: An answer as `render_with_citations` returned it.
+        sources: The answer's sources.
+        bodies: The text of each passage sent to Claude, by chunk id. Quotes are matched against it as well as the
+            cited text, because a citation can cover only part of a sentence that the parser split across lines.
+
+    Returns:
+        The text with verbatim quotes in quotation marks.
+    """
+    passages = {
+        source.n: [_comparable(passage) for passage in [*source.cited_text, bodies.get(source.chunk_id, "")]]
+        for source in sources
+    }
+    parts: list[str] = []
+    position = 0
+    for markers in MARKERS_RE.finditer(text):
+        before = text[position : markers.start()]
+        cited = [passage for n in MARKER_NUMBER_RE.findall(markers.group()) for passage in passages.get(int(n), [])]
+        start = _quote_start(before, cited)
+        parts.append(before if start is None else _join_quote(before[:start], before[start:]))
+        parts.append(markers.group())
+        position = markers.end()
+    parts.append(text[position:])
+    return "".join(parts)
 
 
 def thinking_summary(response: Message) -> str:
