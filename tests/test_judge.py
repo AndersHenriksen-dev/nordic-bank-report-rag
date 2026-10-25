@@ -74,7 +74,7 @@ class TestJudge:
         assert request["system"][0]["cache_control"] == {"type": "ephemeral"}
         schema = request["output_config"]["format"]["schema"]
         assert set(schema["required"]) == {"reason", "correct", "complete", "consistent"}
-        assert request["output_config"]["effort"] == "low"
+        assert request["output_config"]["effort"] == "medium"
         assert QUESTION.gold_answer in request["messages"][0]["content"]
 
     @pytest.mark.parametrize(

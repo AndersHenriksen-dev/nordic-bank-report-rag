@@ -49,7 +49,9 @@ def judge(question: Question, answer_text: str) -> tuple[Verdict, float]:
             max_tokens=MAX_OUTPUT_TOKENS,
             system=[{"type": "text", "text": _rubric(), "cache_control": {"type": "ephemeral"}}],
             messages=[{"role": "user", "content": judge_prompt(question, answer_text)}],
-            output_config={"effort": "low"},
+            # At low effort the judge failed answers for clumsy wording it called "inconsistent"; on the same 34 answers
+            # medium effort agreed with the rubric more often, at USD 0.0002 instead of 0.00013 per verdict.
+            output_config={"effort": "medium"},
             output_format=Verdict,
         )
     except ValidationError as error:  # output cut off at the token limit is not valid JSON
