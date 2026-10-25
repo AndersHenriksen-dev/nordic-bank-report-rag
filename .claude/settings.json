@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv run pytest:*)",
+      "Bash(uv run ruff:*)",
+      "Bash(uv run bankrag search:*)",
+      "Bash(uv run bankrag ingest:*)",
+      "Bash(uv run python evals/run_evals.py)",
+      "Bash(uv run python scripts/download.py:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Bash(cat .env:*)",
+      "Bash(git push --force:*)"
+    ]
+  }
+}
