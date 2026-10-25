@@ -104,3 +104,14 @@ def test_cited_quotes_stay_inline_after_own_words() -> None:
     text, _ = render_with_citations(response, hits)
 
     assert text == "Nordeas egenkapitalforrentning var 15,5 % i 2025: Return on equity was 15.5% (16.7%). [1]"
+
+
+def test_space_is_added_where_a_cited_block_follows_a_full_stop() -> None:
+    response = message(
+        [
+            {"type": "text", "text": "Egenkapitalforrentningen var 15,5 %.", "citations": None},
+            {"type": "text", "text": "Return on equity was 15.5%.", "citations": [citation(0, "RoE")]},
+        ],
+    )
+    text, _ = render_with_citations(response, [hit(40, "a")])
+    assert text == "Egenkapitalforrentningen var 15,5 %. Return on equity was 15.5%. [1]"
