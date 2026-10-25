@@ -1,8 +1,7 @@
 """Download the six annual reports into data/raw/ and verify their checksums.
 
-The reports belong to the banks and are not committed to this repository.
-This script fetches them from each bank's investor relations site, so anyone
-can rebuild the same data set.
+The reports belong to the banks and are not committed to this repository. This script fetches them from each bank's
+investor relations site, so anyone can rebuild the same data set.
 
 Usage:
     python scripts/download.py            # download missing files, verify all
@@ -28,6 +27,8 @@ USER_AGENT = "Mozilla/5.0 (compatible; nordic-bank-report-rag/0.1; +https://gith
 
 @dataclass(frozen=True)
 class Report:
+    """One annual report: where to get it and the checksum of the file the evals were built on."""
+
     bank: str
     year: int
     url: str
@@ -35,6 +36,7 @@ class Report:
 
     @property
     def filename(self) -> str:
+        """Local file name, for example "danske_2025.pdf". The ingest pipeline reads bank and year from it."""
         return f"{self.bank}_{self.year}.pdf"
 
 
@@ -79,30 +81,78 @@ REPORTS = [
 ]
 
 
-def sha256_of(path: Path) -> str:
+def _sha256_of(path: Path) -> str:
     digest = hashlib.sha256()
-    with path.open("rb") as f:
-        for block in iter(lambda: f.read(1 << 20), b""):
+    with path.open("rb") as file:
+        for block in iter(lambda: file.read(1 << 20), b""):
             digest.update(block)
     return digest.hexdigest()
 
 
-def download(report: Report, target: Path) -> None:
+def _download(report: Report, target: Path) -> None:
+    """Download a report through a temporary file, so an interrupted download never looks complete.
+
+    Raises:
+        RuntimeError: If the server answers with something other than a PDF.
+    """
     request = urllib.request.Request(report.url, headers={"User-Agent": USER_AGENT})
-    tmp = target.with_suffix(".part")
-    with urllib.request.urlopen(request, timeout=120) as response, tmp.open("wb") as f:
+    partial = target.with_suffix(".part")
+    with urllib.request.urlopen(request, timeout=120) as response, partial.open("wb") as file:
         content_type = response.headers.get("Content-Type", "")
         if "pdf" not in content_type.lower():
             raise RuntimeError(f"{report.url} returned {content_type!r}, not a PDF")
         while block := response.read(1 << 20):
-            f.write(block)
-    tmp.replace(target)
+            file.write(block)
+    partial.replace(target)
+
+
+def _fetch(report: Report, target: Path) -> bool:
+    """Download a report, or explain how to get it by hand when the site refuses scripts.
+
+    Returns:
+        True if the file is now on disk.
+    """
+    print(f"downloading {report.filename} from {report.url}")
+    try:
+        _download(report, target)
+    except urllib.error.HTTPError as error:
+        if error.code != 403:
+            raise
+        # Jyske Bank's site sits behind a bot check. We do not try to get around it: a person downloads the file.
+        print(f"  {report.filename}: the site refused a scripted download (HTTP 403).")
+        print(f"  Open the URL above in a browser, save the PDF as {target}, and run this script again.")
+        return False
+    return True
+
+
+def _verify(report: Report, target: Path, print_checksum: bool) -> bool:
+    """Compare a local file with its recorded checksum, or print the checksum.
+
+    Returns:
+        False only on a checksum mismatch.
+    """
+    actual = _sha256_of(target)
+    size_mb = target.stat().st_size / 1e6
+    if print_checksum:
+        print(f"{report.filename}  {size_mb:5.1f} MB  {actual}")
+    elif not report.sha256:
+        print(f"{report.filename}: no checksum recorded yet ({actual})")
+    elif actual != report.sha256:
+        print(f"{report.filename}: CHECKSUM MISMATCH, expected {report.sha256}, got {actual}")
+        print("  The bank may have republished the report. Check the file before updating the checksum.")
+        return False
+    else:
+        print(f"{report.filename}: ok ({size_mb:.1f} MB)")
+    return True
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(
-        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
-    )
+    """Download missing reports and verify all of them.
+
+    Returns:
+        1 if any report is missing or fails its checksum, otherwise 0.
+    """
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--force", action="store_true", help="download again even if the file exists")
     parser.add_argument("--print-checksums", action="store_true", help="print the SHA-256 of each local file")
     args = parser.parse_args()
@@ -111,34 +161,10 @@ def main() -> int:
     failures = 0
     for report in REPORTS:
         target = RAW_DIR / report.filename
-        if args.force or not target.exists():
-            print(f"downloading {report.filename} from {report.url}")
-            try:
-                download(report, target)
-            except urllib.error.HTTPError as e:
-                if e.code != 403:
-                    raise
-                # Jyske Bank's site sits behind a bot check that refuses scripts.
-                # We do not try to get around it: a person downloads the file instead.
-                print(f"  {report.filename}: the site refused a scripted download (HTTP 403).")
-                print(
-                    f"  Open the URL above in a browser, save the PDF as {target}, and run this script again."
-                )
-                failures += 1
-                continue
-
-        actual = sha256_of(target)
-        size_mb = target.stat().st_size / 1e6
-        if args.print_checksums:
-            print(f"{report.filename}  {size_mb:5.1f} MB  {actual}")
-        elif not report.sha256:
-            print(f"{report.filename}: no checksum recorded yet ({actual})")
-        elif actual != report.sha256:
-            print(f"{report.filename}: CHECKSUM MISMATCH, expected {report.sha256}, got {actual}")
-            print("  The bank may have republished the report. Check the file before updating the checksum.")
+        if (args.force or not target.exists()) and not _fetch(report, target):
             failures += 1
-        else:
-            print(f"{report.filename}: ok ({size_mb:.1f} MB)")
+            continue
+        failures += not _verify(report, target, args.print_checksums)
     return 1 if failures else 0
 
 

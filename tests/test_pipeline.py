@@ -1,91 +1,86 @@
-import json
+"""Tests for the crash-safe parsing pipeline, with the worker process replaced at the subprocess boundary."""
+
+from __future__ import annotations
+
 import subprocess
 from pathlib import Path
 
 import pytest
 
 from bankrag.ingest import pipeline
-from bankrag.ingest.pdf import Page, fill_sections
+from bankrag.models import Page
 
-ACCESS_VIOLATION = 3221225477  # 0xC0000005 on Windows
-
-
-def fake_worker(total_pages: int, crash_with_layout: set[int], crash_always: set[int]):
-    """Stand-in for the worker process: writes pages and 'crashes' on chosen pages."""
-    calls = []
-
-    def run(cmd, **kwargs):
-        start = int(cmd[cmd.index("--start") + 1])
-        no_layout = {int(p) for p in cmd[cmd.index("--no-layout") + 1].split(",") if p}
-        calls.append((start, sorted(no_layout)))
-        out = Path(cmd[6])
-        with out.open("a", encoding="utf-8") as f:
-            for pno in range(start, total_pages + 1):
-                if pno in crash_always or (pno in crash_with_layout and pno not in no_layout):
-                    return subprocess.CompletedProcess(cmd, ACCESS_VIOLATION, "", "")
-                page = Page(bank="nordea", year=2025, page=pno, section="", heading=f"p{pno}")
-                f.write(json.dumps(page.to_dict()) + "\n")
-        return subprocess.CompletedProcess(cmd, 0, "", "")
-
-    return run, calls
+ACCESS_VIOLATION = 3221225477  # 0xC0000005, how a native crash exits on Windows
+REPORT = pipeline.ReportFile(Path("nordea_2025.pdf"), "nordea", 2025)
 
 
-@pytest.fixture
-def pages_dir(tmp_path, monkeypatch):
-    monkeypatch.setattr(pipeline, "PAGES_DIR", tmp_path)
-    return tmp_path
+class FakeWorker:
+    """Stands in for `subprocess.run` of the worker: writes pages and 'crashes' on chosen pages."""
+
+    def __init__(self, total_pages: int, crash_with_layout: set[int], crash_always: set[int]) -> None:
+        """Set up a report of `total_pages` pages.
+
+        Args:
+            total_pages: Pages in the fake report.
+            crash_with_layout: Pages that crash unless they are in the worker's --no-layout list.
+            crash_always: Pages that crash even without the layout model.
+        """
+        self.total_pages = total_pages
+        self.crash_with_layout = crash_with_layout
+        self.crash_always = crash_always
+        self.calls: list[tuple[int, list[int]]] = []
+
+    def __call__(self, command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+        start = int(command[command.index("--start") + 1])
+        no_layout = {int(page) for page in command[command.index("--no-layout") + 1].split(",") if page}
+        self.calls.append((start, sorted(no_layout)))
+        with Path(command[6]).open("a", encoding="utf-8") as out:
+            for number in range(start, self.total_pages + 1):
+                if number in self.crash_always or (number in self.crash_with_layout and number not in no_layout):
+                    return subprocess.CompletedProcess(command, ACCESS_VIOLATION, "", "")
+                page = Page(bank="nordea", year=2025, page=number, section="", heading=f"p{number}")
+                out.write(page.model_dump_json() + "\n")
+        return subprocess.CompletedProcess(command, 0, "", "")
 
 
-def test_restarts_at_crashing_page_without_layout(pages_dir, monkeypatch):
-    run, calls = fake_worker(total_pages=6, crash_with_layout={3, 5}, crash_always=set())
-    monkeypatch.setattr(pipeline.subprocess, "run", run)
+class TestParseReport:
+    @pytest.fixture(autouse=True)
+    def pages_dir(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+        monkeypatch.setattr(pipeline, "PAGES_DIR", tmp_path)
+        return tmp_path
 
-    summary = pipeline._parse_report(Path("nordea_2025.pdf"), "nordea", 2025)
+    def test_restarts_at_crashing_page_without_layout(self, pages_dir: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        worker = FakeWorker(total_pages=6, crash_with_layout={3, 5}, crash_always=set())
+        monkeypatch.setattr(pipeline.subprocess, "run", worker)
 
-    pages = pipeline._read_pages(pages_dir / "nordea_2025.jsonl")
-    assert [p["page"] for p in pages] == [1, 2, 3, 4, 5, 6]
-    assert calls == [(1, []), (3, [3]), (5, [3, 5])]
-    assert "[3, 5]" in summary
+        summary = pipeline._parse_report(REPORT)
 
+        pages = pipeline._read_pages(pages_dir / "nordea_2025.jsonl")
+        assert [page.page for page in pages] == [1, 2, 3, 4, 5, 6]
+        assert worker.calls == [(1, []), (3, [3]), (5, [3, 5])]
+        assert "[3, 5]" in summary
 
-def test_page_that_always_crashes_is_kept_empty(pages_dir, monkeypatch):
-    run, _ = fake_worker(total_pages=4, crash_with_layout=set(), crash_always={2})
-    monkeypatch.setattr(pipeline.subprocess, "run", run)
+    def test_page_that_always_crashes_is_kept_empty(self, pages_dir: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setattr(pipeline.subprocess, "run", FakeWorker(4, crash_with_layout=set(), crash_always={2}))
 
-    summary = pipeline._parse_report(Path("nordea_2025.pdf"), "nordea", 2025)
+        summary = pipeline._parse_report(REPORT)
 
-    pages = pipeline._read_pages(pages_dir / "nordea_2025.jsonl")
-    assert [p["page"] for p in pages] == [1, 2, 3, 4]
-    assert pages[1]["blocks"] == []
-    assert "page(s) [2] left empty" in summary
+        pages = pipeline._read_pages(pages_dir / "nordea_2025.jsonl")
+        assert [page.page for page in pages] == [1, 2, 3, 4]
+        assert pages[1].blocks == []
+        assert "page(s) [2] left empty" in summary
 
+    def test_python_error_is_raised_not_retried(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        def failing_run(command: list[str], **kwargs: object) -> subprocess.CompletedProcess[str]:
+            return subprocess.CompletedProcess(command, 1, "", "Traceback (most recent call last):\n  ImportError")
 
-def test_python_error_is_raised_not_retried(pages_dir, monkeypatch):
-    def run(cmd, **kwargs):
-        return subprocess.CompletedProcess(cmd, 1, "", "Traceback (most recent call last):\n  ImportError")
+        monkeypatch.setattr(pipeline.subprocess, "run", failing_run)
+        with pytest.raises(RuntimeError, match="ImportError"):
+            pipeline._parse_report(REPORT)
 
-    monkeypatch.setattr(pipeline.subprocess, "run", run)
-    with pytest.raises(RuntimeError, match="ImportError"):
-        pipeline._parse_report(Path("nordea_2025.pdf"), "nordea", 2025)
+    def test_line_cut_off_by_a_crash_is_parsed_again(self, pages_dir: Path) -> None:
+        cache = pages_dir / "nordea_2025.partial.jsonl"
+        complete = Page(bank="nordea", year=2025, page=1, section="", heading="").model_dump_json()
+        cache.write_text(complete + "\n" + complete[:20], encoding="utf-8")
 
-
-def test_fill_sections_carries_forward():
-    pages = [
-        Page(bank="danske", year=2025, page=1, section="Financial review", heading=""),
-        Page(bank="danske", year=2025, page=2, section="", heading=""),
-        Page(bank="danske", year=2025, page=3, section="Risk management", heading=""),
-    ]
-    assert [p.section for p in fill_sections(pages)] == [
-        "Financial review",
-        "Financial review",
-        "Risk management",
-    ]
-
-
-def test_is_title_rejects_chart_labels_and_figures():
-    from bankrag.ingest.pdf import is_title
-
-    for good in ["Financial review", "Capital and liquidity management", "G11. Loan impairment charges"]:
-        assert is_title(good), good
-    for bad in ["DKK 6,307 million", "'24 …", "↘ 65%", "E", "statements", "Contents", "Annual Report 2024"]:
-        assert not is_title(bad), bad
+        assert [page.page for page in pipeline._read_pages(cache)] == [1]

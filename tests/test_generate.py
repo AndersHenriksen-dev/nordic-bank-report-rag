@@ -1,0 +1,85 @@
+"""Tests for turning chunks into citable search results and Claude's citations into numbered sources.
+
+No API call is made: responses are built from the SDK's own `Message` model.
+"""
+
+from __future__ import annotations
+
+from anthropic.types import Message
+
+from bankrag.answer.generate import render_with_citations, search_result_block
+from bankrag.models import Chunk
+from bankrag.retrieve import Hit
+
+
+def hit(page: int, body: str) -> Hit:
+    chunk = Chunk(
+        id=f"nordea-2025-p{page:03d}-c00",
+        bank="nordea",
+        year=2025,
+        page=page,
+        section="Board of Directors' report",
+        heading="Financial review 2025",
+        text=body,
+        body=body,
+        has_table=False,
+    )
+    return Hit(chunk, 1.0)
+
+
+def message(content: list[dict[str, object]]) -> Message:
+    return Message.model_validate(
+        {
+            "id": "msg_test",
+            "type": "message",
+            "role": "assistant",
+            "model": "claude-haiku-5-5",
+            "content": content,
+            "stop_reason": "end_turn",
+            "stop_sequence": None,
+            "usage": {"input_tokens": 10, "output_tokens": 5},
+        },
+    )
+
+
+def citation(index: int, cited_text: str) -> dict[str, object]:
+    return {
+        "type": "search_result_location",
+        "cited_text": cited_text,
+        "source": "nordea-2025-p40",
+        "title": "Nordea",
+        "search_result_index": index,
+        "start_block_index": 0,
+        "end_block_index": 1,
+    }
+
+
+def test_search_result_block_splits_paragraphs_and_names_the_page() -> None:
+    block = search_result_block(hit(40, "Return on equity was 15.5%.\n\nCET1 ratio was 15.7%."))
+    assert block["title"] == "Nordea, Annual Report 2025, page 40, Financial review 2025"
+    assert [part["text"] for part in block["content"]] == ["Return on equity was 15.5%.", "CET1 ratio was 15.7%."]
+    assert block["citations"] == {"enabled": True}
+
+
+def test_render_numbers_sources_in_order_of_first_citation() -> None:
+    hits = [hit(5, "a"), hit(40, "b")]
+    response = message(
+        [
+            {"type": "text", "text": "Return on equity was 15.5%", "citations": [citation(1, "RoE 15.5%")]},
+            {"type": "text", "text": " and CET1 was 15.7%", "citations": [citation(0, "CET1 15.7%")]},
+            {"type": "text", "text": ".", "citations": None},
+        ],
+    )
+
+    text, sources = render_with_citations(response, hits)
+
+    assert text == "Return on equity was 15.5% [1] and CET1 was 15.7% [2]."
+    assert [(source.n, source.page) for source in sources] == [(1, 40), (2, 5)]
+    assert sources[0].cited_text == ["RoE 15.5%"]
+
+
+def test_render_ignores_citations_outside_the_hits() -> None:
+    response = message([{"type": "text", "text": "Something", "citations": [citation(7, "x")]}])
+    text, sources = render_with_citations(response, [hit(40, "a")])
+    assert text == "Something"
+    assert sources == []
