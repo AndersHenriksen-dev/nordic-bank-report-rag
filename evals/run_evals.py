@@ -7,6 +7,7 @@ python evals/run_evals.py --answers    # also answer every question with Claude 
 from __future__ import annotations
 
 import argparse
+import io
 import re
 import statistics
 import sys
@@ -15,6 +16,9 @@ from pathlib import Path
 from textwrap import shorten
 from typing import NamedTuple
 
+import matplotlib as mpl
+from matplotlib.figure import Figure
+from matplotlib.lines import Line2D
 from pydantic import BaseModel, TypeAdapter, ValidationError
 
 from bankrag.answer import answer, log_trace
@@ -32,6 +36,26 @@ K_VALUES = (1, 3, 6, 10)
 SEARCH_DEPTH = 30  # how far down the ranking MRR looks
 PASSAGE_WIDTH = 400  # characters of each cited passage shown in ANSWERS.md
 PAGE_KEY_RE = re.compile(r"([a-z]+)-(\d{4})-p(\d+)")
+CHART_K = (1, 3, 6)
+LIGHT_CHART = "retrieval-light.svg"
+DARK_CHART = "retrieval-dark.svg"
+
+
+class ChartTheme(NamedTuple):
+    """Colours for one GitHub theme, from the reference data-viz palette (series: its first three categorical slots)."""
+
+    series: tuple[str, str, str]  # recall@1, @3, @6
+    ink: str
+    secondary: str
+    grid: str
+    line: str
+    surface: str  # GitHub's page background, for the ring around each dot
+
+
+CHART_THEMES = {
+    LIGHT_CHART: ChartTheme(("#2a78d6", "#eb6834", "#1baf7a"), "#0b0b0b", "#52514e", "#e1e0d9", "#c3c2b7", "#ffffff"),
+    DARK_CHART: ChartTheme(("#3987e5", "#d95926", "#199e70"), "#f0efec", "#c3c2b7", "#2c2c2a", "#383835", "#0d1117"),
+}
 
 
 class RetrievalConfig(NamedTuple):
@@ -254,6 +278,86 @@ def _judge_rows(judged: JudgeSummary, model: str) -> list[str]:
     ]
 
 
+def _draw_retrieval_chart(retrieval: list[RetrievalResult], theme: ChartTheme) -> Figure:
+    """Draw one row per search setup with a dot for each recall@k, and label the recall@6 the answer model sees."""
+    figure = Figure(figsize=(8, 1.4 + 0.42 * len(retrieval)))
+    figure.patch.set_alpha(0)
+    axes = figure.add_axes((0.36, 0.12, 0.6, 0.66))
+    axes.set_facecolor("none")
+    rows = range(len(retrieval), 0, -1)  # first setup at the top, as in the table
+    for row, result in zip(rows, retrieval, strict=True):
+        values = [result.recall[k] for k in CHART_K]
+        axes.plot([min(values), max(values)], [row, row], color=theme.line, linewidth=1.5, zorder=1)
+        for value, color in zip(values, theme.series, strict=True):
+            axes.plot(value, row, "o", markersize=7, color=color, markeredgecolor=theme.surface, markeredgewidth=1.5)
+        axes.annotate(
+            f"{values[-1]:.2f}",
+            (values[-1], row),
+            xytext=(8, 0),
+            textcoords="offset points",
+            va="center",
+            color=theme.secondary,
+            fontsize=9,
+        )
+    axes.set_xlim(0, 1.08)
+    axes.set_ylim(0.4, len(retrieval) + 0.6)
+    axes.set_xticks([0, 0.25, 0.5, 0.75, 1.0], ["0", "0.25", "0.5", "0.75", "1"])
+    axes.set_yticks(list(rows), [result.config for result in retrieval])
+    axes.tick_params(colors=theme.secondary, labelsize=9, length=0)
+    axes.grid(axis="x", color=theme.grid, linewidth=0.75)
+    axes.set_axisbelow(True)
+    for spine in axes.spines.values():
+        spine.set_visible(False)
+    handles = [
+        Line2D([], [], marker="o", linestyle="", markersize=7, color=color, markeredgecolor=theme.surface)
+        for color in theme.series
+    ]
+    axes.legend(
+        handles,
+        [f"Recall@{k}" for k in CHART_K],
+        loc="lower left",
+        bbox_to_anchor=(0, 1.0),
+        ncol=len(CHART_K),
+        frameon=False,
+        labelcolor=theme.ink,
+        fontsize=9,
+        handletextpad=0.3,
+        columnspacing=1.2,
+    )
+    title = "Share of the needed evidence in the top k passages"
+    figure.text(0.02, 0.96, title, color=theme.ink, fontsize=12, va="top")
+    figure.text(
+        0.02,
+        0.96 - 0.3 / figure.get_figheight(),
+        f"{retrieval[0].questions} answerable eval questions. Claude reads the top 6.",
+        color=theme.secondary,
+        fontsize=9,
+        va="top",
+    )
+    return figure
+
+
+def write_retrieval_chart(retrieval: list[RetrievalResult]) -> None:
+    """Write the retrieval chart as SVG for GitHub's light and dark themes; RESULTS.md shows the matching one.
+
+    A fixed hash salt and no date keep the files identical between runs with the same numbers, so they only show up
+    in a diff when the results change. Lines end in a bare line feed with no trailing spaces, as the pre-commit hooks
+    require; matplotlib's own file output uses the platform's line endings.
+    """
+    with mpl.rc_context({"svg.hashsalt": "bankrag"}):
+        for filename, theme in CHART_THEMES.items():
+            buffer = io.StringIO()
+            _draw_retrieval_chart(retrieval, theme).savefig(
+                buffer,
+                format="svg",
+                metadata={"Date": None},
+                bbox_inches="tight",  # fit the longest setup name
+                pad_inches=0.15,
+            )
+            svg = "".join(line.rstrip() + "\n" for line in buffer.getvalue().splitlines())
+            (RESULTS_DIR / filename).write_text(svg, encoding="utf-8", newline="\n")
+
+
 def write_results_md(retrieval: list[RetrievalResult], report: AnswerReport | None, n_questions: int) -> None:
     """Write evals/RESULTS.md from the latest retrieval results and the last answer run."""
     lines = [
@@ -277,6 +381,18 @@ def write_results_md(retrieval: list[RetrievalResult], report: AnswerReport | No
     for result in retrieval:
         cells = " | ".join(f"{result.recall[k]:.2f}" for k in K_VALUES)
         lines.append(f"| {result.config} | {cells} | {result.mrr:.2f} |")
+    best = max(retrieval, key=lambda result: result.recall[6])
+    alt = (
+        f"Dot plot of recall@1, @3 and @6 for each search setup. The highest recall@6 is {best.recall[6]:.2f}, "
+        f"for {best.config}."
+    )
+    lines += [
+        "",
+        "<picture>",
+        f'  <source media="(prefers-color-scheme: dark)" srcset="results/{DARK_CHART}">',
+        f'  <img alt="{alt}" src="results/{LIGHT_CHART}" width="760">',
+        "</picture>",
+    ]
     if report:
         answers = report.summary
         lines += [
@@ -447,6 +563,7 @@ def main() -> int:
         ANSWERS_FILE.write_text(report.model_dump_json(indent=2) + "\n", encoding="utf-8", newline="\n")
         print(summary.model_dump_json(indent=2))
 
+    write_retrieval_chart(retrieval)
     write_results_md(retrieval, report, len(questions))
     if report:
         write_answers_md(questions, report)

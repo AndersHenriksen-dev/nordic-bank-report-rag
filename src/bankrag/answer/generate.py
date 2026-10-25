@@ -7,20 +7,21 @@ system prompt is the same on every call and marked for prompt caching.
 
 from __future__ import annotations
 
-import json
 import os
 import time
 from datetime import UTC, datetime
 
 import anthropic
 from anthropic.types import ContentBlockParam, Message, SearchResultBlockParam, TextBlock, Usage
+from pydantic import ValidationError
 
 from bankrag.config import ANSWER_MODEL, PRICES_USD_PER_MTOK, TRACE_DIR, bank_name
-from bankrag.models import Answer, Source
+from bankrag.models import Answer, Source, TracedAnswer
 from bankrag.retrieve import Hit
 
 REFUSAL_PREFIXES = ("not in the documents", "ikke i dokumenterne")
 MAX_OUTPUT_TOKENS = 2048
+TRACE_FILE = TRACE_DIR / "answers.jsonl"
 
 SYSTEM_PROMPT = """\
 You answer questions about the annual reports of three Nordic banks: Danske Bank, Nordea and Jyske Bank, \
@@ -224,7 +225,23 @@ def answer(question: str, hits: list[Hit]) -> Answer:
 
 def log_trace(result: Answer, eval_id: str | None = None) -> None:
     """Append the answer, its sources, tokens, cost and latency to data/traces/answers.jsonl."""
-    TRACE_DIR.mkdir(parents=True, exist_ok=True)
-    record = {"time": datetime.now(UTC).isoformat(timespec="seconds"), "eval_id": eval_id, **result.model_dump()}
-    with (TRACE_DIR / "answers.jsonl").open("a", encoding="utf-8") as trace:
-        trace.write(json.dumps(record, ensure_ascii=False) + "\n")
+    traced = TracedAnswer(**result.model_dump(), time=datetime.now(UTC).replace(microsecond=0), eval_id=eval_id)
+    TRACE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with TRACE_FILE.open("a", encoding="utf-8") as trace:
+        trace.write(traced.model_dump_json() + "\n")
+
+
+def load_traces() -> list[TracedAnswer]:
+    """Read every answer in the trace log, oldest first.
+
+    Lines that do not parse are skipped: a write cut off by a crash, or a line from an older format.
+    """
+    if not TRACE_FILE.exists():
+        return []
+    traces = []
+    for line in TRACE_FILE.read_text(encoding="utf-8").splitlines():
+        try:
+            traces.append(TracedAnswer.model_validate_json(line))
+        except ValidationError:
+            continue
+    return traces

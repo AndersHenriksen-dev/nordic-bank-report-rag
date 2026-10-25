@@ -1,14 +1,18 @@
-"""Tests for turning chunks into citable search results and Claude's citations into numbered sources.
+"""Tests for turning chunks into citable search results, Claude's citations into numbered sources, and the trace log.
 
 No API call is made: responses are built from the SDK's own `Message` model.
 """
 
 from __future__ import annotations
 
+from pathlib import Path
+
+import pytest
 from anthropic.types import Message
 
+from bankrag.answer import generate
 from bankrag.answer.generate import is_refusal, render_with_citations, search_result_block, thinking_summary
-from bankrag.models import Chunk
+from bankrag.models import Answer, Chunk
 from bankrag.retrieve import Hit
 
 
@@ -125,3 +129,48 @@ def test_thinking_summary_joins_thinking_blocks_only() -> None:
         ],
     )
     assert thinking_summary(response) == "The 2025 table gives 15.5%."
+
+
+def saved_answer(text: str) -> Answer:
+    return Answer(
+        question="What was Nordea's return on equity in 2025?",
+        text=text,
+        thinking="The financial review gives 15.5%.",
+        sources=[],
+        refused=False,
+        model="claude-haiku-5-5",
+        input_tokens=100,
+        output_tokens=20,
+        cache_read_tokens=0,
+        cache_write_tokens=0,
+        cost_usd=0.001,
+        latency_s=3.0,
+        retrieved=["nordea-2025-p040-c03"],
+    )
+
+
+class TestTraceLog:
+    @pytest.fixture(autouse=True)
+    def trace_file(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+        path = tmp_path / "traces" / "answers.jsonl"
+        monkeypatch.setattr(generate, "TRACE_FILE", path)
+        return path
+
+    def test_answers_come_back_as_they_were_logged(self) -> None:
+        generate.log_trace(saved_answer("Return on equity was 15.5%."), eval_id="q05")
+        generate.log_trace(saved_answer("15.5%."))
+        traces = generate.load_traces()
+        assert [traced.text for traced in traces] == ["Return on equity was 15.5%.", "15.5%."]
+        assert [traced.eval_id for traced in traces] == ["q05", None]
+        assert traces[0].thinking == "The financial review gives 15.5%."
+        assert traces[0].retrieved == ["nordea-2025-p040-c03"]
+
+    def test_unreadable_lines_are_skipped(self, trace_file: Path) -> None:
+        generate.log_trace(saved_answer("Return on equity was 15.5%."))
+        with trace_file.open("a", encoding="utf-8") as trace:
+            trace.write('{"question": "cut off by a cra\n')
+        generate.log_trace(saved_answer("15.5%."))
+        assert [traced.text for traced in generate.load_traces()] == ["Return on equity was 15.5%.", "15.5%."]
+
+    def test_no_log_means_no_answers(self) -> None:
+        assert generate.load_traces() == []
