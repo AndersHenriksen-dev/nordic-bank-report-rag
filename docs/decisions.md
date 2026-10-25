@@ -103,15 +103,16 @@ What the evals showed (22 answerable questions, all routed with the Danish gloss
 
 | Setup | Recall@1 | Recall@3 | Recall@6 | MRR |
 |---|---|---|---|---|
-| BM25 | 0.16 | 0.59 | 0.89 | 0.45 |
-| Dense | 0.17 | 0.52 | 0.70 | 0.43 |
-| Hybrid (RRF) | 0.36 | 0.64 | 0.85 | 0.57 |
-| Hybrid + reranker | 0.41 | 0.79 | 0.89 | 0.62 |
+| BM25 | 0.16 | 0.59 | 0.89 | 0.46 |
+| Dense | 0.17 | 0.52 | 0.74 | 0.44 |
+| Hybrid (RRF) | 0.36 | 0.64 | 0.85 | 0.58 |
+| Hybrid + reranker | 0.41 | 0.83 | 0.94 | 0.65 |
 
 - Dense search alone is weaker than BM25 here. Annual reports are full of exact terms ("CET1", "cost/income ratio") and figures in tables, which keyword search matches directly.
 - Fusion more than doubles recall@1, because a page both searches rank fairly high is usually the right one.
-- The reranker lifts recall@3 from 0.59 to 0.79 and fixes the two misses I had listed in milestone 1 (Jyske Bank's impairment drivers, and the three-bank CET1 comparison). Recall@6 stays at 0.89: the gain is in ordering, which matters because Claude reads the top passages most closely and the page shows them first.
+- The reranker lifts recall@3 from 0.59 to 0.83 and recall@6 from 0.89 to 0.94. It fixes the two misses I had listed in milestone 1 (Jyske Bank's impairment drivers, and the three-bank CET1 comparison), and it finds two pages with Jyske Bank's net interest income for both years that BM25 never ranked high. With it, 17 of 17 numeric answers are exact, up from 16 of 17, at about 10% more cost per answer (USD 0.00103 against 0.00093).
 - It also loses two questions. For "What drove the increase in Danske Bank's net fee income?" it prefers business-unit pages ("Net fee income decreased 4%" in Personal Customers) over the group's financial review, and drops the gold page to rank 9. Group versus business-unit figures is a known weak spot.
-- The Danish glossary still helps dense search a little (recall@6 0.65 to 0.70), so it stays on.
+- The Danish glossary still helps dense search a little (recall@6 0.70 to 0.74), so it stays on.
+- These numbers include a correction: the reranked search surfaced pages 23 and 140 of Jyske Bank's 2025 report, which hold the net interest income figures but were missing from my gold list. I checked both in the PDF and added them, which raised every setup that finds them.
 
 A mistake on the way: I first blamed the reranker's lost question on score ties, because the printed scores all read "1.00". The scores were only rounded in my printout; at full precision they differ and the order is the same in half and full precision. The reranker now reports raw scores, which are readable in the web page.
