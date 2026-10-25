@@ -8,6 +8,7 @@ own share of the results.
 
 from __future__ import annotations
 
+import itertools
 import math
 import re
 from dataclasses import dataclass, field
@@ -15,6 +16,7 @@ from typing import Protocol
 
 from bankrag.config import BANK_NAMES, YEARS
 from bankrag.retrieve.bm25 import Hit
+from bankrag.retrieve.rewrite import expand_danish
 
 BANK_PATTERNS = {
     "danske": re.compile(r"\bdanske\b", re.I),
@@ -46,14 +48,18 @@ def detect_filters(question: str) -> Filters:
     return Filters(banks=banks, years=years)
 
 
-def routed_search(retriever: Retriever, question: str, k: int = 6, route: bool = True) -> list[Hit]:
+def routed_search(
+    retriever: Retriever, question: str, k: int = 6, route: bool = True, expand: bool = True
+) -> list[Hit]:
+    query = expand_danish(question) if expand else question
     if not route:
-        return retriever.search(question, k=k)
+        return retriever.search(query, k=k)
     f = detect_filters(question)
     if len(f.banks) <= 1:
-        return retriever.search(question, k=k, banks=f.banks or None, years=f.years or None)
-    per_bank = max(2, math.ceil(k / len(f.banks)))
-    hits: list[Hit] = []
-    for bank in f.banks:
-        hits.extend(retriever.search(question, k=per_bank, banks=[bank], years=f.years or None))
-    return sorted(hits, key=lambda h: h.score, reverse=True)
+        return retriever.search(query, k=k, banks=f.banks or None, years=f.years or None)
+    per_bank = math.ceil(k / len(f.banks))
+    by_bank = [retriever.search(query, k=per_bank, banks=[b], years=f.years or None) for b in f.banks]
+    # Interleave by rank (each bank's best hit, then each bank's second best, ...), so
+    # any top slice stays balanced. Scores are not comparable across banks anyway.
+    hits = [h for rank in itertools.zip_longest(*by_bank) for h in rank if h is not None]
+    return hits[:k]

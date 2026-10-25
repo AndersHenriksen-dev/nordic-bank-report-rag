@@ -68,13 +68,13 @@ REPORTS = [
         bank="jyske",
         year=2024,
         url="https://jyskebank.com/wps/wcm/connect/jbc/db0d2cb1-8b88-4ddd-bbcc-b04dc5330d64/Jyske+Bank+Annual+Report+2024.pdf?MOD=AJPERES",
-        sha256="",
+        sha256="16de198680254c62812b5532bbabeda04e0d98e857428e38c10156719dcc293c",
     ),
     Report(
         bank="jyske",
         year=2025,
         url="https://jyskebank.com/wps/wcm/connect/jbc/50bd88a1-062f-4e35-a27f-0052b3b66571/Jyske+Bank+Annual+Report+2025.pdf?MOD=AJPERES",
-        sha256="",
+        sha256="6143b08a189867a344bc265d5ba3c2e40cc8ed90fb8cb74458dc371812955141",
     ),
 ]
 

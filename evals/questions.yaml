@@ -8,7 +8,9 @@
 #             write one figure (for example 23037 million or 23.0 billion).
 #   verified: false until Anders has checked the gold answer against the PDF himself.
 #
-# Gold answers drafted by Claude Code from the PDFs on 2026-10-24.
+# Gold answers drafted by Claude Code from the PDFs on 2026-10-24. On 2026-10-25 q02, q24 and q26
+# got extra evidence pages after the first retrieval run surfaced pages that also hold the answer
+# (checked in the PDF text, not taken on trust from the retriever).
 
 - id: q01
   question: What was Danske Bank's cost/income ratio in 2025, and how did it change from 2024?
@@ -30,7 +32,7 @@
   gold_answer: DKK 23,037 million (2024 DKK 23,629 million), a decrease of 3%.
   numbers: [[23037, 23.0, 23.04]]
   evidence:
-    - [danske-2025-p4, danske-2025-p6, danske-2025-p10]
+    - [danske-2025-p4, danske-2025-p6, danske-2025-p10, danske-2025-p136]
   verified: false
 
 - id: q03
@@ -229,4 +231,110 @@
   gold_answer: Afvis. Et fremtidigt udbytte for 2027 står ikke i rapporterne.
   numbers: []
   evidence: []
+  verified: false
+
+- id: q20
+  question: What was Jyske Bank's net profit in 2025?
+  lang: en
+  category: lookup
+  answerable: true
+  gold_answer: DKK 5,414 million (2024 DKK 5,312 million), about DKK 5.4 billion.
+  numbers: [[5414, 5.4]]
+  evidence:
+    - [jyske-2025-p21, jyske-2025-p11]
+  verified: false
+
+- id: q21
+  question: What did Jyske Bank say were the main drivers of its loan impairment charges in 2025?
+  lang: en
+  category: why
+  answerable: true
+  gold_answer: >-
+    Loan impairment charges were DKK 2 million against DKK 21 million in 2024. The low level
+    reflects solid credit quality and includes a DKK 79 million reduction in post-model
+    adjustments, to DKK 1.7 billion.
+  numbers: []
+  evidence:
+    - [jyske-2025-p5, jyske-2025-p21, jyske-2025-p25]
+  verified: false
+
+- id: q22
+  question: Compare the CET1 ratio of the three banks at the end of 2025.
+  lang: en
+  category: compare_banks
+  answerable: true
+  gold_answer: Danske Bank 17.3%, Jyske Bank 16.1% and Nordea 15.7%.
+  numbers: [[17.3], [16.1], [15.7]]
+  evidence:
+    - [danske-2025-p4, danske-2025-p6, danske-2025-p32]
+    - [nordea-2025-p5, nordea-2025-p39, nordea-2025-p40]
+    - [jyske-2025-p5, jyske-2025-p8, jyske-2025-p34]
+  verified: false
+
+- id: q23
+  question: Hvad var Jyske Banks cost/income ratio i 2025?
+  lang: da
+  category: danish
+  answerable: true
+  gold_answer: 48,3% i 2025 (46,8% i 2024).
+  numbers: [[48.3, 48]]
+  evidence:
+    - [jyske-2025-p8, jyske-2025-p11]
+  verified: false
+
+- id: q24
+  question: How does Jyske Bank use AI, according to its 2025 annual report?
+  lang: en
+  category: why
+  answerable: true
+  gold_answer: >-
+    It launched AI assistants and Copilot for advisers to support their daily work and streamline
+    processes, alongside automated data collection for credit processing. As part of the group
+    strategy, all employees got Microsoft Copilot and training in generative AI, and AI is used
+    to make employees more efficient within limits set by information security and data ethics.
+  numbers: []
+  evidence:
+    - [jyske-2025-p18, jyske-2025-p19, jyske-2025-p92, jyske-2025-p128]
+  verified: false
+
+- id: q25
+  question: What was Jyske Bank's CET1 capital ratio at the end of 2024?
+  lang: en
+  category: lookup
+  answerable: true
+  gold_answer: 17.6% (end of 2023 16.9%).
+  numbers: [[17.6]]
+  evidence:
+    - [jyske-2024-p8, jyske-2024-p32, jyske-2025-p8, jyske-2025-p34]
+  verified: false
+
+- id: q26
+  question: Which of the three banks mention AI in their 2025 annual reports, and how do they use it?
+  lang: en
+  category: compare_banks
+  answerable: true
+  gold_answer: >-
+    All three. Danske Bank's advisers use AI tools such as Microsoft Copilot and its own Danske
+    Assist. Nordea calls technology, data and AI critical to its strategy and uses AI for virtual
+    assistants, churn prediction, fraud detection and cyber defence, under a governance framework
+    for AI models. Jyske Bank launched AI assistants and Copilot for advisers and gave all
+    employees Copilot and generative AI training.
+  numbers: []
+  evidence:
+    - [danske-2025-p7, danske-2025-p8]
+    - [nordea-2025-p12, nordea-2025-p14, nordea-2025-p15, nordea-2025-p181, nordea-2025-p305]
+    - [jyske-2025-p18, jyske-2025-p19, jyske-2025-p92, jyske-2025-p128]
+  verified: false
+
+- id: q27
+  question: What was Jyske Bank's net interest income in 2025 compared with 2024?
+  lang: en
+  category: compare_years
+  answerable: true
+  gold_answer: >-
+    DKK 8,842 million in 2025 against DKK 9,544 million in 2024, a fall of 7%, driven by lower
+    short-term interest rates after Danmarks Nationalbank cut its policy rate (page 22).
+  numbers: [[8842], [9544]]
+  evidence:
+    - [jyske-2025-p7, jyske-2025-p21]
   verified: false
