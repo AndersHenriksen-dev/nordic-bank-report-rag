@@ -164,6 +164,11 @@ def render_with_citations(response: Message, hits: list[Hit]) -> tuple[str, list
     return text.strip(), sorted(sources.values(), key=lambda source: source.n)
 
 
+def thinking_summary(response: Message) -> str:
+    """Return the summary of Claude's reasoning, or an empty string if it did not think."""
+    return "\n\n".join(block.thinking.strip() for block in response.content if block.type == "thinking").strip()
+
+
 def answer(question: str, hits: list[Hit]) -> Answer:
     """Ask Claude to answer from the retrieved chunks only, and measure the call.
 
@@ -176,6 +181,8 @@ def answer(question: str, hits: list[Hit]) -> Answer:
         max_tokens=MAX_OUTPUT_TOKENS,
         system=[{"type": "text", "text": SYSTEM_PROMPT, "cache_control": {"type": "ephemeral"}}],
         messages=[{"role": "user", "content": _user_content(question, hits)}],
+        # Thinking is billed the same whether it is shown or not, so the summary is free to show.
+        thinking={"type": "adaptive", "display": "summarized"},
         output_config={"effort": "low"},
     )
     latency = time.perf_counter() - start
@@ -190,6 +197,7 @@ def answer(question: str, hits: list[Hit]) -> Answer:
     return Answer(
         question=question,
         text=text,
+        thinking=thinking_summary(response),
         sources=sources,
         refused=is_refusal(text),
         model=ANSWER_MODEL,

@@ -25,6 +25,11 @@ BANK_NAMES: dict[Bank, str] = {
 }
 YEARS = (2024, 2025)
 
+DISCLAIMER = (
+    "Built on public annual reports for demonstration. Not investment advice. "
+    "Figures should be checked against the source page."
+)
+
 ANSWER_MODEL = os.getenv("BANKRAG_MODEL", "claude-haiku-5-5")
 
 # USD per million tokens: (input, output). Cache writes cost 1.25x input, cache reads 0.1x.
