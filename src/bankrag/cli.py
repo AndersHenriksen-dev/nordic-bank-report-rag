@@ -8,7 +8,16 @@ import sys
 from bankrag.answer import answer, log_trace, mark_quotes
 from bankrag.config import BANK_NAMES, DISCLAIMER
 from bankrag.ingest import load_chunks, run
-from bankrag.kpi import KPI_YEARS, METRICS, build_db, compare_banks, extract_table, load_figures, save_figures
+from bankrag.kpi import (
+    KPI_YEARS,
+    METRICS,
+    build_db,
+    compare_banks,
+    extract_table,
+    load_figures,
+    save_figures,
+    with_key_figures,
+)
 from bankrag.models import KpiFigure
 from bankrag.retrieve import (
     DEFAULT_RETRIEVER,
@@ -36,13 +45,16 @@ def search(question: str, k: int, retriever: RetrieverKind, route: bool) -> None
 
 
 def ask(question: str, k: int, retriever: RetrieverKind) -> None:
-    """Answer a question with citations, and print its sources, cost and latency."""
+    """Answer a question with citations, and print its sources, any figure to check, cost and latency."""
     hits = routed_search(build_retriever(retriever, load_chunks("structure")), question, k=k)
+    hits = with_key_figures(question, hits)
     result = answer(question, hits)
     log_trace(result)
     print(mark_quotes(result.text, result.sources, {hit.chunk.id: hit.chunk.body for hit in hits}) + "\n")
     for source in result.sources:
         print(f"[{source.n}] {source.label}  ({source.section})")
+    if result.ungrounded:
+        print(f"\nNot in a cited passage, so check against the report: {', '.join(result.ungrounded)}")
     print(
         f"\n{result.model} | {result.input_tokens} in, {result.cache_read_tokens} cached, {result.output_tokens} out"
         f" | USD {result.cost_usd:.5f} (DKK {result.cost_dkk:.4f}) | {result.latency_s:.1f}s",

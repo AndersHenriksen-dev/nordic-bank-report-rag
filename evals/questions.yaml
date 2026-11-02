@@ -6,6 +6,8 @@
 #             Comparison questions have one group per bank or year.
 #   numbers:  figures the answer must contain. Each inner list holds the acceptable ways to
 #             write one figure (for example 23037 million or 23.0 billion).
+#   key_figures: the KPI table rows (bank-year-metric) the question asks for. The answer gets them next to its
+#             passages, and evals/check_retrieval.py fails if a question gets other rows. Empty when it asks for none.
 #   verified: false until Anders has checked the gold answer against the PDF himself.
 #
 # Gold answers drafted by Claude Code from the PDFs on 2026-10-24. On 2026-10-25 q02, q24 and q26
@@ -17,6 +19,8 @@
 # added to q20, q35 and q36 after checking.
 # Later the same day the 2022 and 2023 reports were added; q17's gold answer was updated after checking that they
 # do not state Nordea's 2012 net profit.
+# On 2026-11-02 the questions got key_figures, decided by reading each question: 25 of them ask for a key figure
+# with a bank and a report year, and every listed row's value is in the question's gold answer.
 
 - id: q01
   question: What was Danske Bank's cost/income ratio in 2025, and how did it change from 2024?
@@ -28,6 +32,7 @@
   evidence:
     - [danske-2025-p4, danske-2025-p5]
     - [danske-2025-p4, danske-2024-p5]
+  key_figures: [danske-2024-cost_income_ratio, danske-2025-cost_income_ratio]
   verified: false
 
 - id: q02
@@ -39,6 +44,7 @@
   numbers: [[23037, 23.0, 23.04]]
   evidence:
     - [danske-2025-p4, danske-2025-p6, danske-2025-p10, danske-2025-p136]
+  key_figures: [danske-2025-net_profit]
   verified: false
 
 - id: q03
@@ -50,6 +56,7 @@
   numbers: [[17.3]]
   evidence:
     - [danske-2025-p4, danske-2025-p6, danske-2025-p32]
+  key_figures: [danske-2025-cet1_ratio]
   verified: false
 
 - id: q04
@@ -61,6 +68,7 @@
   numbers: [[13.4, 13.5]]
   evidence:
     - [danske-2024-p5, danske-2024-p6]
+  key_figures: [danske-2024-return_on_equity]
   verified: false
 
 - id: q05
@@ -72,6 +80,7 @@
   numbers: [[15.5]]
   evidence:
     - [nordea-2025-p5, nordea-2025-p39, nordea-2025-p40]
+  key_figures: [nordea-2025-return_on_equity]
   verified: false
 
 - id: q06
@@ -83,6 +92,7 @@
   numbers: [[15.7]]
   evidence:
     - [nordea-2025-p5, nordea-2025-p39, nordea-2025-p40]
+  key_figures: [nordea-2025-cet1_ratio]
   verified: false
 
 - id: q07
@@ -94,6 +104,7 @@
   numbers: [[5059, 5.06, 5.1]]
   evidence:
     - [nordea-2024-p40, nordea-2024-p42]
+  key_figures: [nordea-2024-net_profit]
   verified: false
 
 - id: q08
@@ -120,6 +131,7 @@
   evidence:
     - [danske-2025-p4, danske-2025-p6, danske-2025-p32]
     - [nordea-2025-p5, nordea-2025-p39, nordea-2025-p40]
+  key_figures: [danske-2025-cet1_ratio, nordea-2025-cet1_ratio]
   verified: false
 
 - id: q10
@@ -149,6 +161,7 @@
   numbers: [[294]]
   evidence:
     - [danske-2025-p11, danske-2025-p10, danske-2025-p5]
+  key_figures: [danske-2025-loan_impairment_charges]
   verified: false
 
 - id: q12
@@ -174,6 +187,7 @@
   numbers: [[23037, 23.0, 23.04]]
   evidence:
     - [danske-2025-p4, danske-2025-p6, danske-2025-p10]
+  key_figures: [danske-2025-net_profit]
   verified: false
 
 - id: q14
@@ -187,6 +201,7 @@
   numbers: [[17.8], [17.3]]
   evidence:
     - [danske-2025-p32]
+  key_figures: [danske-2024-cet1_ratio, danske-2025-cet1_ratio]
   verified: false
 
 - id: q15
@@ -250,6 +265,7 @@
   numbers: [[5414, 5.4]]
   evidence:
     - [jyske-2025-p21, jyske-2025-p11, jyske-2025-p7, jyske-2025-p140]
+  key_figures: [jyske-2025-net_profit]
   verified: false
 
 - id: q21
@@ -264,6 +280,7 @@
   numbers: []
   evidence:
     - [jyske-2025-p5, jyske-2025-p21, jyske-2025-p25]
+  key_figures: [jyske-2025-loan_impairment_charges]
   verified: false
 
 - id: q22
@@ -277,6 +294,7 @@
     - [danske-2025-p4, danske-2025-p6, danske-2025-p32]
     - [nordea-2025-p5, nordea-2025-p39, nordea-2025-p40]
     - [jyske-2025-p5, jyske-2025-p8, jyske-2025-p34]
+  key_figures: [danske-2025-cet1_ratio, nordea-2025-cet1_ratio, jyske-2025-cet1_ratio]
   verified: false
 
 - id: q23
@@ -288,6 +306,7 @@
   numbers: [[48.3, 48]]
   evidence:
     - [jyske-2025-p8, jyske-2025-p11]
+  key_figures: [jyske-2025-cost_income_ratio]
   verified: false
 
 - id: q24
@@ -314,6 +333,7 @@
   numbers: [[17.6]]
   evidence:
     - [jyske-2024-p8, jyske-2024-p32, jyske-2025-p8, jyske-2025-p34]
+  key_figures: [jyske-2024-cet1_ratio]
   verified: false
 
 - id: q26
@@ -356,6 +376,7 @@
   numbers: [[5312, 5.3]]
   evidence:
     - [jyske-2024-p4, jyske-2024-p6, jyske-2024-p7, jyske-2024-p9, jyske-2024-p13, jyske-2024-p21, jyske-2024-p166, jyske-2025-p7, jyske-2025-p21, jyske-2025-p133]
+  key_figures: [jyske-2024-net_profit]
   verified: false
 
 - id: q29
@@ -367,6 +388,7 @@
   numbers: [[16.7]]
   evidence:
     - [nordea-2024-p5, nordea-2024-p40, nordea-2024-p43, nordea-2025-p40, nordea-2025-p43]
+  key_figures: [nordea-2024-return_on_equity]
   verified: false
 
 - id: q30
@@ -395,6 +417,7 @@
   evidence:
     - [nordea-2025-p40, nordea-2025-p43]
     - [nordea-2025-p40, nordea-2025-p43, nordea-2024-p40, nordea-2024-p43]
+  key_figures: [nordea-2024-cost_income_ratio, nordea-2025-cost_income_ratio]
   verified: false
 
 - id: q32
@@ -410,6 +433,7 @@
   evidence:
     - [danske-2025-p4, danske-2025-p10]
     - [danske-2025-p4, danske-2025-p10, danske-2024-p4]
+  key_figures: [danske-2024-total_income, danske-2025-total_income]
   verified: false
 
 - id: q33
@@ -422,6 +446,7 @@
   evidence:
     - [danske-2025-p4, danske-2025-p5, danske-2025-p6]
     - [nordea-2025-p5, nordea-2025-p40, nordea-2025-p43]
+  key_figures: [danske-2025-return_on_equity, nordea-2025-return_on_equity]
   verified: false
 
 - id: q34
@@ -437,6 +462,7 @@
     - [danske-2025-p4, danske-2025-p5]
     - [nordea-2025-p40, nordea-2025-p43]
     - [jyske-2025-p8, jyske-2025-p11]
+  key_figures: [danske-2025-cost_income_ratio, nordea-2025-cost_income_ratio, jyske-2025-cost_income_ratio]
   verified: false
 
 - id: q35
@@ -453,6 +479,7 @@
     - [danske-2025-p4, danske-2025-p6, danske-2025-p10, danske-2025-p136]
     - [nordea-2025-p40, nordea-2025-p42]
     - [jyske-2025-p7, jyske-2025-p11, jyske-2025-p21, jyske-2025-p140]
+  key_figures: [danske-2025-net_profit, nordea-2025-net_profit, jyske-2025-net_profit]
   verified: false
 
 - id: q36
@@ -467,6 +494,7 @@
   evidence:
     - [danske-2024-p4, danske-2024-p6, danske-2024-p9, danske-2025-p4]
     - [nordea-2024-p40, nordea-2024-p42, nordea-2025-p40, nordea-2025-p42]
+  key_figures: [danske-2024-net_profit, nordea-2024-net_profit]
   verified: false
 
 - id: q37
@@ -510,6 +538,7 @@
   numbers: [[17.6], [16.1]]
   evidence:
     - [jyske-2025-p5, jyske-2025-p34]
+  key_figures: [jyske-2024-cet1_ratio, jyske-2025-cet1_ratio]
   verified: false
 
 - id: q40

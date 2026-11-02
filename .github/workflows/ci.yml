@@ -17,7 +17,8 @@ jobs:
       - run: uv run ruff format --check .
       - run: uv run mypy src
       - run: uv run pytest
-      # BM25 with routing and the Danish glossary on the committed fixture; fails if recall@k or MRR drops.
+      # BM25 with routing and the Danish glossary on the committed fixture; fails if recall@k or MRR drops, or if a
+      # question gets other KPI table rows than its key_figures list.
       - name: Retrieval evals on the fixture
         run: uv run python evals/check_retrieval.py
 

@@ -33,6 +33,7 @@ from bankrag.evaluate import (
 )
 from bankrag.ingest import load_chunks
 from bankrag.judge import judge
+from bankrag.kpi import with_key_figures
 from bankrag.models import Question, Source, Verdict
 from bankrag.retrieve import DEFAULT_RETRIEVER, BM25Retriever, Retriever, build_retriever, routed_search
 
@@ -162,7 +163,7 @@ def retrieval_eval(questions: list[Question], configs: list[RetrievalConfig]) ->
 
 
 def _answer_one(question: Question, retriever: Retriever, k: int) -> AnswerRecord:
-    hits = routed_search(retriever, question.question, k=k)
+    hits = with_key_figures(question.question, routed_search(retriever, question.question, k=k))
     result = answer(question.question, hits)
     log_trace(result, eval_id=question.id)
     verdict, judge_cost = None, 0.0

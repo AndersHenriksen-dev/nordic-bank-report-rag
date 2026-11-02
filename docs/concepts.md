@@ -162,7 +162,11 @@ In this project: `src/bankrag/retrieve/rerank.py` with `BAAI/bge-reranker-v2-m3`
 
 **Structured output.** The judge (section 12) uses another feature: the request carries a JSON schema (built from a Pydantic model), and the response is guaranteed to match it, so the code never has to parse free text. The KPI table uses it too: for each bank, year and metric, Claude returns the value, unit, page and the exact table row it read. Structured output and citations cannot be combined in one request, so the copied row stands in for a citation, and code checks that the row is on that page and holds the value.
 
-In this project: `src/bankrag/answer/generate.py`, `src/bankrag/judge.py`; decisions 5, 13 and 14.
+**Key figure rows next to the passages.** When a question names a key figure, a bank and a report year, the KPI table's row for it is sent as one more search result, in front of the search's passages. Its content is the exact row from the report page, so Claude cites the page as usual. Its title states the figure ("Net profit for 2024 is DKK 23,629 million"), because a row from a key figure table holds several years without its header. This combines a structured store with retrieval: a lookup supplies the figure that matters most, the citation still points at the page, and the search still runs, so the answer can explain the figure.
+
+**Checking figures at answer time.** After Claude answers, every figure in the answer is looked up in the passages it cites, with the same rules as the grounding metric (section 11). The web page and the CLI name any figure that is not there, so the reader knows what to check by hand.
+
+In this project: `src/bankrag/answer/generate.py`, `src/bankrag/judge.py`, `src/bankrag/kpi/lookup.py`; decisions 5, 13, 14 and 22.
 
 ## 10. Refusals and guardrails
 
@@ -285,11 +289,11 @@ Short answers below each; the sections above have the details.
 6. **What is the difference between a bi-encoder and a cross-encoder, and why use both?** A bi-encoder embeds texts separately, so passages can be embedded in advance and searched fast. A cross-encoder reads question and passage together, which is more accurate but needs one model run per pair, so it only reranks the top 30.
 7. **What does recall@6 = 0.94 mean here?** Averaged over 35 questions, 94% of the evidence groups they need (one per bank or year) have a gold page among the 6 passages Claude reads.
 8. **What does MRR add to recall?** Recall says whether the right page is in the top k; MRR says how high it is.
-9. **How do you catch a made-up figure?** Citations come from the API and point at real passages, and the grounding check requires every figure in the answer to be in a cited passage.
+9. **How do you catch a made-up figure?** Citations come from the API and point at real passages, and the grounding check requires every figure in the answer to be in a cited passage. The same check runs on every answer, which names any figure it cannot find.
 10. **How do you trust an LLM judge?** Read its verdicts against the answers, change one thing at a time on the same saved answers, and report its error rate with the score.
 11. **How does the system decide to refuse, and where is the line?** The prompt refuses forecasts and advice with a fixed phrase the code detects. A bank's own published outlook is answered, because it is a fact in the report.
 12. **Why is the cheapest model enough?** Once the right passages are in the prompt, reading figures from them is easy; the gains came from retrieval.
-13. **What fails most often, and what would you try?** Business-unit figures offered next to the group's. Ideas: label chunks as group or segment and prefer group pages, a table of key figures per bank and year that answers lookups directly, and merging paragraphs the parser split.
+13. **What fails most often, and what would you try?** Business-unit figures offered next to the group's. Ideas: label chunks as group or segment and prefer group pages, a table of key figures per bank and year whose checked rows go to Claude with the passages (now built), and merging paragraphs the parser split.
 14. **What does prompt caching save here?** The 1,800-token system prompt is read from the cache at a tenth of the price on every call after the first within a few minutes.
 15. **How would this scale to 100 banks?** A Qdrant server with an HNSW index, routing by a list of bank names, batch ingest, and a larger eval set that samples every bank.
 

@@ -18,6 +18,7 @@ from bankrag.answer import answer, load_traces, log_trace, mark_quotes
 from bankrag.config import DISCLAIMER, RAW_DIR, Bank, bank_name
 from bankrag.figures import figures_in
 from bankrag.ingest import load_chunks
+from bankrag.kpi import with_key_figures
 from bankrag.models import Answer, Chunk, Source, TracedAnswer
 from bankrag.retrieve import DEFAULT_RETRIEVER, Hit, Retriever, build_retriever, routed_search
 from bankrag.ui.highlight import HighlightedPage, focus_passage, render_highlighted_page
@@ -67,7 +68,7 @@ def _page_images(
 
 
 def _ask(question: str) -> Result:
-    hits = routed_search(_retriever(), question, k=TOP_K)
+    hits = with_key_figures(question, routed_search(_retriever(), question, k=TOP_K))
     result = answer(question, hits)
     log_trace(result)
     return Result(result, hits)
@@ -76,10 +77,12 @@ def _ask(question: str) -> Result:
 def _replay(traced: TracedAnswer) -> Result:
     """Rebuild a saved answer and the passages its search found, without calling the API or the search models.
 
-    The trace keeps the ids of the retrieved chunks but not their reranker scores, so those show as blank.
+    The trace keeps the ids of the retrieved chunks but not their reranker scores, so those show as blank. Key figure
+    rows are rebuilt from the KPI table, if the answer had them.
     """
     chunks = _chunks_by_id()
-    hits = [Hit(chunks[chunk_id], math.nan) for chunk_id in traced.retrieved if chunk_id in chunks]
+    key_figures = [hit for hit in with_key_figures(traced.question, []) if hit.chunk.id in traced.retrieved]
+    hits = key_figures + [Hit(chunks[chunk_id], math.nan) for chunk_id in traced.retrieved if chunk_id in chunks]
     return Result(traced, hits, saved_at=traced.time)
 
 
@@ -98,6 +101,10 @@ def _show_answer(result: Answer, hits: list[Hit]) -> None:
     st.subheader("Answer")
     bodies = {hit.chunk.id: hit.chunk.body for hit in hits}
     st.markdown(_markdown(mark_quotes(result.text, result.sources, bodies)))
+    if result.ungrounded:
+        st.warning(
+            f"Not in any passage the answer cites: {', '.join(result.ungrounded)}. Check these against the report.",
+        )
     latency, cost, tokens, cached = st.columns(4)
     latency.metric("Latency", f"{result.latency_s:.1f} s")
     cost.metric("Cost", f"DKK {result.cost_dkk:.3f}", help=f"USD {result.cost_usd:.5f}")

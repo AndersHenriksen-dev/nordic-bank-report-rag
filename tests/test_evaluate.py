@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 
 from bankrag.config import Bank
 from bankrag.evaluate import K_VALUES, SEARCH_DEPTH, figures_grounded, numbers_match, retrieval_scores, score_retrieval
-from bankrag.figures import numbers_in
+from bankrag.figures import numbers_in, ungrounded_figures
 from bankrag.models import Chunk, Question, Source
 from bankrag.retrieve import Hit
 
@@ -93,6 +93,10 @@ class TestFiguresGrounded:
         passage = ["Loan impairment charges | 294 | -543"]
         text = "A charge of DKK 294 million against a reversal of DKK 543 million, a change of DKK 837 million."
         assert figures_grounded(text, [source(10, passage)])
+
+    def test_ungrounded_figures_are_named_as_the_answer_writes_them(self) -> None:
+        text = "Net profit was DKK 23,037 million, against DKK 1,260 million and 45.6% elsewhere [1]."
+        assert ungrounded_figures(text, ["| Net profit | 23,037 | 23,629 |"]) == ["1,260", "45.6"]
 
 
 @dataclass

@@ -49,8 +49,11 @@ Search the summary pages (financial highlights, executive summary, CEO letter), 
   numbers: [[15.8]]             # one inner list per required figure, with its acceptable spellings
   evidence:
     - [nordea-2024-p40, nordea-2025-p40]
+  key_figures: [nordea-2024-cet1_ratio]   # KPI table rows the question asks for, as bank-year-metric
   verified: false               # only Anders sets this to true, after checking the PDF himself
 ```
+
+- `key_figures` lists every KPI table row the question asks for: one of the seven metrics in `src/bankrag/kpi/lookup.py`, for each bank and each report year it names. Leave it out when the question asks for none, names no bank or year, or asks about a year after the last report. Check that each row's value is in the gold answer.
 
 - `numbers` is empty for "why" questions unless a figure is the point of the question.
 - Danish questions get a Danish gold answer with Danish number formats (15,5%).

@@ -107,6 +107,10 @@ class Question(BaseModel):
     gold_answer: str
     numbers: list[list[float]] = Field(default_factory=list)
     evidence: list[list[str]] = Field(default_factory=list)
+    key_figures: list[str] = Field(
+        default_factory=list,
+        description="The KPI table rows the question should get next to its passages, as bank-year-metric.",
+    )
     verified: bool = False
 
 
@@ -150,6 +154,10 @@ class Answer(BaseModel):
     cost_usd: float
     latency_s: float
     retrieved: list[str]
+    ungrounded: list[str] = Field(
+        default_factory=list,
+        description="Figures in the text that no cited passage holds, as the text writes them: check these by hand.",
+    )
 
     @computed_field  # type: ignore[prop-decorator]
     @property
