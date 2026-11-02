@@ -29,8 +29,10 @@ The `make` targets wrap the same commands.
 | File | Read it when | What it covers |
 |---|---|---|
 | [.claude/reference/python-style.md](.claude/reference/python-style.md) | **Before writing or editing any `.py` file** | The single source of truth for Python here: PEP 8 via ruff, typing checked by mypy, Google-style docstrings, Pydantic models at boundaries, module structure, KISS/DRY/LEAN, comments, testing. |
+| [.claude/reference/git-workflow.md](.claude/reference/git-workflow.md) | **Before creating a branch, a commit or a pull request** | Branch names (`category/description`), commit messages (`tag(scope): Header`, a body that says why), rebasing instead of merging `main` in, pull request bodies, attribution. |
+| [.claude/commands/commit-push-pr.md](.claude/commands/commit-push-pr.md) | Committing and opening a pull request | Command that runs the checks, commits, pushes and opens the pull request by the workflow above. |
 | [.claude/hooks/check_python_style_read.py](.claude/hooks/check_python_style_read.py) | Debugging why a Python edit was blocked | `PreToolUse` hook that blocks editing `.py`/`.ipynb` files until the style guide has been read in the session. |
-| [.claude/settings.json](.claude/settings.json) | Changing permissions or hooks | Allowed and denied commands, and the hook above. |
+| [.claude/settings.json](.claude/settings.json) | Changing permissions or hooks | Allowed, asked and denied commands (paid API runs ask; force pushes that are not `--force-with-lease` are denied), and the hook above. |
 | [.pre-commit-config.yaml](.pre-commit-config.yaml) and [.github/workflows/ci.yml](.github/workflows/ci.yml) | Changing what runs on commit or in CI | The automatic half of the style guide, plus the gitleaks secret scan. |
 | [docs/decisions.md](docs/decisions.md) | Changing a design choice | Why things are built the way they are. |
 | [.claude/skills/add-eval-case/SKILL.md](.claude/skills/add-eval-case/SKILL.md) | Adding or correcting an eval question | How to find and check every gold figure and page in the parsed report text. |
@@ -56,7 +58,7 @@ The `make` targets wrap the same commands.
 
 - Never use em dashes anywhere: README, docs, comments, commit messages. Use commas, colons, full stops or parentheses.
 - Plain English, short sentences, numbers instead of adjectives, no hype words. README in first person singular.
-- Commits: short imperative header, a body that explains why, author `Anders Henriksen <anhenr.dev@gmail.com>`. Short branches, squash merge.
+- Git: follow [.claude/reference/git-workflow.md](.claude/reference/git-workflow.md). Branches `category/description`, one per task, rebased (never merged) onto `main`. Commits `tag(scope): Header` with a body that explains why, author `Anders Henriksen <anhenr.dev@gmail.com>`. Squash merge.
 
 ## Layout
 

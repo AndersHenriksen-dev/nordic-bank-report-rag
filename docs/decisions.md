@@ -170,6 +170,16 @@ The 2022 and 2023 annual reports of all three banks are in, which doubles the co
 
 **The `.claude` folder** now has two project skills (`add-eval-case`, `run-evals-and-report`), one subagent (`eval-reviewer`), the style-guide hook and project permissions. The second skill and the subagent write down procedures that were done by hand many times in this build: explaining every changed eval number by its questions, and sorting failed cases by cause. The permissions allow the free read-only scripts and always ask before the commands that call the paid API, so the rule in CLAUDE.md is also enforced by the harness.
 
+## 20. Git follows my standard workflow
+
+From November 2026, branches, commits and pull requests follow [.claude/reference/git-workflow.md](../.claude/reference/git-workflow.md), the git half of the same standard as the Python style guide (D12). Until then this repo used only its short form: an imperative header, a body that says why, and squash merges.
+
+- **Branch names say what kind of change it is:** `feature/`, `bug/`, `docs/`, `hotfix/`, one branch per task.
+- **Commit headers carry a tag and a scope** (`ci(evals): ...`), so the log can be read by kind of change and by part of the system.
+- **Rebase, never merge `main` into a branch.** PR 9 merged `main` in to resolve conflicts after PR 8's squash merge; a rebase keeps the branch a clean sequence of commits. Because a rebased branch needs `git push --force-with-lease`, the project permissions now ask for that instead of denying every force push. Plain `--force`, `-f`, `--mirror` and `filter-branch` stay denied.
+- **Pull request bodies** have a summary and a test plan. The `commit-push-pr` command runs the checks, commits, pushes and opens the pull request in that form.
+- **Not adopted:** the source project's ban on agent credit (see D12), and its long human git guide, which is written for a different team and setup.
+
 ## 21. Retrieval evals in CI, on a committed fixture of real chunks
 
 CI ran lint, types and unit tests, so a change to routing, the Danish glossary or the tokenizer could lower recall with every check green. The full evals cannot run there: they need the twelve parsed reports, which are not in the repository, and two 2.3 GB models.
