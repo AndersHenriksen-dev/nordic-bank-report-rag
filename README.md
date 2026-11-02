@@ -8,9 +8,9 @@ Not investment advice. Figures should be checked against the source page.
 
 ## Headline results
 
-Measured on 44 eval questions, 35 of them answerable from the reports ([evals/RESULTS.md](evals/RESULTS.md)):
+Measured on 44 eval questions, 35 of them answerable from the reports ([evals/RESULTS.md](evals/RESULTS.md)). Search is measured over all twelve reports. The answer figures come from the last answer run, made over the six 2024 and 2025 reports before the 2022 and 2023 reports were added:
 
-- **Recall@6 0.94** with hybrid search and a reranker, against 0.77 for keyword search alone: the 6 passages Claude reads hold the needed evidence 95% of the time, counting each bank or year a question needs.
+- **Recall@6 0.94** with hybrid search and a reranker, against 0.77 for keyword search alone: the 6 passages Claude reads hold the needed evidence 94% of the time, counting each bank or year a question needs.
 - **27 of 28 numeric answers exact.**
 - **9 of 9 unanswerable questions refused**, and no answerable question refused.
 - **USD 0.001 (DKK 0.007) and about 5 seconds per question**, with Claude Haiku 5.5 and local open models for search.
