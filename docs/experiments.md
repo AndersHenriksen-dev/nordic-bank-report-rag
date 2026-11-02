@@ -101,6 +101,38 @@ q10 failed under all three, which is defensible: the answer says the group figur
 | q35 Three banks' net profit | Calls Danske Bank's figure the highest, then says the three cannot be ranked | Yes: a mild self-contradiction |
 | q40 Jyske Bank's employees (Danish) | Says the report does not explain the gap of 50 between two counts | No: that is true; the footnote explains a gap of 23 |
 
+## Answers over twelve reports (run 3)
+
+Run 3 used the same answer code, prompt (apart from the years it names), search and judge as run 2, over all twelve reports instead of six. It cost USD 0.053: 0.045 for the 44 answers and 0.007 for the 35 verdicts.
+
+| Metric | Run 2, six reports | Run 3, twelve reports |
+|---|---|---|
+| Numeric answers exact | 27 of 28 | 26 of 28 |
+| Answers with every figure in a cited passage | 26 of 32 | 32 of 32 |
+| Unanswerable questions refused | 9 of 9 | 9 of 9 |
+| Answerable questions wrongly refused | 0 of 35 | 0 of 35 |
+| Answers the judge passed (correct, complete, consistent) | 27 of 35 | 29 of 35 |
+| "Why" answers the judge passed | 4 of 7 | 6 of 7 |
+| Cost per question, mean (USD) | 0.00105, plus 0.0002 per verdict | 0.00103, plus 0.0002 per verdict |
+| Time per question, mean | 5.1 s | 4.4 s |
+
+- **Grounding at 32 of 32 is variation, not a gain.** The grounding metric gives the same verdicts as before when rerun on run 2's answers, and nothing in the answer code changed. Each of run 2's six ungrounded answers had a figure just outside the span its citation covered, and where Claude places that span varies between runs: 29, 26 and now 32 of 32 with the same setup.
+- **One answer got worse because of the new reports.** q01 passed in run 2. Over twelve reports, the search no longer sends a page with Danske Bank's 2024 cost/income ratio. The cause is BM25's term statistics, as found when the reports were added. The answer gives 2025's 45.5% and says the 2024 figure is not in its passages.
+- **Three answers that failed in run 2 now pass**, each because the answer itself changed. q09 no longer hedges over a second Nordea figure. q10 names the business unit behind one segment figure and flags the other as unplaced rather than offering it as the group's. q12 now names churn prediction and fraud detection.
+
+### What the judge failed in run 3
+
+| Question | What is wrong with the answer | Cause | Real fault? |
+|---|---|---|---|
+| q01 Danske Bank's cost/income ratio | Gives 45.5% for 2025 and says the 2024 figure is not in its passages | Search: neither page with 45.6% (page 4 of the 2025 report, page 5 of the 2024 report) was among the 6 | Yes, though the answer is honest about the gap |
+| q11 Danske Bank's impairment charges | A business unit's DKK 1,260 million next to the group's DKK 294 million, with no choice between them | Parsing: page 21 is a business unit's page, and its parsed section label is empty | Yes |
+| q26 How the three banks use AI | Leaves out Danske Bank's Copilot and Danske Assist, and Jyske Bank's AI assistants | Search missed Danske Bank's pages 7 and 8; Jyske Bank's page 128 was sent but not used | Yes |
+| q34 Three banks' cost/income ratios | No Danske Bank figure; declines to use a business unit's 40.0% instead | Search: Danske Bank's pages 4 and 5 were not among the 6 | Yes, though the answer is honest about the gap |
+| q35 Three banks' net profit | Calls Danske Bank's DKK 23.0 billion the largest; Nordea's EUR 4.84 billion is about DKK 36 billion | Generation: ranks figures in different currencies | Yes |
+| q40 Jyske Bank's employees (Danish) | Gives 3,794 from the key figure table with its footnote, and 3,844 from the workforce section | Judge: it reads "nøgletallet i sektionen om medarbejdere" as the key figure table and marks the answer incorrect | No: every figure and source is right; at most it could have named 3,794 as the headline figure |
+
+The two numeric misses are q01 and q34, both search misses. Of the 9 verdicts read (the 6 fails and the 3 new passes), a reading agrees with 8. These readings were made by Claude Code and are still to be checked by hand.
+
 ## A fixture for retrieval evals in CI
 
 CI has neither the parsed reports nor the models, so it searches a committed fixture: every chunk on a gold page, plus each answerable question's top 20 results from routed BM25 search with the glossary over the full index. That is 533 of 8,700 chunks, 1.05 MB with each chunk's text stored once. BM25 with routing and the glossary scores lower on it than on the full index:
