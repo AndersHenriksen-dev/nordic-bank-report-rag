@@ -35,17 +35,17 @@ answer, with the passages it cites, is in [ANSWERS.md](ANSWERS.md).
 
 | Metric | Value |
 |---|---|
-| Numeric answers exact | 93% of 28 |
+| Numeric answers exact | 100% of 28 |
 | Answerable questions answered with a citation | 100% |
-| Answers whose figures all appear in a cited passage | 100% of 32 |
+| Answers whose figures all appear in a cited passage | 97% of 31 |
 | Answerable questions wrongly refused | 0 |
 | Unanswerable questions refused | 9 of 9 |
-| Cost per question, mean / p95 (USD) | 0.00103 / 0.00136 |
-| Latency per question, mean / p95 (s) | 4.4 / 6.9 |
-| Answers the judge passed (correct, complete and consistent) | 83% of 35 |
+| Cost per question, mean / p95 (USD) | 0.00104 / 0.00147 |
+| Latency per question, mean / p95 (s) | 4.5 / 7.6 |
+| Answers the judge passed (correct, complete and consistent) | 86% of 35 |
 | "Why" answers the judge passed | 86% of 7 |
-| Judge criteria met: correct / complete / consistent | 91% / 89% / 94% |
-| Judge cost for the whole run (USD) | 0.0074 |
+| Judge criteria met: correct / complete / consistent | 89% / 97% / 91% |
+| Judge cost for the whole run (USD) | 0.0067 |
 
 The judge (`claude-haiku-5-5`) grades every answered question against its gold answer, by the rubric in
 [judge_rubric.md](judge_rubric.md). Refusals are not judged; they are counted above.

@@ -133,6 +133,40 @@ Run 3 used the same answer code, prompt (apart from the years it names), search 
 
 The two numeric misses are q01 and q34, both search misses. Of the 9 verdicts read (the 6 fails and the 3 new passes), a reading agrees with 8. These readings were made by Claude Code and are still to be checked by hand.
 
+## Key figure rows from the KPI table (run 4)
+
+Run 4 is run 3 plus one change (decision 22): when a question names a key figure, a bank and a report year, the KPI table's checked row goes to Claude in front of the search results, and the system prompt says to prefer it for the group's figures. 25 questions get rows. The run cost USD 0.052: 0.046 for the answers and 0.007 for the verdicts.
+
+| Metric | Run 3 | Run 4, with key figure rows |
+|---|---|---|
+| Numeric answers exact | 26 of 28 | **28 of 28** |
+| Answers with every figure in a cited passage | 32 of 32 | 30 of 31 |
+| Unanswerable questions refused | 9 of 9 | 9 of 9 |
+| Answerable questions wrongly refused | 0 of 35 | 0 of 35 |
+| Answers the judge passed | 29 of 35 | 30 of 35 |
+| Cost per question, mean / p95 (USD) | 0.00103 / 0.00136 | 0.00104 / 0.00147 |
+| Time per question, mean / p95 | 4.4 s / 6.9 s | 4.5 s / 7.6 s |
+
+- **The rows fixed both search misses.** q01 and q34 now cite Danske Bank's checked cost/income rows, give every figure and pass the judge. 20 of the 25 questions with rows cite at least one; the other 5 found the same figure in a searched passage and cited that.
+- **q11 improved but still fails.** It now gives DKK 294 million as the group's charge and says it is the figure to rely on, but it still reports page 21's DKK 1,260 million as an inconsistency in the report. Page 21 belongs to a business unit, and its parsed section label is empty, so nothing tells Claude that.
+- **The one grounding miss is the old pattern.** q39 states two figures in a sentence with no citation marker. Its answer now lists them, 249.3 and 229.5, as figures to check; no other answer of the 44 has a warning.
+- **The extra rows cost little:** about 1% more per question, and a slower 95th percentile from longer prompts.
+
+### What the judge failed or newly passed in run 4
+
+| Question | Verdict | What the answer does | Agree? |
+|---|---|---|---|
+| q01 Danske Bank's cost/income ratio | Pass (was fail) | 45.5% and 45.6% from the two checked rows, down 0.1 points | Yes |
+| q34 Three banks' cost/income ratios | Pass (was fail) | 45.5%, 46.0% and 48.3%, Danske Bank lowest, two of them from checked rows | Yes |
+| q35 Three banks' net profit | Pass (was fail) | Still opens by calling Danske Bank's DKK 23,037 million the highest, above Nordea's EUR 4,840 million | No: the same fault it failed in run 3 |
+| q11 Danske Bank's impairment charges | Fail | As above: the right group figure, but a business unit's figure called an inconsistency | Yes |
+| q22 Three banks' CET1 ratios | Fail (was pass) | All three figures right and cited, but calls Jyske Bank's 16.1% the lowest; Nordea's 15.7% is | Yes: a ranking error |
+| q26 How the three banks use AI | Fail | Still misses Danske Bank's and Jyske Bank's main uses of AI | Yes |
+| q32 Danske Bank's total income | Fail (was pass) | Right figures and drivers; calls net interest income flat, then quotes the report's "small decrease" | No: the report itself uses both words |
+| q40 Jyske Bank's employees (Danish) | Fail | Leads with 3,844 without a citation, then gives 3,794 with its footnote, and leaves English quotes untranslated | Partly: every figure is right, but the lead figure is uncited |
+
+A reading agrees with 6 of these 8 verdicts. Ranking is now the clearest weakness: with every figure right and cited, q22 and q35 still order the banks wrongly. These readings are still to be checked by hand.
+
 ## A fixture for retrieval evals in CI
 
 CI has neither the parsed reports nor the models, so it searches a committed fixture: every chunk on a gold page, plus each answerable question's top 20 results from routed BM25 search with the glossary over the full index. That is 533 of 8,700 chunks, 1.05 MB with each chunk's text stored once. BM25 with routing and the glossary scores lower on it than on the full index:
