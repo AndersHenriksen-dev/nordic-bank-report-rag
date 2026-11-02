@@ -37,7 +37,7 @@ History before November 2026 uses plain sentence headers. It is not rewritten.
 
 - Open from the branch into `main` with `gh pr create`. The title is the commit header; GitHub uses it as the header of the squash commit.
 - The body has a `## Summary` (what changed and why) and a `## Test plan` (what was run and what it showed, with numbers).
-- CI must be green: lint, types, tests and the secret scan.
+- CI must be green: lint, types, the full test suite, the retrieval check on the fixture, and the secret scan.
 - I review and squash-merge; the branch is deleted on merge. An agent opens a pull request when the task asks for one, and never merges it.
 
 The [commit-push-pr](../commands/commit-push-pr.md) command runs the whole sequence.

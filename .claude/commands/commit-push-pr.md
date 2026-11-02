@@ -27,7 +27,7 @@ Only when both sets are non-empty and differ, ask with `AskUserQuestion`, listin
 
 1. Fix the index to match the chosen set: `git restore --staged` what is out of scope, `git add` what is in scope, by exact path. Never `git add -A` or `git add .`.
 2. Never stage anything under `data/`, a PDF or `.env`.
-3. Run what CI runs: `uv run ruff check . && uv run ruff format --check . && uv run mypy src && uv run pytest`. Stop and report if it fails.
+3. Run `uv run ruff check . && uv run ruff format --check . && uv run mypy src`, then only the tests for the Python modules that changed: their test files and any test file that imports them. Docs-only changes need no tests. If search, routing, the glossary or the eval questions changed, also run `uv run python evals/check_retrieval.py`. CI runs the full suite. Stop and report if anything fails.
 4. If on `main`, create a branch from an up-to-date `main` (`git pull --ff-only` first), named `category/description-with-dashes` by what the files do.
 5. Write the commit message as `tag(scope): Header`, body and footer, from the staged diff (`git diff --cached`), not from memory. The body says what changed and why, never how. End it with the Claude Code co-author trailer. No em dashes.
 
