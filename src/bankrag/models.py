@@ -110,6 +110,13 @@ class Question(BaseModel):
     verified: bool = False
 
 
+class RetrievalScores(BaseModel):
+    """How well the search did for one question: recall at each k, and the reciprocal rank of the first gold page."""
+
+    recall: dict[int, float]
+    reciprocal_rank: float
+
+
 class Source(BaseModel):
     """A page cited in an answer, numbered in the order it is first cited."""
 

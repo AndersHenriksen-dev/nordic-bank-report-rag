@@ -62,7 +62,10 @@ Search the summary pages (financial highlights, executive summary, CEO letter), 
 ```bash
 uv run bankrag search "the new question"     # does the search find a gold page?
 uv run python evals/run_evals.py             # retrieval metrics, free
+uv run python evals/check_retrieval.py --rebuild   # the CI fixture and baseline, with the new question's pages
 ```
+
+Commit `evals/fixture/` with the question. Without the rebuild CI fails, because the fixture lacks the new gold pages.
 
 A question the search misses is still a good question: it shows a weakness. Do not tune the question until the search finds it.
 

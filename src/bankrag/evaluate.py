@@ -8,7 +8,11 @@ import yaml
 from pydantic import TypeAdapter
 
 from bankrag.figures import close_to, figure_tokens, numbers_in
-from bankrag.models import Chunk, Question, Source
+from bankrag.models import Chunk, Question, RetrievalScores, Source
+from bankrag.retrieve import Retriever, routed_search
+
+K_VALUES = (1, 3, 6, 10)
+SEARCH_DEPTH = 30  # how far down the ranking MRR looks
 
 _QUESTIONS_ADAPTER: TypeAdapter[list[Question]] = TypeAdapter(list[Question])
 
@@ -41,6 +45,34 @@ def retrieval_scores(question: Question, ranked_pages: list[str], k: int) -> tup
     gold = {page for group in question.evidence for page in group}
     reciprocal_rank = next((1 / (rank + 1) for rank, page in enumerate(ranked_pages) if page in gold), 0.0)
     return recall, reciprocal_rank
+
+
+def score_retrieval(
+    retriever: Retriever,
+    question: Question,
+    route: bool = True,
+    expand: bool = True,
+) -> RetrievalScores:
+    """Search for one question at each k in `K_VALUES` and score the results against its evidence.
+
+    Args:
+        retriever: The search backend.
+        question: An answerable question.
+        route: Filter on the banks and years the question names, as `routed_search` does.
+        expand: Add English wording for Danish finance terms, as `routed_search` does.
+
+    Returns:
+        Recall at each k, and the reciprocal rank of the first gold page within `SEARCH_DEPTH` results.
+    """
+    recall = {}
+    for k in K_VALUES:
+        # Search at each k, because routing splits k between banks: the top k of a deeper search is not what the
+        # answer model would get.
+        hits = routed_search(retriever, question.question, k=k, route=route, expand=expand)
+        recall[k] = retrieval_scores(question, [page_key(hit.chunk) for hit in hits], k)[0]
+    hits = routed_search(retriever, question.question, k=SEARCH_DEPTH, route=route, expand=expand)
+    ranked_pages = list(dict.fromkeys(page_key(hit.chunk) for hit in hits))
+    return RetrievalScores(recall=recall, reciprocal_rank=retrieval_scores(question, ranked_pages, SEARCH_DEPTH)[1])
 
 
 def numbers_match(question: Question, answer_text: str) -> bool | None:
