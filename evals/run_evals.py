@@ -23,7 +23,14 @@ from pydantic import BaseModel, TypeAdapter, ValidationError
 
 from bankrag.answer import answer, log_trace, mark_quotes
 from bankrag.config import ANSWER_MODEL, EMBED_MODEL, JUDGE_MODEL, RERANK_MODEL, bank_name, parse_bank
-from bankrag.evaluate import figures_grounded, load_questions, numbers_match, page_key, percentile, retrieval_scores
+from bankrag.evaluate import (
+    K_VALUES,
+    figures_grounded,
+    load_questions,
+    numbers_match,
+    percentile,
+    score_retrieval,
+)
 from bankrag.ingest import load_chunks
 from bankrag.judge import judge
 from bankrag.models import Question, Source, Verdict
@@ -32,8 +39,6 @@ from bankrag.retrieve import DEFAULT_RETRIEVER, BM25Retriever, Retriever, build_
 EVAL_DIR = Path(__file__).resolve().parent
 RESULTS_DIR = EVAL_DIR / "results"
 ANSWERS_FILE = RESULTS_DIR / "answers.json"
-K_VALUES = (1, 3, 6, 10)
-SEARCH_DEPTH = 30  # how far down the ranking MRR looks
 PASSAGE_WIDTH = 400  # characters of each cited passage shown in ANSWERS.md
 PAGE_KEY_RE = re.compile(r"([a-z]+)-(\d{4})-p(\d+)")
 CHART_K = (1, 3, 6)
@@ -141,28 +146,12 @@ _RETRIEVAL_ADAPTER: TypeAdapter[list[RetrievalResult]] = TypeAdapter(list[Retrie
 
 
 def _evaluate_config(config: RetrievalConfig, questions: list[Question]) -> RetrievalResult:
-    recalls: dict[int, list[float]] = {k: [] for k in K_VALUES}
-    reciprocal_ranks = []
-    for question in questions:
-        for k in K_VALUES:
-            # Search at each k, because routing splits k between banks: the top k of a deeper search is not what the
-            # answer model would get.
-            hits = routed_search(config.retriever, question.question, k=k, route=config.route, expand=config.expand)
-            recalls[k].append(retrieval_scores(question, [page_key(hit.chunk) for hit in hits], k)[0])
-        hits = routed_search(
-            config.retriever,
-            question.question,
-            k=SEARCH_DEPTH,
-            route=config.route,
-            expand=config.expand,
-        )
-        ranked_pages = list(dict.fromkeys(page_key(hit.chunk) for hit in hits))
-        reciprocal_ranks.append(retrieval_scores(question, ranked_pages, SEARCH_DEPTH)[1])
+    scores = [score_retrieval(config.retriever, question, config.route, config.expand) for question in questions]
     return RetrievalResult(
         config=config.name,
         questions=len(questions),
-        recall={k: statistics.mean(values) for k, values in recalls.items()},
-        mrr=statistics.mean(reciprocal_ranks),
+        recall={k: statistics.mean(score.recall[k] for score in scores) for k in K_VALUES},
+        mrr=statistics.mean(score.reciprocal_rank for score in scores),
     )
 
 

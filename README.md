@@ -154,9 +154,12 @@ While the server has searched, it holds the vector index's lock, like the web pa
 ```bash
 make eval-retrieval   # recall@k and MRR for 8 search setups, free, a few minutes
 make eval             # also answers all 44 questions and grades them with the judge: about USD 0.05
+make check-retrieval  # keyword search on the committed fixture, as CI runs it: free, 10 seconds, no reports needed
 ```
 
-Both write [evals/RESULTS.md](evals/RESULTS.md), with a chart of the retrieval comparison; the full run also writes [evals/ANSWERS.md](evals/ANSWERS.md) with every question, gold answer, answer, cited passage and verdict.
+The first two write [evals/RESULTS.md](evals/RESULTS.md), with a chart of the retrieval comparison; the full run also writes [evals/ANSWERS.md](evals/ANSWERS.md) with every question, gold answer, answer, cited passage and verdict.
+
+CI cannot run the full evals: they need the twelve parsed reports and two 2.3 GB models. So [evals/fixture/](evals/fixture/) holds 533 real chunks (6% of the index): every chunk on a gold page, plus the 20 chunks that keyword search ranks highest for each question over the whole index, which are the passages each question has to beat. CI runs BM25 with routing and the Danish glossary on them and fails if recall@1, 3, 6 or 10 or MRR falls below [the committed baseline](evals/fixture/baseline.json). Its numbers are lower than over the full index (recall@6 0.63 against 0.77), because BM25 weighs each term by how rare it is in the fixture, where most chunks discuss the same figures. It is a check that nothing got worse, not a measurement: turning off routing or the glossary, splitting figures into digits or dropping the stopword list each make it fail.
 
 ### Settings
 
@@ -173,10 +176,10 @@ All optional, in `.env`:
 ### Development
 
 ```bash
-make check    # ruff, ruff format, mypy and pytest: what CI runs
+make check    # ruff, ruff format, mypy, pytest and the retrieval check on the fixture: what CI runs
 ```
 
-The 67 tests need no API key, models or PDFs: they use small fakes, an in-memory Qdrant and a fake HTTP transport for the Claude API. Pre-commit runs ruff, mypy and a gitleaks secret scan on every commit, and GitHub Actions runs the checks and the secret scan on every pull request.
+The 99 tests need no API key, models or PDFs: they use small fakes, an in-memory Qdrant and a fake HTTP transport for the Claude API. Pre-commit runs ruff, mypy and a gitleaks secret scan on every commit, and GitHub Actions runs the checks, the retrieval check and the secret scan on every pull request.
 
 ## How it is measured
 
@@ -237,7 +240,7 @@ src/bankrag/
     evaluate.py            recall@k, MRR, number and grounding checks
     ui/                    the Streamlit page and the passage highlighter
     mcp_server.py          the read-only MCP server: report search and the KPI table
-evals/                     questions, judge rubric, the eval runner and its generated results
+evals/                     questions, judge rubric, the eval runner and its results, the CI fixture and check
 kpi/figures.yaml           the 42 key figures with page and source row, for review by hand
 scripts/                   download the reports; search the parsed pages; retrieval per eval question
 tests/                     unit tests, no network or models needed
@@ -258,10 +261,10 @@ The `.claude` folder is part of the repository, and each piece exists because it
 - **[eval-reviewer](.claude/agents/eval-reviewer.md)**, a subagent, reads failed eval cases and sorts each by cause: retrieval, parsing, generation, gold answer or judge. That is the review I did by hand for the LLM judge's verdicts, written down so it can run on its own.
 - **[Permissions](.claude/settings.json)** deny reading `.env`, allow the free read-only scripts without asking, and always ask before the commands that spend money.
 
-Not done yet: retrieval evals in CI against a small index fixture, a screen recording of the MCP server in Claude Desktop, a test from a clean clone, and my own check of every gold answer and KPI figure against the PDFs (all are marked `verified: false` until then).
+Not done yet: a screen recording of the MCP server in Claude Desktop, a test from a clean clone, and my own check of every gold answer and KPI figure against the PDFs (all are marked `verified: false` until then).
 
 ## Disclaimer
 
 Built on public annual reports for demonstration. Not investment advice. Figures should be checked against the source page.
 
-The annual reports belong to the banks. This repository does not contain them: `scripts/download.py` fetches them from each bank's investor relations site. The code is MIT licensed.
+The annual reports belong to the banks. This repository does not contain them: `scripts/download.py` fetches them from each bank's investor relations site. Report text in the repository is limited to short quotes in the eval results and the KPI table, and the CI test fixture of 533 passages, each with its report and page. The code is MIT licensed.
