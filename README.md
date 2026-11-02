@@ -245,7 +245,7 @@ kpi/figures.yaml           the 42 key figures with page and source row, for revi
 scripts/                   download the reports; search the parsed pages; retrieval per eval question
 tests/                     unit tests, no network or models needed
 docs/                      decisions, experiments, documents, concepts, build log
-.claude/                   Claude Code setup: style guide, hook, two project skills, a subagent, permissions
+.claude/                   Claude Code setup: style guide, git workflow, hook, two skills, a command, a subagent, permissions
 ```
 
 ## How I built it
@@ -256,6 +256,7 @@ The `.claude` folder is part of the repository, and each piece exists because it
 
 - **[CLAUDE.md](CLAUDE.md)** gives every session the rules: how to run things, never commit data or keys, ask before any paid API run, refuse investment advice, every new feature gets an eval case. The build log lists what each paid run cost; all of them together came to about USD 0.31.
 - **A [Python style guide](.claude/reference/python-style.md) and a hook** that blocks an agent from editing Python before it has read the guide. Ruff, mypy and pre-commit then catch what a tool can check, before a commit.
+- **A [git workflow](.claude/reference/git-workflow.md) and a [commit-push-pr](.claude/commands/commit-push-pr.md) command**: one `category/description` branch per task, rebased onto `main`, commits as `tag(scope): Header` with a body that says why, and pull requests with a summary and a test plan. The command runs the checks first.
 - **[add-eval-case](.claude/skills/add-eval-case/SKILL.md)**, a project skill, makes every eval question's figures and pages checked in the parsed report text. It was used for all 17 questions added in milestone 2, and those checks found a restatement, four different employee counts in one report, and pages missing from gold lists.
 - **[run-evals-and-report](.claude/skills/run-evals-and-report/SKILL.md)**, a project skill, is the loop that keeps the docs honest: run the free evals, find the questions behind every changed number, check unexpected pages in the text, update the docs. It was written down after doing that by hand for every change from the hybrid search to the twelve reports.
 - **[eval-reviewer](.claude/agents/eval-reviewer.md)**, a subagent, reads failed eval cases and sorts each by cause: retrieval, parsing, generation, gold answer or judge. That is the review I did by hand for the LLM judge's verdicts, written down so it can run on its own.
