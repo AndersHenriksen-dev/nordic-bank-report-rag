@@ -15,6 +15,14 @@ uv run python evals/run_evals.py
 
 Retrieval only: no API calls, a few minutes on a GPU. It rewrites `evals/RESULTS.md`, its charts and `evals/results/retrieval.json`, and regenerates `evals/ANSWERS.md` from the last answer run. Qdrant allows one process at a time, so stop the web page and the MCP server first.
 
+Then run the check CI runs, keyword search on the committed fixture:
+
+```bash
+uv run python evals/check_retrieval.py
+```
+
+If it fails, the change made keyword search worse on the fixture; it names the questions, which step 3 explains. Accept an intended, explained drop with `--update` and give the reason in the commit. After an ingest or a change to the gold pages, use `--rebuild` instead.
+
 **Never add `--answers` without asking Anders first.** It answers all 44 questions with Claude and grades them with the judge: about USD 0.05 per run. Say the cost when asking.
 
 ## 2. Compare with the last committed results

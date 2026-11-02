@@ -1,4 +1,4 @@
-.PHONY: setup download ingest ask app mcp eval-retrieval eval test lint check
+.PHONY: setup download ingest ask app mcp eval-retrieval eval check-retrieval test lint check
 
 setup:
 	uv sync
@@ -28,6 +28,10 @@ eval-retrieval:
 eval:
 	uv run python evals/run_evals.py --answers
 
+# BM25 retrieval on the committed fixture, as CI runs it: fails if recall@k or MRR drops below the baseline.
+check-retrieval:
+	uv run python evals/check_retrieval.py
+
 test:
 	uv run pytest
 
@@ -37,4 +41,4 @@ lint:
 	uv run mypy src
 
 # Everything CI runs.
-check: lint test
+check: lint test check-retrieval

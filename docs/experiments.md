@@ -101,6 +101,33 @@ q10 failed under all three, which is defensible: the answer says the group figur
 | q35 Three banks' net profit | Calls Danske Bank's figure the highest, then says the three cannot be ranked | Yes: a mild self-contradiction |
 | q40 Jyske Bank's employees (Danish) | Says the report does not explain the gap of 50 between two counts | No: that is true; the footnote explains a gap of 23 |
 
+## A fixture for retrieval evals in CI
+
+CI has neither the parsed reports nor the models, so it searches a committed fixture: every chunk on a gold page, plus each answerable question's top 20 results from routed BM25 search with the glossary over the full index. That is 533 of 8,700 chunks, 1.05 MB with each chunk's text stored once. BM25 with routing and the glossary scores lower on it than on the full index:
+
+| Index | Chunks | Size | Recall@1 | Recall@3 | Recall@6 | Recall@10 | MRR | Questions whose recall@6 differs from the full index |
+|---|---|---|---|---|---|---|---|---|
+| Full index | 8,700 | | 0.23 | 0.53 | 0.77 | 0.79 | 0.47 | |
+| Fixture (committed) | 533 | 1.05 MB | 0.19 | 0.43 | 0.63 | 0.71 | 0.40 | 7 |
+| Fixture + 500 random chunks | 1,033 | 2.0 MB | 0.20 | 0.51 | 0.63 | 0.76 | 0.44 | 7 |
+| Fixture + 1,000 random chunks | 1,533 | 3.0 MB | 0.23 | 0.51 | 0.67 | 0.79 | 0.47 | 5 |
+| Fixture + 2,000 random chunks | 2,533 | 4.9 MB | 0.23 | 0.54 | 0.73 | 0.82 | 0.48 | 2 |
+
+A smaller index should be easier, so the drop needed explaining. Adding random chunks moves the scores back towards the full index, which points to BM25's term weights: a term counts for more the rarer it is in the index, and in the fixture most chunks discuss the same figures, so terms such as "net profit" weigh less. Getting close to the full index would take five times the size, so I kept the small fixture as a regression check rather than a measurement. The full index stays the reference for every number in this page.
+
+Whether it catches regressions was tested by breaking the search on purpose:
+
+| Change | Recall@1 | Recall@3 | Recall@6 | Recall@10 | MRR | CI |
+|---|---|---|---|---|---|---|
+| None (the baseline) | 0.19 | 0.43 | 0.63 | 0.71 | 0.40 | passes |
+| Routing off | 0.19 | 0.33 | 0.49 | 0.63 | 0.36 | fails |
+| Glossary off | 0.19 | 0.35 | 0.52 | 0.69 | 0.37 | fails |
+| Routing and glossary off | 0.19 | 0.30 | 0.40 | 0.52 | 0.34 | fails |
+| Figures split into digits ("23,037" as "23" and "037") | 0.21 | 0.43 | 0.60 | 0.71 | 0.41 | fails |
+| No stopword list | 0.16 | 0.45 | 0.60 | 0.73 | 0.38 | fails |
+
+Two of the changes raise some numbers while lowering others, so CI checks every metric, not one.
+
 ## Everything else, by stage
 
 | Stage | What I tried | What happened | Kept? |
