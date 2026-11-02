@@ -8,12 +8,12 @@ Not investment advice. Figures should be checked against the source page.
 
 ## Headline results
 
-Measured on 44 eval questions, 35 of them answerable from the reports ([evals/RESULTS.md](evals/RESULTS.md)). Search is measured over all twelve reports. The answer figures come from the last answer run, made over the six 2024 and 2025 reports before the 2022 and 2023 reports were added:
+Measured on 44 eval questions over all twelve reports, 35 of them answerable from the reports ([evals/RESULTS.md](evals/RESULTS.md)):
 
 - **Recall@6 0.94** with hybrid search and a reranker, against 0.77 for keyword search alone: the 6 passages Claude reads hold the needed evidence 94% of the time, counting each bank or year a question needs.
-- **27 of 28 numeric answers exact.**
+- **26 of 28 numeric answers exact.** In the other 2 the search missed the page with the figure, and the answer said so instead of guessing.
 - **9 of 9 unanswerable questions refused**, and no answerable question refused.
-- **USD 0.001 (DKK 0.007) and about 5 seconds per question**, with Claude Haiku 5.5 and local open models for search.
+- **USD 0.001 (DKK 0.007) and 4.4 seconds per question** on average, with Claude Haiku 5.5 and local open models for search.
 
 ## What an answer looks like
 
@@ -206,12 +206,13 @@ Each step was measured on the 35 answerable questions, searching all twelve repo
 | BM25 and dense fused by reciprocal rank fusion | 0.39 | 0.68 | 0.82 |
 | + cross-encoder reranker (`bge-reranker-v2-m3`) on the top 30 | **0.50** | **0.84** | **0.94** |
 
-Answers on all 44 questions with the reranked search and Claude Haiku 5.5 (the latest of two runs, made before the 2022 and 2023 reports were added):
+Answers on all 44 questions over the twelve reports, with the reranked search and Claude Haiku 5.5:
 
-- 27 of 28 numeric answers exact, and 26 of 32 answers with every figure in a cited passage (29 in the run before).
+- 26 of 28 numeric answers exact (27 over six reports). Both misses are search misses: the page with the figure was not among the 6 passages, and the answer said the figure was missing.
+- 32 of 32 answers with every figure in a cited passage. The two runs over six reports scored 29 and 26 with the same answer code; where Claude places its citations varies from run to run, so this is not a gain from the extra reports.
 - All 9 questions the reports cannot answer refused, and no answerable question refused.
-- The LLM judge passed 27 of 35 answers as correct, complete and consistent. Reading the 8 fails, 7 are real faults.
-- USD 0.001 and 5 s per question, plus USD 0.0002 per judge verdict.
+- The LLM judge passed 29 of 35 answers as correct, complete and consistent (27 over six reports). Reading the 6 fails, 5 are real faults: two search misses, a business-unit page without a section label, an answer that leaves out one bank's main uses of AI, and a wrong ranking across currencies. The sixth is a judge error.
+- USD 0.001 and 4.4 s per question, plus USD 0.0002 per judge verdict.
 
 What I take from it:
 
@@ -220,7 +221,7 @@ What I take from it:
 - **Dense vectors alone do not replace BM25 on annual reports**, which are full of exact terms and figures. They put the right page first about as often (recall@1 0.24 against 0.23) but find less of the evidence in the top 6 (0.74 against 0.77). Fused with BM25 they put the right page first 70% more often, and the reranker more than doubles BM25's rate (0.50 against 0.23).
 - **The eval had to be debugged too.** My first citation metric scored 50%, but it measured my gold page lists more than the answers. Its replacement checks that every figure in an answer appears in a passage the answer cites. Better searches also kept finding pages that hold the answer but were missing from my gold lists; each one is checked in the page text before it is added.
 - **A judge needs checking too.** The LLM judge caught comparisons that contradict themselves and business-unit figures offered as the group's, which no figure check could see. At low effort it also failed 3 good answers, and a sharper rubric alone only moved those errors around. Judging the same answers at medium effort cut the wrong verdicts to 1 of 34.
-- **Where it breaks:** group versus business-unit pages (the answer offers a business unit's figure next to the group's and will not choose), paragraphs the parser splits into pieces so a citation covers only part of a sentence, and sentences quoted without a citation marker. My first refusal rule also refused questions about a bank's own published outlook; a new eval question caught it, and the fix removed the last wrong refusal.
+- **Where it breaks:** group versus business-unit pages (the answer offers a business unit's figure next to the group's and will not choose), rankings across currencies (one answer called Danske Bank's DKK 23.0 billion larger than Nordea's EUR 4.8 billion, which is about DKK 36 billion), paragraphs the parser splits into pieces so a citation covers only part of a sentence, and sentences quoted without a citation marker. My first refusal rule also refused questions about a bank's own published outlook; a new eval question caught it, and the fix removed the last wrong refusal.
 
 Every strategy, with its numbers and what I kept, is in [docs/experiments.md](docs/experiments.md).
 
@@ -250,11 +251,11 @@ docs/                      decisions, experiments, documents, concepts, build lo
 
 ## How I built it
 
-I built this with Claude Code in about 9 hours over two days, of which about 1.6 hours was parsing that ran in the background. [docs/BUILD_LOG.md](docs/BUILD_LOG.md) has one row per session: what was built, what Claude Code did, where it got something wrong, and what I decided.
+I built this with Claude Code in about 9.5 hours over three days, of which about 1.6 hours was parsing that ran in the background. [docs/BUILD_LOG.md](docs/BUILD_LOG.md) has one row per session: what was built, what Claude Code did, where it got something wrong, and what I decided.
 
 The `.claude` folder is part of the repository, and each piece exists because it made the work faster or safer:
 
-- **[CLAUDE.md](CLAUDE.md)** gives every session the rules: how to run things, never commit data or keys, ask before any paid API run, refuse investment advice, every new feature gets an eval case. The build log lists what each paid run cost; all of them together came to about USD 0.31.
+- **[CLAUDE.md](CLAUDE.md)** gives every session the rules: how to run things, never commit data or keys, ask before any paid API run, refuse investment advice, every new feature gets an eval case. The build log lists what each paid run cost; all of them together came to about USD 0.36.
 - **A [Python style guide](.claude/reference/python-style.md) and a hook** that blocks an agent from editing Python before it has read the guide. Ruff, mypy and pre-commit then catch what a tool can check, before a commit.
 - **A [git workflow](.claude/reference/git-workflow.md) and a [commit-push-pr](.claude/commands/commit-push-pr.md) command**: one `category/description` branch per task, rebased onto `main`, commits as `tag(scope): Header` with a body that says why, and pull requests with a summary and a test plan. The command runs the checks first.
 - **[add-eval-case](.claude/skills/add-eval-case/SKILL.md)**, a project skill, makes every eval question's figures and pages checked in the parsed report text. It was used for all 17 questions added in milestone 2, and those checks found a restatement, four different employee counts in one report, and pages missing from gold lists.
