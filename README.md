@@ -54,7 +54,10 @@ flowchart LR
     S1 --> RRF[Rank fusion]
     S2 --> RRF
     RRF --> RR[Rerank to 6]
+    RT --> KF[Key figure rows from the KPI table]
     RR --> CL[Claude answers with citations]
+    KF --> CL
+    CL --> CK[Figures checked against the cited text]
 ```
 
 1. **Parse.** PyMuPDF reads every page. Tables are rebuilt row by row from word positions, because the library's own cell output merged columns on many report tables. Each page keeps its bank, year, PDF page number and section. Each report is parsed in a child process that restarts after a crash, because PyMuPDF's layout model crashed the process on 3 of the 3,553 pages.
@@ -63,10 +66,12 @@ flowchart LR
 4. **Expand Danish.** A glossary of 25 Danish finance terms adds the English wording the reports use ("egenkapitalforrentning" adds "return on equity").
 5. **Search twice and fuse.** BM25 matches exact terms and figures. Dense vectors from `BAAI/bge-m3`, stored in embedded Qdrant, match meaning across languages. Reciprocal rank fusion merges the two rankings by rank, not score.
 6. **Rerank.** The cross-encoder `BAAI/bge-reranker-v2-m3` reads the question and each of the top 30 passages together and keeps the best 6. Both models run locally, on the GPU when there is one.
-7. **Answer.** Claude Haiku 5.5 gets the 6 passages as `search_result` blocks with citations turned on, and a cached system prompt with the rules: answer only from the passages, cite every figure, answer Danish questions in Danish, refuse forecasts and advice, but report a bank's own published outlook.
-8. **Log.** Every answer goes to `data/traces/answers.jsonl` with its sources, tokens, cost and latency.
+7. **Add key figures.** When a question names a key figure (such as net profit or the CET1 ratio), a bank and a report year, the matching rows of the KPI table (below) go in front of the passages. Each is the exact row from the report's key figure page, titled with the figure for that year. The search sometimes returns a business unit's page instead of the group's key figures; the row makes sure Claude also has the group's. 25 of the 44 eval questions get rows, and CI checks that each gets exactly the rows it should.
+8. **Answer.** Claude Haiku 5.5 gets the passages as `search_result` blocks with citations turned on, and a cached system prompt with the rules: answer only from the passages, cite every figure, answer Danish questions in Danish, refuse forecasts and advice, but report a bank's own published outlook.
+9. **Check figures.** Every figure in the answer is looked up in the passages it cites. The web page and the CLI name any figure that is not there, so the reader knows what to check by hand.
+10. **Log.** Every answer goes to `data/traces/answers.jsonl` with its sources, tokens, cost and latency.
 
-Next to the answers sits a **KPI table** ([kpi/figures.yaml](kpi/figures.yaml)): net profit, total income, cost/income ratio, return on equity, CET1 ratio, loan impairment charges and lending, for each bank and year. Each of the 42 figures has its page and the exact table row it came from. Claude Haiku read them with structured output from each report's key figure pages and the search results, for USD 0.05 in total. Three automatic checks (the page was sent, the row is on the page, the value is in the row) passed on all 42, and the figures agree with every gold answer that states the same number. They are marked `verified: false` until I have checked them against the PDFs. `bankrag kpi show` prints the table from SQLite, which the MCP server will query.
+Next to the answers sits a **KPI table** ([kpi/figures.yaml](kpi/figures.yaml)): net profit, total income, cost/income ratio, return on equity, CET1 ratio, loan impairment charges and lending, for each bank and year. Each of the 42 figures has its page and the exact table row it came from. Claude Haiku read them with structured output from each report's key figure pages and the search results, for USD 0.05 in total. Three automatic checks (the page was sent, the row is on the page, the value is in the row) passed on all 42, and the figures agree with every gold answer that states the same number. They are marked `verified: false` until I have checked them against the PDFs. `bankrag kpi show` prints the table from SQLite, which the MCP server queries and the answers use (step 7).
 
 The reasons behind each choice are in [docs/decisions.md](docs/decisions.md). A study guide to the concepts (BM25, embeddings, rank fusion, rerankers, citations, the eval metrics, and the banking terms in the reports) is in [docs/concepts.md](docs/concepts.md).
 
@@ -236,7 +241,7 @@ src/bankrag/
     ingest/                PDF parsing, chunking, the crash-safe pipeline
     retrieve/              BM25, Qdrant vectors, fusion, reranking, routing, Danish glossary
     answer/generate.py     the Claude call with citations, refusals, cost and the trace log
-    kpi/                   the KPI table: extraction with structured output, automatic checks, SQLite queries
+    kpi/                   the KPI table: structured output, automatic checks, SQLite, rows sent with answers
     judge.py               the LLM judge
     evaluate.py            recall@k, MRR, number and grounding checks
     ui/                    the Streamlit page and the passage highlighter

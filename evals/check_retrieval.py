@@ -1,9 +1,10 @@
-"""Check that keyword search on a small committed fixture still finds the gold pages; exit 1 if recall drops.
+"""Check what Claude is sent for each eval question, without the reports or the models; exit 1 if it got worse.
 
 The full evals need the twelve parsed reports and two 2.3 GB models, which CI does not have. The fixture holds every
 chunk on a gold page, plus the chunks that routed BM25 search ranks highest for each question over the full index, so
 each question meets the same competing passages as in the full index. CI searches it with BM25, routing and the
-Danish glossary, and compares recall@k and MRR with the committed baseline. Free: no API calls, no models.
+Danish glossary, and compares recall@k and MRR with the committed baseline. It also checks that every question gets
+exactly the KPI table rows its `key_figures` list. Free: no API calls, no models.
 
 python evals/check_retrieval.py            # compare with the baseline
 python evals/check_retrieval.py --update   # accept the current scores as the baseline, after a deliberate change
@@ -23,6 +24,7 @@ from pydantic import BaseModel
 
 from bankrag.evaluate import K_VALUES, load_questions, page_key, score_retrieval
 from bankrag.ingest import load_chunks
+from bankrag.kpi import figure_key, key_figures_for
 from bankrag.models import Chunk, Question, RetrievalScores
 from bankrag.retrieve import BM25Retriever, routed_search
 
@@ -122,15 +124,26 @@ def _table(baseline: Baseline, now: Baseline) -> list[str]:
     return rows
 
 
+def _key_figure_mismatches(questions: list[Question]) -> list[str]:
+    """Name every question that would get other KPI table rows than its `key_figures` list."""
+    lines = []
+    for question in questions:
+        sent = [figure_key(figure) for figure in key_figures_for(question.question)]
+        if sorted(sent) != sorted(question.key_figures):
+            lines.append(f"  {question.id}: gets {sent or 'none'}, should get {question.key_figures or 'none'}")
+    return lines
+
+
 def main() -> int:
-    """Rebuild or update if asked, then compare the fixture's scores with the baseline."""
+    """Rebuild or update if asked, then compare the fixture's scores with the baseline and check the key figures."""
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     action = parser.add_mutually_exclusive_group()
     action.add_argument("--update", action="store_true", help="write the current scores as the baseline")
     action.add_argument("--rebuild", action="store_true", help="rebuild the fixture and the baseline from data/")
     args = parser.parse_args()
 
-    questions = [question for question in load_questions(EVAL_DIR / "questions.yaml") if question.answerable]
+    all_questions = load_questions(EVAL_DIR / "questions.yaml")
+    questions = [question for question in all_questions if question.answerable]
     if args.rebuild:
         write_fixture(build_fixture(load_chunks("structure"), questions))
     chunks = load_fixture()
@@ -154,9 +167,15 @@ def main() -> int:
     drops = _drops(baseline, now)
     if drops:
         print(f"FAILED: {', '.join(drops)} fell below the baseline. If the drop is intended, run with --update.")
-        return 1
-    print("OK: no metric fell below the baseline.")
-    return 0
+    else:
+        print("OK: no metric fell below the baseline.")
+
+    mismatches = _key_figure_mismatches(all_questions)
+    right = len(all_questions) - len(mismatches)
+    print(f"\nKey figure rows: {right} of {len(all_questions)} questions get exactly the rows they list")
+    if mismatches:
+        print("FAILED:\n" + "\n".join(mismatches))
+    return 1 if drops or mismatches else 0
 
 
 if __name__ == "__main__":

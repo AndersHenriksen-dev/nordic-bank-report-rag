@@ -48,15 +48,19 @@ def is_danish(question: str) -> bool:
     return bool(DANISH_RE.search(question))
 
 
+def english_terms(text: str) -> list[str]:
+    """Return the English report wording for every glossary term in the text, whatever its language."""
+    added: list[str] = []
+    for pattern, english in _GLOSSARY_PATTERNS:
+        if pattern.search(text) and english not in added:
+            added.append(english)
+    return added
+
+
 def expand_danish(question: str) -> str:
     """Append the English report wording for every Danish finance term in a Danish question.
 
     English questions come back unchanged, because some glossary entries (such as "strategi") also match English.
     """
-    if not is_danish(question):
-        return question
-    added: list[str] = []
-    for pattern, english in _GLOSSARY_PATTERNS:
-        if pattern.search(question) and english not in added:
-            added.append(english)
+    added = english_terms(question) if is_danish(question) else []
     return f"{question} {' '.join(added)}" if added else question

@@ -1,4 +1,4 @@
-"""Tests for the KPI table: the automatic checks, the extraction request, the YAML and SQLite store.
+"""Tests for the KPI table: the automatic checks, the extraction request, the store, and the rows sent with answers.
 
 No API call is made: the SDK's HTTP transport is replaced by one that records the request and returns a canned reply,
 and the search is a fake that returns fixed passages.
@@ -15,7 +15,7 @@ import httpx2
 import pytest
 
 from bankrag.config import Bank
-from bankrag.kpi import extract, store
+from bankrag.kpi import extract, lookup, store
 from bankrag.models import Chunk, ExtractedKpi, KpiFigure, Metric
 from bankrag.retrieve import Hit, Retriever
 
@@ -191,3 +191,111 @@ class TestStore:
     def test_no_yaml_means_an_empty_table(self) -> None:
         assert store.load_figures() == []
         assert store.compare_banks("cet1_ratio", 2025) == []
+
+
+TABLE = {
+    ("danske", "cost_income_ratio", 2024): KpiFigure(
+        bank="danske",
+        year=2024,
+        metric="cost_income_ratio",
+        value=45.6,
+        unit="%",
+        page=4,
+        quote="| Cost/income ratio (C/I), (%) | 45.6 | 48.6 |",
+        label="Cost/income ratio (C/I), (%)",
+    ),
+    ("danske", "cost_income_ratio", 2025): KpiFigure(
+        bank="danske",
+        year=2025,
+        metric="cost_income_ratio",
+        value=45.5,
+        unit="%",
+        page=4,
+        quote="| Cost/income ratio (C/I), (%) | 45.5 | 45.6 |",
+        label="Cost/income ratio (C/I), (%)",
+    ),
+    ("danske", "net_profit", 2024): KpiFigure(
+        bank="danske",
+        year=2024,
+        metric="net_profit",
+        value=23629,
+        unit="DKK million",
+        page=4,
+        quote="| Net profit | 23,629 | 21,262 |",
+        label="Net profit",
+    ),
+    ("nordea", "net_profit", 2024): KpiFigure(
+        bank="nordea",
+        year=2024,
+        metric="net_profit",
+        value=5059,
+        unit="EUR million",
+        page=40,
+        quote="| Net profit for the year | 5,059 | 4,934 |",
+        label="Net profit for the year",
+    ),
+    ("jyske", "net_profit", 2024): KpiFigure(
+        bank="jyske",
+        year=2024,
+        metric="net_profit",
+        value=5312,
+        unit="DKK million",
+        page=7,
+        quote="| Profit for the year | 5,312 |",
+        failed_checks=["the value is not in the quote"],
+    ),
+    ("danske", "loan_impairment_charges", 2024): KpiFigure(
+        bank="danske",
+        year=2024,
+        metric="loan_impairment_charges",
+        value=-543,
+        unit="DKK million",
+        page=4,
+        quote="| Loan impairment charges | -543 | 262 |",
+        label="Loan impairment charges",
+    ),
+}
+
+
+class TestKeyFigures:
+    @pytest.fixture(autouse=True)
+    def table(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        monkeypatch.setattr(lookup, "get_kpi", lambda bank, metric, year: TABLE.get((bank, metric, year)))
+
+    def test_metrics_are_read_in_english_and_danish(self) -> None:
+        assert lookup.asked_metrics("What was Danske Bank's cost/income ratio in 2025?") == ["cost_income_ratio"]
+        assert lookup.asked_metrics("Sammenlign Danske Banks og Nordeas nettoresultat for 2024.") == ["net_profit"]
+        assert lookup.asked_metrics("How did Nordea's net interest income change?") == []
+
+    def test_a_question_gets_a_row_for_each_bank_and_year_it_names(self) -> None:
+        figures = lookup.key_figures_for(
+            "What was Danske Bank's cost/income ratio in 2025, and how did it change from 2024?",
+        )
+        assert [lookup.figure_key(figure) for figure in figures] == [
+            "danske-2024-cost_income_ratio",
+            "danske-2025-cost_income_ratio",
+        ]
+
+    def test_rows_that_failed_a_check_are_left_out(self) -> None:
+        figures = lookup.key_figures_for("Compare the net profit of the three banks in 2024.")
+        assert [figure.bank for figure in figures] == ["danske", "nordea"]
+
+    def test_no_bank_no_year_or_a_future_year_means_no_rows(self) -> None:
+        assert lookup.key_figures_for("What was the cost/income ratio in 2025?") == []
+        assert lookup.key_figures_for("What was Danske Bank's cost/income ratio?") == []
+        assert lookup.key_figures_for("What net profit does Danske Bank expect for 2026, after 2024?") == []
+
+    def test_a_row_becomes_a_passage_titled_with_its_figure(self) -> None:
+        hit = lookup.key_figure_hit(TABLE[("danske", "net_profit", 2024)])
+        assert hit.chunk.id == "kpi-danske-2024-net_profit"
+        assert (hit.chunk.page, hit.chunk.body) == (4, "| Net profit | 23,629 | 21,262 |")
+        assert hit.chunk.heading.endswith("Net profit for 2024 is DKK 23,629 million")
+
+    def test_a_negative_impairment_charge_is_called_a_reversal(self) -> None:
+        hit = lookup.key_figure_hit(TABLE[("danske", "loan_impairment_charges", 2024)])
+        assert hit.chunk.heading.endswith("is a net reversal of DKK 543 million")
+
+    def test_rows_go_in_front_of_the_search_results(self) -> None:
+        searched = [hit(10, "Net profit was DKK 23,629 million.")]
+        hits = lookup.with_key_figures("What was Danske Bank's net profit in 2024?", searched)
+        assert [found.chunk.id for found in hits] == ["kpi-danske-2024-net_profit", searched[0].chunk.id]

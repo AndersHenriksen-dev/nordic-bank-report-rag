@@ -18,6 +18,7 @@ from anthropic.types import ContentBlockParam, Message, SearchResultBlockParam, 
 from pydantic import ValidationError
 
 from bankrag.config import ANSWER_MODEL, PRICES_USD_PER_MTOK, TRACE_DIR, bank_name
+from bankrag.figures import ungrounded_figures
 from bankrag.models import Answer, Source, TracedAnswer
 from bankrag.retrieve import Hit
 
@@ -52,6 +53,10 @@ figure refers to. Danske Bank and Jyske Bank report in DKK, Nordea reports in EU
 - Tables in the search results are written as rows with cells separated by "|". The first rows of a table \
 are usually its column headers, often years. If you cannot tell which column a figure belongs to, say so \
 instead of guessing.
+- Some search results are single rows from a bank's key figure table. Their title says "key figure checked \
+against this page" and states which figure the row gives for which year. For the group's key figures, use these \
+rows rather than figures for a business unit, a segment or the parent company, and cite them like any other \
+search result.
 - For a change between years, give both values and the difference, and use the report's own wording for \
 what drove it.
 - For a comparison across banks, give each bank's figure with its own citation. Point out when the banks \
@@ -259,6 +264,8 @@ def thinking_summary(response: Message) -> str:
 def answer(question: str, hits: list[Hit]) -> Answer:
     """Ask Claude to answer from the retrieved chunks only, and measure the call.
 
+    The answer lists any figure it states that no cited passage holds, so the reader knows what to check by hand.
+
     Raises:
         SystemExit: If no API key is configured.
     """
@@ -295,6 +302,7 @@ def answer(question: str, hits: list[Hit]) -> Answer:
         cost_usd=cost_usd(ANSWER_MODEL, usage),
         latency_s=latency,
         retrieved=[hit.chunk.id for hit in hits],
+        ungrounded=ungrounded_figures(text, [passage for source in sources for passage in source.cited_text]),
     )
 
 
