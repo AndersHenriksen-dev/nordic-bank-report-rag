@@ -29,12 +29,12 @@ Only when both sets are non-empty and differ, ask with `AskUserQuestion`, listin
 2. Never stage anything under `data/`, a PDF or `.env`.
 3. Run `uv run ruff check . && uv run ruff format --check . && uv run mypy src`, then only the tests for the Python modules that changed: their test files and any test file that imports them. Docs-only changes need no tests. If search, routing, the glossary or the eval questions changed, also run `uv run python evals/check_retrieval.py`. CI runs the full suite. Stop and report if anything fails.
 4. If on `main`, create a branch from an up-to-date `main` (`git pull --ff-only` first), named `category/description-with-dashes` by what the files do.
-5. Write the commit message as `tag(scope): Header`, body and footer, from the staged diff (`git diff --cached`), not from memory. The body says what changed and why, never how. End it with the Claude Code co-author trailer. No em dashes.
+5. Write the commit message as `tag(scope): Header`, body and footer, from the staged diff (`git diff --cached`), not from memory. The body says what changed and why, never how. No co-author trailers. No em dashes.
 
 ## 4. Push and open the pull request
 
 1. `git push -u origin <branch>`.
-2. `gh pr create` with the commit header as the title and a body with `## Summary` and `## Test plan`, ending with the Claude Code line.
+2. `gh pr create` with the commit header as the title and a body with `## Summary` and `## Test plan`, with no generated-by line.
 3. Report the pull request's URL.
 
 One run makes one branch and one pull request. If the chosen files are clearly two unrelated pieces of work, say so and suggest splitting them; do not split them yourself.

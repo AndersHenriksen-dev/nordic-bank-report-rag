@@ -252,14 +252,14 @@ kpi/figures.yaml           the 42 key figures with page and source row, for revi
 scripts/                   download the reports; search the parsed pages; retrieval per eval question
 tests/                     unit tests, no network or models needed
 docs/                      decisions, experiments, documents, concepts, build log
-.claude/                   Claude Code setup: style guide, git workflow, hook, two skills, a command, a subagent, permissions
+.claude/                   development setup: style guide, git workflow, hook, two skills, a command, a subagent, permissions
 ```
 
 ## How I built it
 
-I built this with Claude Code in about 10 hours over three days, of which about 1.6 hours was parsing that ran in the background. [docs/BUILD_LOG.md](docs/BUILD_LOG.md) has one row per session: what was built, what Claude Code did, where it got something wrong, and what I decided.
+I built this in about 10 hours over three days, of which about 1.6 hours was parsing that ran in the background. [docs/BUILD_LOG.md](docs/BUILD_LOG.md) has one row per session: what was built and what I decided.
 
-The `.claude` folder is part of the repository, and each piece exists because it made the work faster or safer:
+The repository also holds my development setup, in `CLAUDE.md` and the `.claude` folder, and each piece exists because it made the work faster or safer:
 
 - **[CLAUDE.md](CLAUDE.md)** gives every session the rules: how to run things, never commit data or keys, ask before any paid API run, refuse investment advice, every new feature gets an eval case. The build log lists what each paid run cost; all of them together came to about USD 0.41.
 - **A [Python style guide](.claude/reference/python-style.md) and a hook** that blocks an agent from editing Python before it has read the guide. Ruff, mypy and pre-commit then catch what a tool can check, before a commit.

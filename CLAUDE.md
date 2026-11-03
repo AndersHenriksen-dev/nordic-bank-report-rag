@@ -51,7 +51,7 @@ The `make` targets wrap the same commands.
 - The first search downloads `BAAI/bge-m3` and `BAAI/bge-reranker-v2-m3` (2.3 GB each) from Hugging Face. They run on the GPU when PyTorch finds one.
 - Nothing from Anders's current or past employers goes in this repo. The banks appear only as the public subjects of their reports.
 - The system must refuse forecasts, recommendations and investment advice. Keep the disclaimer in the README and the UI.
-- Update `docs/BUILD_LOG.md` at the end of each session: date, hours, what was built, what Claude Code did, what Anders decided.
+- Update `docs/BUILD_LOG.md` at the end of each session: date, hours, what was built, what Anders decided.
 - Record design choices and their reasons in `docs/decisions.md`.
 
 ## Writing style (everything that is not Python)
