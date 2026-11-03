@@ -190,6 +190,8 @@ uv run python evals/check_retrieval.py   # with the line above, what CI runs (ma
 
 The 108 tests need no API key, models or PDFs: they use small fakes, an in-memory Qdrant and a fake HTTP transport for the Claude API. Pre-commit runs ruff, mypy and a gitleaks secret scan on every commit, and GitHub Actions runs the checks, the retrieval check and the secret scan on every pull request.
 
+I tested the setup steps from a fresh clone on Windows 11 on 3 November 2026. Installing took 14 seconds from uv's cache, the download 7 seconds (Jyske Bank refused three of its four reports, as described above), and the ingest 66 minutes. The chunks came out byte-identical to my working copy, and the retrieval evals and the CI check gave the same numbers.
+
 ## How it is measured
 
 The eval set ([evals/questions.yaml](evals/questions.yaml)) has 44 questions: 10 lookups, 6 comparisons across years, 6 across banks, 7 "why" questions, 6 Danish questions and 9 that the reports cannot answer (forecasts, advice, years not covered). Each answerable question has a gold answer and the PDF pages that hold it, checked in the page text.
@@ -273,7 +275,7 @@ The repository also holds my development setup, in `CLAUDE.md` and the `.claude`
 - **[eval-reviewer](.claude/agents/eval-reviewer.md)**, a subagent, reads failed eval cases and sorts each by cause: retrieval, parsing, generation, gold answer or judge. That is the review I did by hand for the LLM judge's verdicts, written down so it can run on its own.
 - **[Permissions](.claude/settings.json)** deny reading `.env`, allow the free read-only scripts without asking, and always ask before the commands that spend money.
 
-Not done yet: a screen recording of the MCP server in Claude Desktop, a test from a clean clone, and my own check of every gold answer and KPI figure against the PDFs (all are marked `verified: false` until then).
+Not done yet: a screen recording of the MCP server in Claude Desktop, and my own check of every gold answer and KPI figure against the PDFs (all are marked `verified: false` until then).
 
 ## Disclaimer
 
