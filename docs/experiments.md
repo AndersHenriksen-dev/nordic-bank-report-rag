@@ -86,7 +86,7 @@ To separate the judge from the answers, the 34 answers of run 1 were judged thre
 | Rubric with main and secondary points defined, low effort | 26 | 3: q06 and q24 fixed, but q23 and q38 newly failed as "inconsistent" for clumsy wording, and q40 still failed |
 | Same rubric, medium effort | 28 | 1: q40 |
 
-q10 failed under all three, which is defensible: the answer says the group figure is not in its passages, and the rubric fails an answer that says the documents lack what the gold answer shows. (The first review of run 1 counted q10 as a wrong verdict; on a second reading it is not.) The four clear faults (q11, q26, q34, q35) failed under all three. A rubric change alone moved errors around instead of removing them, and the low-effort judge disagreed with itself on unchanged answers. Medium effort costs USD 0.0002 instead of 0.00013 per verdict, so it became the default. These readings were made by Claude Code and are still to be checked by hand.
+q10 failed under all three, which is defensible: the answer says the group figure is not in its passages, and the rubric fails an answer that says the documents lack what the gold answer shows. (The first review of run 1 counted q10 as a wrong verdict; on a second reading it is not.) The four clear faults (q11, q26, q34, q35) failed under all three. A rubric change alone moved errors around instead of removing them, and the low-effort judge disagreed with itself on unchanged answers. Medium effort costs USD 0.0002 instead of 0.00013 per verdict, so it became the default. These readings are still to be checked by hand.
 
 ### What the judge failed in run 2
 
@@ -131,7 +131,7 @@ Run 3 used the same answer code, prompt (apart from the years it names), search 
 | q35 Three banks' net profit | Calls Danske Bank's DKK 23.0 billion the largest; Nordea's EUR 4.84 billion is about DKK 36 billion | Generation: ranks figures in different currencies | Yes |
 | q40 Jyske Bank's employees (Danish) | Gives 3,794 from the key figure table with its footnote, and 3,844 from the workforce section | Judge: it reads "nøgletallet i sektionen om medarbejdere" as the key figure table and marks the answer incorrect | No: every figure and source is right; at most it could have named 3,794 as the headline figure |
 
-The two numeric misses are q01 and q34, both search misses. Of the 9 verdicts read (the 6 fails and the 3 new passes), a reading agrees with 8. These readings were made by Claude Code and are still to be checked by hand.
+The two numeric misses are q01 and q34, both search misses. Of the 9 verdicts read (the 6 fails and the 3 new passes), a reading agrees with 8. These readings are still to be checked by hand.
 
 ## Key figure rows from the KPI table (run 4)
 

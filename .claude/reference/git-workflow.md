@@ -29,9 +29,9 @@ Footer
 - **Footer:** issue references, breaking changes, co-author trailers.
 - **One working step per commit.** Each commit leaves ruff, mypy and pytest passing. If the header needs "and", it is probably two commits.
 - **Author:** `Anders Henriksen <anhenr.dev@gmail.com>`. Never override the author.
-- **Attribution:** commits made with Claude Code end with its `Co-Authored-By:` trailer, and pull request bodies with its "Generated with Claude Code" line. This repo shows how it was built with Claude Code, so the history says so too (decision 12).
+- **Attribution:** I am the only author. No co-author trailers for tools or assistants, and no generated-by lines in pull requests (decision 12).
 
-History before November 2026 uses plain sentence headers. It is not rewritten.
+History before November 2026 uses plain sentence headers; only its co-author trailers were removed.
 
 ## Pull requests
 

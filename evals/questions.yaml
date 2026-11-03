@@ -10,7 +10,7 @@
 #             passages, and evals/check_retrieval.py fails if a question gets other rows. Empty when it asks for none.
 #   verified: false until Anders has checked the gold answer against the PDF himself.
 #
-# Gold answers drafted by Claude Code from the PDFs on 2026-10-24. On 2026-10-25 q02, q24 and q26
+# Gold answers drafted from the PDFs on 2026-10-24. On 2026-10-25 q02, q24 and q26
 # got extra evidence pages after the first retrieval run surfaced pages that also hold the answer
 # (checked in the PDF text, not taken on trust from the retriever). Later the same day q27 got pages 23 and 140,
 # which the reranked search found and which hold both figures. Also on 2026-10-25, q28 to q44 were added with the
