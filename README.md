@@ -89,14 +89,17 @@ The reasons behind each choice are in [docs/decisions.md](docs/decisions.md). A 
 ```bash
 git clone https://github.com/AndersHenriksen-dev/nordic-bank-report-rag.git
 cd nordic-bank-report-rag
-make setup          # uv sync, and the pre-commit hooks
-make download       # the twelve PDFs into data/raw/, checked against their SHA-256
+uv sync                             # Python 3.12 and every dependency
+uv run pre-commit install           # lint, type and secret checks on each commit
+uv run python scripts/download.py   # the twelve PDFs into data/raw/, checked against their SHA-256
 ```
 
-Jyske Bank's website blocks scripted downloads. For its four reports the script prints the URL: open it in a browser, save the PDF under the name the script gives in `data/raw/`, and run `make download` again to check it.
+Each command also has a `make` shortcut in the [Makefile](Makefile) (`make setup`, `make download`, `make ingest` and so on). Windows has no `make` unless you install it, so the steps here use `uv` directly.
+
+Jyske Bank's website often refuses scripted downloads: in my last test from a clean clone it refused three of its four reports. For each one it refuses, the script prints the URL: open it in a browser, save the PDF under the name the script gives in `data/raw/`, and run the script again to check it.
 
 ```bash
-make ingest         # parse, chunk and index: about 55 minutes the first time
+uv run bankrag ingest               # parse, chunk and index: about 55 minutes the first time
 ```
 
 Parsing is the slow part, and its result is cached per report. The first run also downloads `bge-m3` from Hugging Face and builds the vector index (about 2 minutes on my GPU, including the download). Running `ingest` again parses only reports without a cache, and rebuilds the index only when the chunks or the embedding model changed.
@@ -116,17 +119,17 @@ Then add the API key and ask:
 
 ```bash
 cp .env.example .env          # then put your key after ANTHROPIC_API_KEY=
-make ask Q="How did Nordea's net interest income change from 2024 to 2025, and why?"
-make app                      # the web page on http://localhost:8501
+uv run bankrag ask "How did Nordea's net interest income change from 2024 to 2025, and why?"
+uv run streamlit run src/bankrag/ui/app.py   # the web page on http://localhost:8501
 ```
 
 The web page listens on localhost only, because every question spends the key's credit. Qdrant runs inside the process and locks its folder, so run one of the web page, the CLI or the evals at a time.
 
-Every answer is logged to `data/traces/answers.jsonl`, and the web page's "Saved answers" menu shows any of them again, with its reasoning, sources and highlighted pages, without calling the API or loading the search models. After `make eval` that includes all 44 eval questions, which is how the screenshots above were made.
+Every answer is logged to `data/traces/answers.jsonl`, and the web page's "Saved answers" menu shows any of them again, with its reasoning, sources and highlighted pages, without calling the API or loading the search models. After a full eval run that includes all 44 eval questions, which is how the screenshots above were made.
 
 ### Use it from Claude Desktop or Claude Code (MCP)
 
-`make mcp` starts a read-only MCP server over stdio with three tools:
+`uv run bankrag-mcp` starts a read-only MCP server over stdio with three tools:
 
 - `search_reports(query, bank?, year?, k?)`: the passages the reranked search finds, with bank, year, PDF page and section, so Claude can cite them.
 - `get_kpi(bank, metric, year)` and `compare_banks(metric, year)`: figures from the KPI table, with page and source row.
@@ -157,9 +160,9 @@ While the server has searched, it holds the vector index's lock, like the web pa
 ### Evals
 
 ```bash
-make eval-retrieval   # recall@k and MRR for 8 search setups, free, a few minutes
-make eval             # also answers all 44 questions and grades them with the judge: about USD 0.05
-make check-retrieval  # keyword search on the committed fixture, as CI runs it: free, 10 seconds, no reports needed
+uv run python evals/run_evals.py             # recall@k and MRR for 8 search setups, free, a few minutes
+uv run python evals/run_evals.py --answers   # also answers all 44 questions and grades them: about USD 0.05
+uv run python evals/check_retrieval.py       # what CI checks: free, 10 seconds, no reports or models needed
 ```
 
 The first two write [evals/RESULTS.md](evals/RESULTS.md), with a chart of the retrieval comparison; the full run also writes [evals/ANSWERS.md](evals/ANSWERS.md) with every question, gold answer, answer, cited passage and verdict.
@@ -181,10 +184,11 @@ All optional, in `.env`:
 ### Development
 
 ```bash
-make check    # ruff, ruff format, mypy, pytest and the retrieval check on the fixture: what CI runs
+uv run ruff check . && uv run ruff format --check . && uv run mypy src && uv run pytest
+uv run python evals/check_retrieval.py   # with the line above, what CI runs (make check)
 ```
 
-The 99 tests need no API key, models or PDFs: they use small fakes, an in-memory Qdrant and a fake HTTP transport for the Claude API. Pre-commit runs ruff, mypy and a gitleaks secret scan on every commit, and GitHub Actions runs the checks, the retrieval check and the secret scan on every pull request.
+The 108 tests need no API key, models or PDFs: they use small fakes, an in-memory Qdrant and a fake HTTP transport for the Claude API. Pre-commit runs ruff, mypy and a gitleaks secret scan on every commit, and GitHub Actions runs the checks, the retrieval check and the secret scan on every pull request.
 
 ## How it is measured
 
