@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from bankrag.config import Bank
 from bankrag.models import Chunk
-from bankrag.retrieve import Hit, detect_filters, routed_search
+from bankrag.retrieve.bm25 import Hit
+from bankrag.retrieve.route import detect_filters, routed_search
 
 
 class TestDetectFilters:

@@ -5,28 +5,15 @@ from __future__ import annotations
 import argparse
 import sys
 
-from bankrag.answer import answer, log_trace, mark_quotes
+from bankrag.answer.generate import answer, log_trace, mark_quotes
 from bankrag.config import BANK_NAMES, DISCLAIMER
-from bankrag.ingest import load_chunks, run
-from bankrag.kpi import (
-    KPI_YEARS,
-    METRICS,
-    build_db,
-    compare_banks,
-    extract_table,
-    load_figures,
-    save_figures,
-    with_key_figures,
-)
+from bankrag.ingest.pipeline import load_chunks, run
+from bankrag.kpi.extract import KPI_YEARS, METRICS, extract_table
+from bankrag.kpi.lookup import with_key_figures
+from bankrag.kpi.store import build_db, compare_banks, load_figures, save_figures
 from bankrag.models import KpiFigure
-from bankrag.retrieve import (
-    DEFAULT_RETRIEVER,
-    RETRIEVER_KINDS,
-    RetrieverKind,
-    build_retriever,
-    ensure_index,
-    routed_search,
-)
+from bankrag.retrieve.factory import DEFAULT_RETRIEVER, RETRIEVER_KINDS, RetrieverKind, build_retriever, ensure_index
+from bankrag.retrieve.route import routed_search
 
 
 def ingest(force: bool) -> None:

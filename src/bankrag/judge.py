@@ -11,7 +11,7 @@ from functools import cache
 
 from pydantic import ValidationError
 
-from bankrag.answer import api_client, cost_usd
+from bankrag.answer.generate import api_client, cost_usd
 from bankrag.config import JUDGE_MODEL, ROOT
 from bankrag.models import Question, Verdict
 

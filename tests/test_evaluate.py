@@ -8,7 +8,7 @@ from bankrag.config import Bank
 from bankrag.evaluate import K_VALUES, SEARCH_DEPTH, figures_grounded, numbers_match, retrieval_scores, score_retrieval
 from bankrag.figures import numbers_in, ungrounded_figures
 from bankrag.models import Chunk, Question, Source
-from bankrag.retrieve import Hit
+from bankrag.retrieve.bm25 import Hit
 
 
 def question(numbers: list[list[float]] | None = None, evidence: list[list[str]] | None = None) -> Question:

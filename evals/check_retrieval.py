@@ -23,10 +23,11 @@ from pathlib import Path
 from pydantic import BaseModel
 
 from bankrag.evaluate import K_VALUES, load_questions, page_key, score_retrieval
-from bankrag.ingest import load_chunks
-from bankrag.kpi import figure_key, key_figures_for
+from bankrag.ingest.pipeline import load_chunks
+from bankrag.kpi.lookup import figure_key, key_figures_for
 from bankrag.models import Chunk, Question, RetrievalScores
-from bankrag.retrieve import BM25Retriever, routed_search
+from bankrag.retrieve.bm25 import BM25Retriever
+from bankrag.retrieve.route import routed_search
 
 EVAL_DIR = Path(__file__).resolve().parent
 FIXTURE_DIR = EVAL_DIR / "fixture"

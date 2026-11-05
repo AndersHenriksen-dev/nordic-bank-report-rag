@@ -21,7 +21,7 @@ from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
 from pydantic import BaseModel, TypeAdapter, ValidationError
 
-from bankrag.answer import answer, log_trace, mark_quotes
+from bankrag.answer.generate import answer, log_trace, mark_quotes
 from bankrag.config import ANSWER_MODEL, EMBED_MODEL, JUDGE_MODEL, RERANK_MODEL, bank_name, parse_bank
 from bankrag.evaluate import (
     K_VALUES,
@@ -31,11 +31,13 @@ from bankrag.evaluate import (
     percentile,
     score_retrieval,
 )
-from bankrag.ingest import load_chunks
+from bankrag.ingest.pipeline import load_chunks
 from bankrag.judge import judge
-from bankrag.kpi import with_key_figures
+from bankrag.kpi.lookup import with_key_figures
 from bankrag.models import Question, Source, Verdict
-from bankrag.retrieve import DEFAULT_RETRIEVER, BM25Retriever, Retriever, build_retriever, routed_search
+from bankrag.retrieve.bm25 import BM25Retriever
+from bankrag.retrieve.factory import DEFAULT_RETRIEVER, build_retriever
+from bankrag.retrieve.route import Retriever, routed_search
 
 EVAL_DIR = Path(__file__).resolve().parent
 RESULTS_DIR = EVAL_DIR / "results"

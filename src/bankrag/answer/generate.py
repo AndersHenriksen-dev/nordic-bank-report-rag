@@ -20,7 +20,7 @@ from pydantic import ValidationError
 from bankrag.config import ANSWER_MODEL, PRICES_USD_PER_MTOK, TRACE_DIR, bank_name
 from bankrag.figures import ungrounded_figures
 from bankrag.models import Answer, Source, TracedAnswer
-from bankrag.retrieve import Hit
+from bankrag.retrieve.bm25 import Hit
 
 REFUSAL_PREFIXES = ("not in the documents", "ikke i dokumenterne")
 MAX_OUTPUT_TOKENS = 2048

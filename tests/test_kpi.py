@@ -17,7 +17,8 @@ import pytest
 from bankrag.config import Bank
 from bankrag.kpi import extract, lookup, store
 from bankrag.models import Chunk, ExtractedKpi, KpiFigure, Metric
-from bankrag.retrieve import Hit, Retriever
+from bankrag.retrieve.bm25 import Hit
+from bankrag.retrieve.route import Retriever
 
 HIGHLIGHTS = (
     "| DKK million | 2025 | 2024 | Index |\n"

@@ -10,8 +10,8 @@ from qdrant_client import QdrantClient
 
 from bankrag.config import Bank
 from bankrag.models import Chunk
-from bankrag.retrieve import Hit
 from bankrag.retrieve import dense as dense_module
+from bankrag.retrieve.bm25 import Hit
 from bankrag.retrieve.dense import DenseRetriever, build_index, index_is_current
 from bankrag.retrieve.hybrid import HybridRetriever
 from bankrag.retrieve.rerank import RerankedRetriever

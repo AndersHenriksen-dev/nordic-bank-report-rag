@@ -16,11 +16,13 @@ from mcp.types import ToolAnnotations
 from pydantic import BaseModel
 
 from bankrag.config import DISCLAIMER, YEARS, Bank, bank_name
-from bankrag.ingest import load_chunks
-from bankrag.kpi import compare_banks as kpi_compare_banks
-from bankrag.kpi import get_kpi as kpi_get_kpi
+from bankrag.ingest.pipeline import load_chunks
+from bankrag.kpi.store import compare_banks as kpi_compare_banks
+from bankrag.kpi.store import get_kpi as kpi_get_kpi
 from bankrag.models import KpiFigure, Metric
-from bankrag.retrieve import DEFAULT_RETRIEVER, Retriever, build_retriever, expand_danish, routed_search
+from bankrag.retrieve.factory import DEFAULT_RETRIEVER, build_retriever
+from bankrag.retrieve.rewrite import expand_danish
+from bankrag.retrieve.route import Retriever, routed_search
 
 MAX_PASSAGES = 10
 READ_ONLY = ToolAnnotations(read_only_hint=True, destructive_hint=False, idempotent_hint=True, open_world_hint=False)

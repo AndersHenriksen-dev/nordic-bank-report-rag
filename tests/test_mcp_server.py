@@ -14,7 +14,7 @@ from mcp.server.mcpserver.exceptions import ToolError
 from bankrag import mcp_server
 from bankrag.config import Bank
 from bankrag.models import Chunk, KpiFigure
-from bankrag.retrieve import Hit
+from bankrag.retrieve.bm25 import Hit
 
 
 def chunk(bank: Bank, year: int, page: int) -> Chunk:

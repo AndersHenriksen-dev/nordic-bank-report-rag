@@ -19,7 +19,7 @@ from bankrag.answer.generate import (
     thinking_summary,
 )
 from bankrag.models import Answer, Chunk, Source
-from bankrag.retrieve import Hit
+from bankrag.retrieve.bm25 import Hit
 
 
 def hit(page: int, body: str) -> Hit:

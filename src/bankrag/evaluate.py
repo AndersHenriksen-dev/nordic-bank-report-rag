@@ -9,7 +9,7 @@ from pydantic import TypeAdapter
 
 from bankrag.figures import close_to, figure_tokens, numbers_in, ungrounded_figures
 from bankrag.models import Chunk, Question, RetrievalScores, Source
-from bankrag.retrieve import Retriever, routed_search
+from bankrag.retrieve.route import Retriever, routed_search
 
 K_VALUES = (1, 3, 6, 10)
 SEARCH_DEPTH = 30  # how far down the ranking MRR looks

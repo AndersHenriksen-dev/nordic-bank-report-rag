@@ -14,9 +14,9 @@ import re
 from bankrag.config import YEARS
 from bankrag.kpi.store import get_kpi
 from bankrag.models import Chunk, KpiFigure, Metric
-from bankrag.retrieve import Hit, detect_filters
+from bankrag.retrieve.bm25 import Hit
 from bankrag.retrieve.rewrite import english_terms
-from bankrag.retrieve.route import YEAR_RE
+from bankrag.retrieve.route import YEAR_RE, detect_filters
 
 # Matched against the question plus the glossary's English wording, so "egenkapitalforrentning" counts as return on
 # equity. The glossary applies here whatever the question's language: none of its key figure terms occur in English.

@@ -12,11 +12,12 @@ from typing import NamedTuple
 
 from pydantic import ValidationError
 
-from bankrag.answer import api_client, cost_usd
+from bankrag.answer.generate import api_client, cost_usd
 from bankrag.config import ANSWER_MODEL, BANK_NAMES, Bank, bank_name
 from bankrag.figures import close_to, numbers_in
 from bankrag.models import Chunk, ExtractedKpi, KpiFigure, Metric
-from bankrag.retrieve import Hit, Retriever, routed_search
+from bankrag.retrieve.bm25 import Hit
+from bankrag.retrieve.route import Retriever, routed_search
 
 PASSAGES = 6
 MAX_OUTPUT_TOKENS = 4096  # thinking counts towards the limit; a figure uses a few hundred tokens
