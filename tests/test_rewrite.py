@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-from bankrag.retrieve import expand_danish
-from bankrag.retrieve.rewrite import english_terms
+from bankrag.retrieve.rewrite import english_terms, expand_danish
 
 
 def test_danish_terms_get_english_wording() -> None:

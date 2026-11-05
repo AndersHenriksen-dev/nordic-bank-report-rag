@@ -14,13 +14,15 @@ from textwrap import shorten
 
 import streamlit as st
 
-from bankrag.answer import answer, load_traces, log_trace, mark_quotes
+from bankrag.answer.generate import answer, load_traces, log_trace, mark_quotes
 from bankrag.config import DISCLAIMER, RAW_DIR, Bank, bank_name
 from bankrag.figures import figures_in
-from bankrag.ingest import load_chunks
-from bankrag.kpi import with_key_figures
+from bankrag.ingest.pipeline import load_chunks
+from bankrag.kpi.lookup import with_key_figures
 from bankrag.models import Answer, Chunk, Source, TracedAnswer
-from bankrag.retrieve import DEFAULT_RETRIEVER, Hit, Retriever, build_retriever, routed_search
+from bankrag.retrieve.bm25 import Hit
+from bankrag.retrieve.factory import DEFAULT_RETRIEVER, build_retriever
+from bankrag.retrieve.route import Retriever, routed_search
 from bankrag.ui.highlight import HighlightedPage, focus_passage, render_highlighted_page
 
 TOP_K = 6

@@ -114,9 +114,10 @@ A reader should be able to tell what a module does by scanning its function name
 
 **Discoverability follows usage.** What other code reaches for often should be the easiest to find:
 
-- A package's `__init__.py` re-exports the small set of names other modules are meant to import (its public API), so
-  `from bankrag.retrieve import routed_search` works and callers do not need to know which file it lives in. Anything
-  not re-exported is internal: importable, but not the intended entry point.
+- Every module, script and test imports with the full path (`from bankrag.retrieve.route import routed_search`), so
+  the import line says which file to open. No relative imports and no `sys.path` changes. An `__init__.py` holds a
+  docstring and does not re-export names for code in this repo. The one exception is the top-level `__init__.py` of
+  an installed package, which may name what people use from outside the repo.
 - Common helpers live where they are easy to find (the top of a module, or a clearly named module), not inside the
   one function that happens to need them.
 - A helper used by exactly one caller stays next to that caller, or private to it (`_leading_underscore`), until a

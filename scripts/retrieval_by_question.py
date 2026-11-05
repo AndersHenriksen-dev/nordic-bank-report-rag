@@ -17,9 +17,10 @@ import sys
 from pathlib import Path
 
 from bankrag.evaluate import load_questions, page_key, retrieval_scores
-from bankrag.ingest import load_chunks
+from bankrag.ingest.pipeline import load_chunks
 from bankrag.models import Question
-from bankrag.retrieve import DEFAULT_RETRIEVER, RETRIEVER_KINDS, Retriever, build_retriever, routed_search
+from bankrag.retrieve.factory import DEFAULT_RETRIEVER, RETRIEVER_KINDS, build_retriever
+from bankrag.retrieve.route import Retriever, routed_search
 
 QUESTIONS_FILE = Path(__file__).resolve().parent.parent / "evals" / "questions.yaml"
 
