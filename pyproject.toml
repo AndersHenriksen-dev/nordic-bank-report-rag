@@ -68,9 +68,11 @@ line-length = 120
 # ANN: every function has input/output type annotations (mypy checks they're correct).
 # D: Google-convention docstrings on modules, classes and functions (see .claude/reference/python-style.md).
 # B/SIM/C4/UP: bugbear, simplify, comprehensions, pyupgrade; catches non-idiomatic/needlessly complex code.
-# COM812: trailing comma required on multi-line calls/literals, so exploded arguments stay consistent.
 # RUF: ruff's own additional checks.
-select = ["E", "F", "I", "W", "ANN", "D", "B", "SIM", "C4", "UP", "COM812", "RUF"]
+# COM812 (trailing commas) is deliberately absent: `ruff format` already adds the comma when it
+# explodes a call, so selecting the rule adds nothing and makes every format run print a conflict
+# warning.
+select = ["E", "F", "I", "W", "ANN", "D", "B", "SIM", "C4", "UP", "RUF"]
 # SIM905: stopword lists read better as one string split on spaces than as 60 quoted items.
 ignore = ["SIM905"]
 
